@@ -39,25 +39,41 @@ export const ProductUploadImages = ({
 
 		const newPreviews: string[] = [];
 		const newFiles: File[] = [];
+		const duplicates: string[] = [];
 		const filesToProcess = Math.min(files.length, availableSlots);
 
 		for (let i = 0; i < filesToProcess; i++) {
-			const url = URL.createObjectURL(files[i]);
+			const file = files[i];
+
+			const isDuplicate = selectedFiles.some(
+				(existingFile) => existingFile.name === file.name
+			);
+
+			if (isDuplicate) {
+				duplicates.push(file.name);
+				continue;
+			}
+
+			const url = URL.createObjectURL(file);
 			newPreviews.push(url);
-			newFiles.push(files[i]);
+			newFiles.push(file);
+		}
+
+		if (duplicates.length > 0) {
+			// Todo: Reemplazar con toast
 		}
 
 		if (files.length > filesToProcess) {
 			// Todo: Alerta con toast
 		}
 
+		if (newFiles.length === 0) return;
+
 		setPreviewImages((prev) => [...prev, ...newPreviews]);
 
-		// Actualizar el array de archivos
 		const updatedFiles = [...selectedFiles, ...newFiles];
 		setSelectedFiles(updatedFiles);
 
-		// Crear un nuevo FileList y actualizar react-hook-form
 		const dataTransfer = new DataTransfer();
 		updatedFiles.forEach((file) => dataTransfer.items.add(file));
 		setValue('images', dataTransfer.files, { shouldValidate: true });
@@ -69,11 +85,9 @@ export const ProductUploadImages = ({
 			return prev.filter((_, i) => i !== index);
 		});
 
-		// Actualizar también los archivos seleccionados
 		const updatedFiles = selectedFiles.filter((_, i) => i !== index);
 		setSelectedFiles(updatedFiles);
 
-		// Actualizar react-hook-form
 		const dataTransfer = new DataTransfer();
 		updatedFiles.forEach((file) => dataTransfer.items.add(file));
 		setValue('images', dataTransfer.files, { shouldValidate: true });
@@ -123,7 +137,7 @@ export const ProductUploadImages = ({
 								<button
 									type="button"
 									onClick={() => removeImage(index)}
-									className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+									className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 cursor-pointer">
 									<Delete className="w-4 h-4" />
 								</button>
 							</div>
@@ -135,7 +149,7 @@ export const ProductUploadImages = ({
 			{/* Imágenes existentes del producto */}
 			{productImages && productImages.length > 0 && (
 				<div className="mt-4">
-					<p className="text-sm font-semibold mb-2 text-gray-700">Imágenes actuales</p>
+					<p className="text-sm font-semibold text-gray-700">Imágenes actuales</p>
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
 						{productImages.map((image, index) => (
 							<div key={image.id} className="relative">

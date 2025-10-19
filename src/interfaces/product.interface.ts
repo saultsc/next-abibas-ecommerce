@@ -8,6 +8,7 @@ export interface Product {
 	slug: string;
 	tags: string[];
 	title: string;
+	disponible: boolean;
 	//todo: type: Type;
 	gender: Category;
 }
