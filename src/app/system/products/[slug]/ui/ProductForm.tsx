@@ -1,11 +1,20 @@
 'use client';
 
-import { Input, ProductImage } from '@/components';
 import { Category, Product, ProductImage as ProductWithImage } from '@/interfaces';
-import { currencyMask } from '@/utils';
-import clsx from 'clsx';
+import {
+	Button,
+	FormControl,
+	FormHelperText,
+	InputLabel,
+	MenuItem,
+	Select,
+	SelectChangeEvent,
+	TextField,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { NumericFormat } from 'react-number-format';
+import { ProductUploadImages } from './ProductUploadImages';
 
 interface Props {
 	product: Partial<Product> & { ProductImage?: ProductWithImage[] };
@@ -14,6 +23,8 @@ interface Props {
 
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
+export type Gender = 'men' | 'women' | 'kid' | 'unisex';
+
 interface FormInputs {
 	title: string;
 	slug: string;
@@ -21,10 +32,8 @@ interface FormInputs {
 	price: number;
 	inStock: number;
 	sizes: string[];
-	tags: string;
-	gender: 'men' | 'women' | 'kid' | 'unisex';
+	gender: Gender;
 	categoryId: string;
-
 	images?: FileList;
 }
 
@@ -41,14 +50,17 @@ export const ProductForm = ({ product, categories }: Props) => {
 	} = useForm<FormInputs>({
 		defaultValues: {
 			...product,
-			tags: product.tags?.join(', '),
 			sizes: product.sizes ?? [],
-
-			images: undefined,
 		},
+		mode: 'onChange',
 	});
 
-	watch('sizes');
+	// Observers
+	register('price', {
+		min: { value: 0, message: 'El precio debe ser mayor o igual a 0' },
+		valueAsNumber: true,
+	});
+	register('gender', { required: 'El género es requerido' });
 
 	const onSizeChanged = (size: string) => {
 		const sizes = new Set(getValues('sizes'));
@@ -56,8 +68,16 @@ export const ProductForm = ({ product, categories }: Props) => {
 		setValue('sizes', Array.from(sizes));
 	};
 
+	const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const cleanValue = event.target.value.replace(/[^0-9.]/g, '');
+		const numericValue = parseFloat(cleanValue);
+		setValue('price', isNaN(numericValue) ? 0 : numericValue, { shouldValidate: true });
+	};
+
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
+
+		console.log({ data });
 
 		const { images, ...productToSave } = data;
 
@@ -68,7 +88,6 @@ export const ProductForm = ({ product, categories }: Props) => {
 		formData.append('title', productToSave.title);
 		formData.append('description', productToSave.description);
 		formData.append('price', productToSave.price.toString());
-		formData.append('inStock', productToSave.inStock.toString());
 		formData.append('sizes', productToSave.sizes.toString());
 		formData.append('categoryId', productToSave.categoryId);
 		formData.append('gender', productToSave.gender);
@@ -82,134 +101,86 @@ export const ProductForm = ({ product, categories }: Props) => {
 		const { ok, product: updatedProduct } = (await {}) as { ok: boolean; product?: Product };
 
 		if (!ok) {
-			alert('Producto no se pudo actualizar');
+			console.log('Error al guardar el producto');
 			return;
 		}
 
-		router.replace(`/admin/product/${updatedProduct?.slug}`);
+		router.replace(`/system/products/${updatedProduct?.slug}`);
 	};
 
 	return (
-		<form
-			onSubmit={handleSubmit(onSubmit)}
-			className="grid px-5 mb-16 grid-cols-1 sm:px-0 sm:grid-cols-2 gap-3">
+		<form onSubmit={handleSubmit(onSubmit)} className="">
 			{/* Textos */}
 			<div className="w-full">
-				<div>
-					<Input
-						label="Título"
-						name="title"
-						register={register}
-						required
-						type="text"
-						error={errors.title?.message}
+				<div className="flex gap-2">
+					<TextField
+						label="Título *"
+						variant="filled"
+						className="w-full"
+						error={!!errors.title}
+						helperText={errors.title?.message}
+						{...register('title', { required: 'Este campo es requerido' })}
 					/>
-
-					<Input
+					<NumericFormat
+						value={watch('price') ?? 0}
+						onChange={handlePriceChange}
+						customInput={TextField}
+						thousandSeparator=","
+						decimalSeparator="."
+						decimalScale={2}
+						fixedDecimalScale
+						valueIsNumericString
+						prefix="$"
+						variant="filled"
 						label="Precio"
-						name="price"
-						register={register}
-						required
-						type="text"
-						mask={currencyMask('DOP')}
-						setValue={setValue}
-						error={errors.price?.message}
+						className="w-full"
+						error={!!errors.price}
+						helperText={errors.price?.message}
+						allowNegative={false}
 					/>
-				</div>
 
-				<div className="flex flex-col mb-2">
-					<span>Descripción</span>
-					<textarea
-						rows={5}
-						className="p-2 border rounded-md bg-gray-200"
-						{...register('description', { required: true })}></textarea>
+					<FormControl
+						variant="filled"
+						className="w-full min-w-[120px]"
+						error={!!errors.gender}>
+						<InputLabel id="gender-select-label">Genero *</InputLabel>
+						<Select
+							labelId="gender-select-label"
+							id="gender-select"
+							value={watch('gender') || ''}
+							label="Genero"
+							onChange={(e: SelectChangeEvent) => {
+								const value = e.target.value as Gender | '';
+								setValue('gender', value as Gender, { shouldValidate: true });
+							}}>
+							<MenuItem value="">
+								<em>Ninguno</em>
+							</MenuItem>
+							<MenuItem value="men">Hombres</MenuItem>
+							<MenuItem value="women">Mujeres</MenuItem>
+							<MenuItem value="kid">Niños</MenuItem>
+							<MenuItem value="unisex">Unisex</MenuItem>
+						</Select>
+						<FormHelperText>{errors.gender?.message}</FormHelperText>
+					</FormControl>
 				</div>
-
-				<div className="flex flex-col mb-2">
-					<span>Gender</span>
-					<select
-						className="p-2 border rounded-md bg-gray-200"
-						{...register('gender', { required: true })}>
-						<option value="">[Seleccione]</option>
-						<option value="men">Men</option>
-						<option value="women">Women</option>
-						<option value="kid">Kid</option>
-						<option value="unisex">Unisex</option>
-					</select>
-				</div>
-
-				<div className="flex flex-col mb-2">
-					<span>Categoria</span>
-					<select
-						className="p-2 border rounded-md bg-gray-200"
-						{...register('categoryId', { required: true })}>
-						<option value="">[Seleccione]</option>
-						{categories.map((category) => (
-							<option key={category.id} value={category.id}>
-								{category.name}
-							</option>
-						))}
-					</select>
-				</div>
-
-				<button className="btn-primary w-full">Guardar</button>
 			</div>
 
 			{/* Selector de tallas y fotos */}
-			<div className="w-full">
-				{/* As checkboxes */}
-				<div className="flex flex-col">
-					<span>Tallas</span>
-					<div className="flex flex-wrap">
-						{sizes.map((size) => (
-							// bg-blue-500 text-white <--- si está seleccionado
-							<div
-								key={size}
-								onClick={() => onSizeChanged(size)}
-								className={clsx(
-									'p-2 border cursor-pointer rounded-md mr-2 mb-2 w-14 transition-all text-center',
-									{
-										'bg-blue-500 text-white': getValues('sizes').includes(size),
-									}
-								)}>
-								<span>{size}</span>
-							</div>
-						))}
-					</div>
-
-					<div className="flex flex-col mb-2">
-						<span>Fotos</span>
-						<input
-							type="file"
-							{...register('images')}
-							multiple
-							className="p-2 border rounded-md bg-gray-200"
-							accept="image/png, image/jpeg, image/avif"
-						/>
-					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-						{product.ProductImage?.map((image) => (
-							<div key={image.id}>
-								<ProductImage
-									alt={product.title ?? ''}
-									src={image.url}
-									width={300}
-									height={300}
-									className="rounded-t shadow-md"
-								/>
-
-								<button
-									type="button"
-									onClick={() => {}}
-									className="btn-danger w-full rounded-b-xl">
-									Eliminar
-								</button>
-							</div>
-						))}
-					</div>
-				</div>
+			<div className="w-[50%]">
+				<p className="mt-3 mb-1 font-semibold text-gray-700">Subir imágenes</p>
+				<ProductUploadImages
+					productImages={product.ProductImage}
+					productTitle={product.title}
+					register={register}
+					setValue={setValue}
+					maxImages={3}
+				/>
 			</div>
+
+			<Button type="submit" variant="contained" fullWidth>
+				Guardar
+			</Button>
 		</form>
 	);
 };
