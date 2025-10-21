@@ -78,7 +78,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 
 			<div className="mb-10">
 				<Table columns={productColumns} rows={products} />
-				<Pagination totalPages={totalPages} />
+				{totalPages > 1 && <Pagination totalPages={totalPages} />}
 			</div>
 		</>
 	);

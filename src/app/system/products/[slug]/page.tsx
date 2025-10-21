@@ -18,7 +18,7 @@ export default async function ProductPage({ params }: Props) {
 
 	return (
 		<>
-			<Title title={title} />
+			<Title title={title} backUrl="/system/products" />
 
 			<ProductForm product={product ?? {}} categories={categories} />
 		</>

@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomSelect, DeleteButton } from '@/components';
 import { Category, Product, ProductImage as ProductWithImage } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
 import clsx from 'clsx';
@@ -109,8 +109,13 @@ export const ProductForm = ({ product, categories }: Props) => {
 		router.replace(`/system/products/${updatedProduct?.slug}`);
 	};
 
+	const handleDelete = async () => {
+		console.log('Producto eliminado');
+		setTimeout(() => {}, 1500); // Simula tiempo de espera
+	};
+
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="flex gap-6">
+		<form onSubmit={handleSubmit(onSubmit)} className="flex gap-6 mb-6 pb-6">
 			{/* Columna Izquierda */}
 			<div className="w-[60%] flex flex-col gap-4">
 				{/* Textos */}
@@ -232,22 +237,16 @@ export const ProductForm = ({ product, categories }: Props) => {
 					<button
 						type="submit"
 						className={
-							'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors'
+							'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
 						}>
 						Guardar
 					</button>
 
-					<button
-						type="button"
-						className={
-							'px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition-colors'
-						}>
-						Eliminar
-					</button>
+					<DeleteButton onDelete={handleDelete} itemName={product.title} />
 				</div>
 			</div>
 
-			{/* Columna Derecha - Espacio en blanco para agregar contenido */}
+			{/* Columna Derecha */}
 			<div className="w-[40%] flex flex-col gap-4">
 				<div className="w-full h-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex items-center justify-center">
 					<p className="text-gray-400 text-center">

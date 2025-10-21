@@ -10,6 +10,8 @@ export * from './products/product-grid/ProductGrid';
 export * from './products/product-grid/ProductGridItem';
 
 // * UI
+export * from './ui/CustomSelect';
+export * from './ui/DeleteButton';
 export * from './ui/PageNotfound';
 export * from './ui/Pagination';
 export * from './ui/Sidebar';
