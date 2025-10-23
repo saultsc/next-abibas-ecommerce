@@ -1,16 +1,15 @@
+import { Decimal } from '@prisma/client/runtime/library';
+
 export interface Product {
-	id: string;
-	description: string;
-	productImage: ProductImage[];
-	inStock: number;
-	price: number;
-	sizes: Size[];
-	slug: string;
-	tags: string[];
-	title: string;
-	disponible: boolean;
-	//todo: type: Type;
-	gender: Category;
+	id_producto: number;
+	titulo: string;
+	descripcion: string;
+	precio: Decimal;
+	existencia: number;
+	id_categoria: number;
+	active: boolean;
+	created_at: Date;
+	updated_at: Date;
 }
 
 export interface CartProduct {
@@ -24,9 +23,9 @@ export interface CartProduct {
 }
 
 export interface ProductImage {
-	id: number;
+	id_imagen: number;
 	url: string;
-	productId: string;
+	id_producto: number;
 }
 
 type Category = 'men' | 'women' | 'kid' | 'unisex';

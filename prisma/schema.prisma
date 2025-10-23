@@ -1,15 +1,295 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
+}
+
+model categorias {
+  id_categoria Int         @id(map: "PK__categori__CD54BC5A8151B7CA") @default(autoincrement())
+  nombre       String      @db.VarChar(100)
+  active       Boolean     @default(true, map: "DF__categoria__activ__6383C8BA")
+  created_at   DateTime    @default(now(), map: "DF__categoria__creat__6477ECF3") @db.DateTime
+  updated_at   DateTime    @default(now(), map: "DF__categoria__updat__656C112C") @db.DateTime
+  productos    productos[]
+}
+
+model clientes {
+  id_cliente Int       @id(map: "PK__clientes__677F38F5F304C5D1")
+  usuario    String    @db.VarChar(50)
+  active     Boolean   @default(true, map: "DF__clientes__active__4D94879B")
+  created_at DateTime  @default(now(), map: "DF__clientes__create__4E88ABD4") @db.DateTime
+  updated_at DateTime  @default(now(), map: "DF__clientes__update__4F7CD00D") @db.DateTime
+  usuarios   usuarios  @relation(fields: [usuario], references: [usuario], onUpdate: NoAction, map: "FK__clientes__usuari__5070F446")
+  pedidos    pedidos[]
+
+  @@index([usuario], map: "idx_cliente_usuario")
+}
+
+model colores {
+  id_color       Int              @id(map: "PK__colores__7CF2AF03459A6F24") @default(autoincrement())
+  color          String           @unique(map: "UQ__colores__900DC6E97A1174D6") @db.VarChar(50)
+  active         Boolean          @default(true, map: "DF__colores__active__5EBF139D")
+  created_at     DateTime         @default(now(), map: "DF__colores__created__5FB337D6") @db.DateTime
+  updated_at     DateTime         @default(now(), map: "DF__colores__updated__60A75C0F") @db.DateTime
+  productos_item productos_item[]
+}
+
+model direcciones {
+  id_direccion  Int       @id(map: "PK__direccio__25C35D07764A3577") @default(autoincrement())
+  id_tercero    Int
+  direccion     String    @db.VarChar(100)
+  ciudad        String    @db.VarChar(100)
+  provincia     String    @db.VarChar(100)
+  pais          String    @db.VarChar(100)
+  codigo_postal String    @db.VarChar(10)
+  created_at    DateTime  @default(now(), map: "DF__direccion__creat__38996AB5") @db.DateTime
+  updated_at    DateTime  @default(now(), map: "DF__direccion__updat__398D8EEE") @db.DateTime
+  terceros      terceros  @relation(fields: [id_tercero], references: [id_tercero], onUpdate: NoAction, map: "FK__direccion__id_te__3A81B327")
+  pedidos       pedidos[]
+
+  @@index([ciudad], map: "idx_direccion_ciudad")
+  @@index([codigo_postal], map: "idx_direccion_codigo_postal")
+  @@index([direccion], map: "idx_direccion_direccion")
+  @@index([pais], map: "idx_direccion_pais")
+  @@index([provincia], map: "idx_direccion_provincia")
+  @@index([id_tercero], map: "idx_direccion_tercero")
+}
+
+model empleados {
+  id_empleado        Int      @id(map: "PK__empleado__88B513949FFF1313")
+  usuario            String   @db.VarChar(50)
+  fecha_contratacion DateTime @db.Date
+  salario            Decimal? @db.Decimal(10, 2)
+  active             Boolean  @default(true, map: "DF__empleados__activ__534D60F1")
+  created_at         DateTime @default(now(), map: "DF__empleados__creat__5441852A") @db.DateTime
+  updated_at         DateTime @default(now(), map: "DF__empleados__updat__5535A963") @db.DateTime
+  usuarios           usuarios @relation(fields: [usuario], references: [usuario], onUpdate: NoAction, map: "FK__empleados__usuar__5629CD9C")
+
+  @@index([usuario], map: "idx_empleado_usuario")
+}
+
+model imagenes_url {
+  id_imagen   Int       @id(map: "PK__imagenes__27CC2689F925CEB4") @default(autoincrement())
+  id_producto Int
+  url         String    @db.VarChar(255)
+  active      Boolean   @default(true, map: "DF__imagenes___activ__75A278F5")
+  created_at  DateTime  @default(now(), map: "DF__imagenes___creat__76969D2E") @db.DateTime
+  updated_at  DateTime  @default(now(), map: "DF__imagenes___updat__778AC167") @db.DateTime
+  productos   productos @relation(fields: [id_producto], references: [id_producto], onUpdate: NoAction, map: "FK__imagenes___id_pr__787EE5A0")
+}
+
+model metodos_pago {
+  id_metodo_pago Int      @id(map: "PK__metodos___85BE0EBC64313E79") @default(autoincrement())
+  metodo         String?  @db.VarChar(50)
+  active         Boolean  @default(true, map: "DF__metodos_p__activ__18EBB532")
+  created_at     DateTime @default(now(), map: "DF__metodos_p__creat__19DFD96B") @db.DateTime
+  updated_at     DateTime @default(now(), map: "DF__metodos_p__updat__1AD3FDA4") @db.DateTime
+  pagos          pagos[]
+}
+
+model movimiento {
+  movimiento                                                       String                 @id(map: "PK__movimien__89784842ECB35784") @db.VarChar(10)
+  active                                                           Boolean                @default(true, map: "DF__movimient__activ__7B5B524B")
+  created_at                                                       DateTime               @default(now(), map: "DF__movimient__creat__7C4F7684") @db.DateTime
+  updated_at                                                       DateTime               @default(now(), map: "DF__movimient__updat__7D439ABD") @db.DateTime
+  movimientos_producto_movimientos_producto_movimientoTomovimiento movimientos_producto[] @relation("movimientos_producto_movimientoTomovimiento")
+}
+
+model movimientos_producto {
+  id_producto                                            Int
+  cantidad                                               Int
+  fecha                                                  DateTime   @default(now(), map: "DF__movimient__fecha__00200768") @db.DateTime
+  movimiento                                             String     @db.VarChar(10)
+  active                                                 Boolean    @default(true, map: "DF__movimient__activ__01142BA1")
+  created_at                                             DateTime   @default(now(), map: "DF__movimient__creat__02084FDA") @db.DateTime
+  updated_at                                             DateTime   @default(now(), map: "DF__movimient__updat__02FC7413") @db.DateTime
+  productos                                              productos  @relation(fields: [id_producto], references: [id_producto], onUpdate: NoAction, map: "FK__movimient__id_pr__03F0984C")
+  movimiento_movimientos_producto_movimientoTomovimiento movimiento @relation("movimientos_producto_movimientoTomovimiento", fields: [movimiento], references: [movimiento], onUpdate: NoAction, map: "FK__movimient__movim__04E4BC85")
+
+  @@id([id_producto, fecha, movimiento], map: "PK__movimien__92AC25773EE1AA00")
+  @@index([id_producto, fecha, movimiento], map: "idx_movimiento_producto")
+}
+
+model pagos {
+  id_pago        Int          @id(map: "PK__pagos__0941B074E73464CB")
+  id_pedido      Int
+  id_metodo_pago Int
+  fecha_pago     DateTime     @db.Date
+  monto          Decimal      @db.Decimal(10, 2)
+  active         Boolean      @default(true, map: "DF__pagos__active__1DB06A4F")
+  created_at     DateTime     @default(now(), map: "DF__pagos__created_a__1EA48E88") @db.DateTime
+  updated_at     DateTime     @default(now(), map: "DF__pagos__updated_a__1F98B2C1") @db.DateTime
+  metodos_pago   metodos_pago @relation(fields: [id_metodo_pago], references: [id_metodo_pago], onUpdate: NoAction, map: "FK__pagos__id_metodo__2180FB33")
+  pedidos        pedidos      @relation(fields: [id_pedido], references: [id_pedido], onUpdate: NoAction, map: "FK__pagos__id_pedido__208CD6FA")
+}
+
+model pedido_productos {
+  id_pedido   Int
+  id_producto Int
+  cantidad    Int
+  active      Boolean   @default(true, map: "DF__pedido_pr__activ__123EB7A3")
+  created_at  DateTime  @default(now(), map: "DF__pedido_pr__creat__1332DBDC") @db.DateTime
+  updated_at  DateTime  @default(now(), map: "DF__pedido_pr__updat__14270015") @db.DateTime
+  pedidos     pedidos   @relation(fields: [id_pedido], references: [id_pedido], onUpdate: NoAction, map: "FK__pedido_pr__id_pe__151B244E")
+  productos   productos @relation(fields: [id_producto], references: [id_producto], onUpdate: NoAction, map: "FK__pedido_pr__id_pr__160F4887")
+
+  @@id([id_pedido, id_producto], map: "PK__pedido_p__A00355495FB7DC28")
+}
+
+model pedidos {
+  id_pedido              Int                @id(map: "PK__pedidos__6FF0148952D6FABA")
+  id_cliente             Int
+  id_direccion           Int
+  id_pedido_estado       Int
+  total_pedido           Decimal?           @db.Decimal(10, 2)
+  fecha_estimada_entrega DateTime?          @db.DateTime
+  fecha_entrega          DateTime           @default(now(), map: "DF__pedidos__fecha_e__0C85DE4D") @db.DateTime
+  pagos                  pagos[]
+  pedido_productos       pedido_productos[]
+  clientes               clientes           @relation(fields: [id_cliente], references: [id_cliente], onUpdate: NoAction, map: "FK__pedidos__id_clie__0D7A0286")
+  direcciones            direcciones        @relation(fields: [id_direccion], references: [id_direccion], onUpdate: NoAction, map: "FK__pedidos__id_dire__0E6E26BF")
+  pedidos_estado         pedidos_estado     @relation(fields: [id_pedido_estado], references: [id_pedido_estado], onUpdate: NoAction, map: "FK__pedidos__id_pedi__0F624AF8")
+}
+
+model pedidos_estado {
+  id_pedido_estado Int       @id(map: "PK__pedidos___D884D66595C97789") @default(autoincrement())
+  estado           String    @db.VarChar(50)
+  active           Boolean   @default(true, map: "DF__pedidos_e__activ__07C12930")
+  created_at       DateTime  @default(now(), map: "DF__pedidos_e__creat__08B54D69") @db.DateTime
+  updated_at       DateTime  @default(now(), map: "DF__pedidos_e__updat__09A971A2") @db.DateTime
+  pedidos          pedidos[]
+}
+
+model productos {
+  id_producto          Int                    @id(map: "PK__producto__FF341C0D89A2EC88")
+  titulo               String                 @db.VarChar(100)
+  precio               Decimal                @db.Decimal(10, 2)
+  existencia           Int                    @default(0, map: "DF__productos__exist__22751F6C")
+  id_categoria         Int
+  descripcion          String                 @db.VarChar(255)
+  active               Boolean                @default(true, map: "DF__productos__activ__68487DD7")
+  created_at           DateTime               @default(now(), map: "DF__productos__creat__693CA210") @db.DateTime
+  updated_at           DateTime               @default(now(), map: "DF__productos__updat__6A30C649") @db.DateTime
+  imagenes_url         imagenes_url[]
+  movimientos_producto movimientos_producto[]
+  pedido_productos     pedido_productos[]
+  categorias           categorias             @relation(fields: [id_categoria], references: [id_categoria], onUpdate: NoAction, map: "FK__productos__id_ca__6B24EA82")
+  productos_item       productos_item[]
+
+  @@index([id_categoria], map: "idx_producto_categoria")
+  @@index([titulo], map: "idx_producto_nombre")
+}
+
+model productos_item {
+  id_producto Int
+  id_color    Int
+  talla       String    @db.VarChar(10)
+  existencia  Int?
+  active      Boolean   @default(true, map: "DF__productos__activ__6E01572D")
+  created_at  DateTime  @default(now(), map: "DF__productos__creat__6EF57B66") @db.DateTime
+  updated_at  DateTime  @default(now(), map: "DF__productos__updat__6FE99F9F") @db.DateTime
+  colores     colores   @relation(fields: [id_color], references: [id_color], onUpdate: NoAction, map: "FK__productos__id_co__72C60C4A")
+  productos   productos @relation(fields: [id_producto], references: [id_producto], onUpdate: NoAction, map: "FK__productos__id_pr__70DDC3D8")
+  tallas      tallas    @relation(fields: [talla], references: [talla], onUpdate: NoAction, map: "FK__productos__talla__71D1E811")
+
+  @@id([id_producto, talla, id_color], map: "PK__producto__AF535751184DA6D3")
+  @@index([id_producto, talla], map: "idx_producto_talla")
+  @@index([id_producto, id_color], map: "inx_producu_color")
+}
+
+model roles {
+  id_role    Int        @id(map: "PK__roles__3D48441D1DBCA4E1") @default(autoincrement())
+  role       String     @db.VarChar(100)
+  active     Boolean    @default(true, map: "DF__roles__active__4222D4EF")
+  create_at  DateTime   @default(now(), map: "DF__roles__create_at__4316F928") @db.DateTime
+  updated_at DateTime   @default(now(), map: "DF__roles__updated_a__440B1D61") @db.DateTime
+  usuarios   usuarios[]
+}
+
+model suplidores {
+  id_suplidor      Int       @id(map: "PK__suplidor__7704C9BEE8CBD783") @default(autoincrement())
+  nombre_comercial String?   @db.VarChar(100)
+  id_tercero       Int?
+  created_at       DateTime  @default(now(), map: "DF__suplidore__creat__3D5E1FD2") @db.DateTime
+  updated_at       DateTime  @default(now(), map: "DF__suplidore__updat__3E52440B") @db.DateTime
+  terceros         terceros? @relation(fields: [id_tercero], references: [id_tercero], onDelete: NoAction, onUpdate: NoAction, map: "FK__suplidore__id_te__3F466844")
+}
+
+model tallas {
+  talla          String           @id(map: "PK__tallas__21BB9F342F224AE9") @db.VarChar(10)
+  active         Boolean          @default(true, map: "DF__tallas__active__59063A47")
+  created_at     DateTime         @default(now(), map: "DF__tallas__created___59FA5E80") @db.DateTime
+  updated_at     DateTime         @default(now(), map: "DF__tallas__updated___5AEE82B9") @db.DateTime
+  productos_item productos_item[]
+}
+
+model telefonos {
+  id_telefono      Int           @id(map: "PK__telefono__28CD6802FF8C77CD") @default(autoincrement())
+  telefono         String        @db.VarChar(11)
+  id_tipo_telefono Int
+  id_tercero       Int
+  created_at       DateTime      @default(now(), map: "DF__telefonos__creat__32E0915F") @db.DateTime
+  updated_at       DateTime      @default(now(), map: "DF__telefonos__updat__33D4B598") @db.DateTime
+  terceros         terceros      @relation(fields: [id_tercero], references: [id_tercero], onUpdate: NoAction, map: "FK__telefonos__id_te__35BCFE0A")
+  tipo_telefono    tipo_telefono @relation(fields: [id_tipo_telefono], references: [id_tipo_telefono], onUpdate: NoAction, map: "FK__telefonos__id_ti__34C8D9D1")
+
+  @@index([telefono], map: "idx_telefono_telefono")
+  @@index([id_tercero], map: "idx_telefono_tercero")
+  @@index([id_tipo_telefono], map: "idx_telefono_tipo_telefono")
+}
+
+model terceros {
+  id_tercero       Int              @id(map: "PK__terceros__CEF344B32CF06FB9")
+  nombre           String           @db.VarChar(100)
+  apellido         String           @db.VarChar(100)
+  fecha_nacimiento DateTime?        @db.Date
+  tipo_documento   Int
+  numero_documento String           @db.VarChar(50)
+  email            String?          @db.VarChar(100)
+  created_at       DateTime         @default(now(), map: "DF__terceros__create__29572725") @db.DateTime
+  updated_at       DateTime         @default(now(), map: "DF__terceros__update__2A4B4B5E") @db.DateTime
+  direcciones      direcciones[]
+  suplidores       suplidores[]
+  telefonos        telefonos[]
+  tipos_documentos tipos_documentos @relation(fields: [tipo_documento], references: [id_tipo_documento], onUpdate: NoAction, map: "FK__terceros__tipo_d__2B3F6F97")
+  usuarios         usuarios[]
+
+  @@index([apellido], map: "idx_tercero_apellido")
+  @@index([numero_documento], map: "idx_tercero_documento")
+  @@index([nombre], map: "idx_tercero_nombre")
+}
+
+model tipo_telefono {
+  id_tipo_telefono Int         @id(map: "PK__tipo_tel__69C5933F7628CDF7") @default(autoincrement())
+  tipo             String      @db.VarChar(50)
+  active           Boolean     @default(true, map: "DF__tipo_tele__activ__2E1BDC42")
+  created_at       DateTime    @default(now(), map: "DF__tipo_tele__creat__2F10007B") @db.DateTime
+  updated_at       DateTime    @default(now(), map: "DF__tipo_tele__updat__300424B4") @db.DateTime
+  telefonos        telefonos[]
+}
+
+model tipos_documentos {
+  id_tipo_documento Int        @id(map: "PK__tipos_do__9F38507CE0C3A61B") @default(autoincrement())
+  tipo              String     @db.VarChar(50)
+  active            Boolean    @default(true, map: "DF__tipos_doc__activ__24927208")
+  created_at        DateTime   @default(now(), map: "DF__tipos_doc__creat__25869641") @db.DateTime
+  updated_at        DateTime   @default(now(), map: "DF__tipos_doc__updat__267ABA7A") @db.DateTime
+  terceros          terceros[]
+}
+
+model usuarios {
+  usuario    String      @id(map: "PK__usuarios__9AFF8FC7657CE5E3") @db.VarChar(50)
+  password   String      @db.VarChar(50)
+  id_role    Int
+  id_tercero Int
+  active     Boolean     @default(true, map: "DF__usuarios__active__46E78A0C")
+  created_at DateTime    @default(now(), map: "DF__usuarios__create__47DBAE45") @db.DateTime
+  updated_at DateTime    @default(now(), map: "DF__usuarios__update__48CFD27E") @db.DateTime
+  clientes   clientes[]
+  empleados  empleados[]
+  roles      roles       @relation(fields: [id_role], references: [id_role], onUpdate: NoAction, map: "FK__usuarios__id_rol__4AB81AF0")
+  terceros   terceros    @relation(fields: [id_tercero], references: [id_tercero], onUpdate: NoAction, map: "FK__usuarios__id_ter__49C3F6B7")
 }
