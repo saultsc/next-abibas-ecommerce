@@ -49,8 +49,17 @@ export const Pagination = ({ totalPages = 0 }: Props) => {
 				<ul className="flex list-style-none">
 					<li className="page-item">
 						<Link
-							className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
-							href={createPageUrl(currentPage - 1)}>
+							className={clsx(
+								'page-link relative block py-1.5 px-3 border-0 outline-none transition-all duration-300 rounded',
+								{
+									'bg-transparent text-gray-800 hover:text-gray-800 hover:bg-gray-200':
+										currentPage > 1,
+									'text-gray-400 cursor-not-allowed pointer-events-none':
+										currentPage <= 1,
+								}
+							)}
+							href={createPageUrl(currentPage - 1)}
+							aria-disabled={currentPage <= 1}>
 							<IoChevronBackOutline size={30} />
 						</Link>
 					</li>
@@ -73,8 +82,17 @@ export const Pagination = ({ totalPages = 0 }: Props) => {
 
 					<li className="page-item">
 						<Link
-							className="page-link relative block py-1.5 px-3 border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
-							href={createPageUrl(currentPage + 1)}>
+							className={clsx(
+								'page-link relative block py-1.5 px-3 border-0 outline-none transition-all duration-300 rounded',
+								{
+									'bg-transparent text-gray-800 hover:text-gray-800 hover:bg-gray-200':
+										currentPage < totalPages,
+									'text-gray-400 cursor-not-allowed pointer-events-none':
+										currentPage >= totalPages,
+								}
+							)}
+							href={createPageUrl(currentPage + 1)}
+							aria-disabled={currentPage >= totalPages}>
 							<IoChevronForwardOutline size={30} />
 						</Link>
 					</li>

@@ -5,16 +5,16 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const productSchema = {
-	id_producto: z.number().optional(),
-	titulo: z.string().min(3).max(100),
+	product_id: z.number().optional(),
+	product_name: z.string().min(1, 'El nombre del producto es obligatorio'),
+	sku: z.string().min(1, 'El SKU es obligatorio'),
 	descripcion: z.string().min(10).max(500),
-	precio: z.coerce
+	price: z.coerce
 		.number()
 		.min(0)
 		.transform((val) => Number(val.toFixed(2))),
-	id_categoria: z.number(),
-	existencia: z.number().optional(),
-	active: z.boolean().default(true),
+	category_id: z.number(),
+	is_active: z.boolean().default(true),
 };
 
 export const createOrUpdateProduct = async (formData: FormData): Promise<Response<Product>> => {
@@ -28,22 +28,22 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 		};
 	}
 
-	const { id_producto, ...rest } = productParsed;
+	const { product_id, ...rest } = productParsed;
 
 	try {
 		const prismaTx = await prisma.$transaction(async (tx) => {
 			let product: Product;
 
-			if (id_producto) {
-				product = await tx.productos.update({
-					where: { id_producto },
+			if (product_id) {
+				product = await tx.products.update({
+					where: { product_id },
 					data: { ...rest },
 				});
 			} else {
-				const newProductId = (await prisma.productos.count()) + 1;
+				const newProductId = (await prisma.products.count()) + 1;
 
-				product = await tx.productos.create({
-					data: { id_producto: newProductId, ...rest },
+				product = await tx.products.create({
+					data: { product_id: newProductId, ...rest },
 				});
 			}
 
@@ -53,10 +53,10 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 					throw new Error('No se pudo cargar las imágenes, rollingback');
 				}
 
-				await prisma.imagenes_url.createMany({
+				await prisma.product_images.createMany({
 					data: images.map((image) => ({
-						url: image!,
-						id_producto: product.id_producto,
+						image_url: image!,
+						product_id: product.product_id,
 					})),
 				});
 			}
@@ -65,8 +65,8 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 		});
 
 		revalidatePath('/system/products');
-		revalidatePath(`/system/products/${id_producto}`);
-		revalidatePath(`/products/${id_producto}`);
+		revalidatePath(`/system/products/${product_id}`);
+		revalidatePath(`/products/${product_id}`);
 
 		return {
 			success: true,

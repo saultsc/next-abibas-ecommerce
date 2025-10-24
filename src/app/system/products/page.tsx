@@ -29,12 +29,12 @@ export default async function OrdersPage({ searchParams }: Props) {
 		{
 			header: 'Imagen',
 			cell: (p: Product) => (
-				<Link href={`products/${p.slug}`}>
+				<Link href={`products/${p.product_id}`}>
 					<ProductImage
-						src={p.productImage[0]?.url || ''}
+						src={p.images?.[0]?.image_url || ''}
 						width={80}
 						height={80}
-						alt={p.title}
+						alt={p.product_name}
 						className="w-20 h-20 object-cover rounded"
 					/>
 				</Link>
@@ -43,8 +43,8 @@ export default async function OrdersPage({ searchParams }: Props) {
 		{
 			header: 'Titulo',
 			cell: (p: Product) => (
-				<Link href={`products/${p.slug}`} className="hover:underline">
-					{p.title}
+				<Link href={`products/${p.product_id}`} className="hover:underline">
+					{p.product_name}
 				</Link>
 			),
 		},
@@ -53,16 +53,8 @@ export default async function OrdersPage({ searchParams }: Props) {
 			cell: (p: Product) => <span className="font-bold">{currencyFormat(p.price)}</span>,
 		},
 		{
-			header: 'Género',
-			cell: (p: Product) => <>{p.gender}</>,
-		},
-		{
-			header: 'Existencia',
-			cell: (p: Product) => <span className="font-bold">{p.inStock}</span>,
-		},
-		{
-			header: 'Tallas',
-			cell: (p: Product) => <span className="font-bold">{p.sizes.join(', ')}</span>,
+			header: 'Categoría',
+			cell: (p: Product) => <>{p.category_id}</>,
 		},
 	];
 

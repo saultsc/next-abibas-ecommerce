@@ -1,7 +1,7 @@
 'use client';
 
 import { CustomSelect, DeleteButton } from '@/components';
-import { Category, Product, ProductImage as ProductWithImage } from '@/interfaces';
+import { Category, Product, ProductImages } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
@@ -10,8 +10,8 @@ import { NumericFormat } from 'react-number-format';
 import { ProductUploadImages } from './ProductUploadImages';
 
 interface Props {
-	product: Partial<Product> & { ProductImage?: ProductWithImage[] };
-	categories: Category[];
+	product: Partial<Product> & { ProductImage?: ProductImages[] };
+	categories?: Category[];
 }
 
 const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];

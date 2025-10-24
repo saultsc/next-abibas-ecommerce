@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { BiCategory as Category } from 'react-icons/bi';
 import {
 	IoCloseOutline,
 	IoLogInOutline,
@@ -29,6 +30,7 @@ const adminMenuItems: MenuItem[] = [
 	{ href: '/system/products', icon: IoShirtOutline, label: 'Productos' },
 	{ href: '/system/orders', icon: IoTicketOutline, label: 'Ordenes' },
 	{ href: '/system/users', icon: IoPeopleOutline, label: 'Usuarios' },
+	{ href: '/system/categories', icon: Category, label: 'Categorias' },
 ];
 
 const userMenuItems: MenuItem[] = [
