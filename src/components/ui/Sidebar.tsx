@@ -19,6 +19,8 @@ import {
 import { useUiStore } from '@/store';
 import { isAdminRoute } from '@/utils';
 import { CiShoppingBasket } from 'react-icons/ci';
+import { IoIosColorFilter } from 'react-icons/io';
+import { MdOutlineFormatSize } from 'react-icons/md';
 
 interface MenuItem {
 	href: string;
@@ -31,6 +33,8 @@ const adminMenuItems: MenuItem[] = [
 	{ href: '/system/orders', icon: IoTicketOutline, label: 'Ordenes' },
 	{ href: '/system/users', icon: IoPeopleOutline, label: 'Usuarios' },
 	{ href: '/system/categories', icon: Category, label: 'Categorias' },
+	{ href: '/system/sizes', icon: MdOutlineFormatSize, label: 'Tallas' },
+	{ href: '/system/colors', icon: IoIosColorFilter, label: 'Colores' },
 ];
 
 const userMenuItems: MenuItem[] = [

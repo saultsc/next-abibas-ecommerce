@@ -1,6 +1,5 @@
-export interface Category {
-	category_id: number;
-	category_name: string;
+export interface Size {
+	size_code: string;
 	is_active: boolean;
 	is_delete: boolean;
 	created_at: Date;

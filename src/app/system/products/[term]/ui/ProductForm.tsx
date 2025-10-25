@@ -30,8 +30,6 @@ export const ProductForm = ({ product, categories }: Props) => {
 		defaultValues: {
 			...product,
 			price: product.price ?? 0,
-			sizes: product.sizes ?? [],
-			disponible: product.disponible ?? true,
 		},
 		mode: 'onChange',
 	});

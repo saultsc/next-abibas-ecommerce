@@ -7,8 +7,8 @@ export interface Product {
 	price: Decimal;
 	category_id: number;
 	is_active: boolean;
-	description: string | null;
-	weight: Decimal | null;
+	description?: string;
+	weight?: Decimal;
 	created_at: Date;
 	updated_at: Date;
 	images?: ProductImages[];
