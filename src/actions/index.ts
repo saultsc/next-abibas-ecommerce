@@ -13,3 +13,7 @@ export * from './sizes/create-update-size';
 export * from './sizes/delete-size';
 export * from './sizes/get-size-by-term';
 export * from './sizes/size-pagination';
+
+// * Colors
+
+export * from './color/color-paginated';
