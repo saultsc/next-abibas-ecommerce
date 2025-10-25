@@ -46,14 +46,14 @@ export const CategoryForm = ({ category }: Props) => {
 		formData.append('category_name', category_name);
 		formData.append('is_active', is_active.toString());
 
-		const { success, category: updatedCategory } = await createUpdateCategory(formData);
+		const { success, category: createOrUpdateCategory } = await createUpdateCategory(formData);
 
 		if (!success) {
 			console.log('Error al guardar la categoría');
 			return;
 		}
 
-		router.replace(`/system/categories/${updatedCategory?.category_id}`);
+		router.replace(`/system/categories/${createOrUpdateCategory?.category_id}`);
 	};
 
 	const handleDelete = async () => {

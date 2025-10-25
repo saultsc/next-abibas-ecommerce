@@ -7,7 +7,7 @@ export const deleteCategory = async (category_id: number) => {
 	try {
 		await prisma.categories.update({
 			where: { category_id },
-			data: { is_active: false, updated_at: new Date() },
+			data: { is_active: false, is_delete: true, updated_at: new Date() },
 		});
 
 		revalidatePath('/system/categories');

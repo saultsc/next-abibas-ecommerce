@@ -3,27 +3,28 @@
 import { Category, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
-export const getCategoryByTerm = async (term: string | number): Promise<Response<Category>> => {
+export const getCategoryByTerm = async (
+	term: string,
+	deleteds?: boolean
+): Promise<Response<Category>> => {
 	try {
 		const isNumeric = !isNaN(Number(term));
 
+		// Conditions
+		const whereTermCondition = isNumeric
+			? { category_id: Number(term) }
+			: { category_name: term as string };
+
+		const whereDeleteCondition = deleteds ? {} : { is_delete: false };
+
 		const category = await prisma.categories.findFirst({
-			where: isNumeric
-				? {
-						category_id: Number(term),
-				  }
-				: {
-						category_name: {
-							equals: term as string,
-						},
-				  },
+			where: { ...whereTermCondition, ...whereDeleteCondition },
 		});
 
 		if (!category)
 			return {
 				success: false,
 				message: 'Categoría no encontrada',
-				data: null,
 			};
 
 		return {

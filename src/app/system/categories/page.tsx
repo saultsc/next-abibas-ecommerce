@@ -23,7 +23,9 @@ export default async function OrdersPage({ searchParams }: Props) {
 
 	const page = resolved?.page ? parseInt(resolved.page) : 1;
 
-	const { data: categories, totalPages } = await getPaginatedCategories({ page });
+	const { data: categories = [], totalPages = 0 } = await getPaginatedCategories({
+		page,
+	});
 
 	const categoryColumns: Column<Category>[] = [
 		{
@@ -43,7 +45,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 			cell: (c: Category) => (
 				<span className="flex items-center gap-2 text-gray-600 text-sm">
 					<IoTimeOutline className="text-base" />
-					{c.created_at ? dateFormat(c.created_at) : 'N/A'}
+					{dateFormat(c.created_at)}
 				</span>
 			),
 		},
@@ -52,7 +54,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 			cell: (c: Category) => (
 				<span className="flex items-center gap-2 text-gray-600 text-sm">
 					<IoTimeOutline className="text-base" />
-					{c.updated_at ? dateFormat(c.updated_at) : 'N/A'}
+					{dateFormat(c.updated_at)}
 				</span>
 			),
 		},
@@ -91,8 +93,8 @@ export default async function OrdersPage({ searchParams }: Props) {
 			</div>
 
 			<div className="mb-10">
-				<Table columns={categoryColumns} rows={categories || []} />
-				{totalPages && totalPages > 0 && <Pagination totalPages={totalPages} />}
+				<Table columns={categoryColumns} rows={categories} />
+				{totalPages > 0 && <Pagination totalPages={totalPages} />}
 			</div>
 		</>
 	);

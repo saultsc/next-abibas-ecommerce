@@ -14,22 +14,7 @@ interface Props {
 	categories?: Category[];
 }
 
-const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-export type Gender = 'men' | 'women' | 'kid' | 'unisex';
-
-interface FormInputs {
-	title: string;
-	slug: string;
-	description: string;
-	price: number;
-	inStock: number;
-	sizes: string[];
-	gender: Gender;
-	categoryId: string;
-	images?: FileList;
-	disponible: boolean;
-}
+interface FormInputs extends Omit<Partial<Product>, 'product_id'> 
 
 export const ProductForm = ({ product, categories }: Props) => {
 	const router = useRouter();
@@ -64,7 +49,7 @@ export const ProductForm = ({ product, categories }: Props) => {
 	});
 
 	const onSizeChanged = (size: string) => {
-		const sizes = new Set(getValues('sizes'));
+		const sizes = new Set(getValues('sizes') as string[]);
 		sizes.has(size) ? sizes.delete(size) : sizes.add(size);
 		setValue('sizes', Array.from(sizes));
 	};

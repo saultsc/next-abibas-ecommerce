@@ -29,7 +29,7 @@ export const createUpdateCategory = async (formData: FormData) => {
 		if (category_id) {
 			category = await prisma.categories.update({
 				where: { category_id },
-				data: { ...rest },
+				data: { ...rest, updated_at: new Date() },
 			});
 		} else {
 			category = await prisma.categories.create({

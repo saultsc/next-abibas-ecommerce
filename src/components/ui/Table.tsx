@@ -31,19 +31,22 @@ export const Table = <T,>({ columns, rows }: Props<T>) => {
 					<tr
 						key={(row as any).id ?? rIdx}
 						className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-						{columns.map((col, cIdx) => (
-							<td
-								key={cIdx}
-								className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
-									col.className ?? ''
-								}`}>
-								{col.cell(row) ? (
-									<>{col.cell(row)}</>
-								) : (
-									<span className="text-gray-400">N/A</span>
-								)}
-							</td>
-						))}
+						{columns.map((col, cIdx) => {
+							const cellContent = col.cell(row);
+							return (
+								<td
+									key={cIdx}
+									className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
+										col.className ?? ''
+									}`}>
+									{cellContent != null && cellContent !== '' ? (
+										<>{cellContent}</>
+									) : (
+										<span className="text-gray-400">N/A</span>
+									)}
+								</td>
+							);
+						})}
 					</tr>
 				))}
 			</tbody>

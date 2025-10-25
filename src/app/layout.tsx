@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-import { titleFonts } from '@/config/fonts';
-
 export const metadata: Metadata = {
 	title: {
 		default: 'Abibas | Tienda virtual',
@@ -18,7 +16,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${titleFonts.className} antialiased`}>{children}</body>
+			<body>{children}</body>
 		</html>
 	);
 }
