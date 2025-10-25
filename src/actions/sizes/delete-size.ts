@@ -3,23 +3,22 @@
 import prismaClient from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-export const deleteCategory = async (category_id: number) => {
+export const deleteSize = async (size_code: string) => {
 	try {
-		await prismaClient.categories.update({
-			where: { category_id },
+		await prismaClient.sizes.update({
+			where: { size_code },
 			data: { is_active: false, is_delete: true, updated_at: new Date() },
 		});
 
-		revalidatePath('/system/categories');
-
+		revalidatePath('/system/sizes');
 		return {
 			success: true,
-			message: 'Categoría eliminada exitosamente',
+			message: 'Talla eliminada exitosamente',
 		};
 	} catch (error) {
 		return {
 			success: false,
-			message: 'Error al eliminar la categoría',
+			message: 'Error al eliminar la talla',
 		};
 	}
 };

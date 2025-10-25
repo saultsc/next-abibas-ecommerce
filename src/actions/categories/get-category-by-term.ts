@@ -1,7 +1,8 @@
 'use server';
 
 import { Category, Response } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import prismaClient from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export const getCategoryByTerm = async (
 	term: string,
@@ -11,13 +12,15 @@ export const getCategoryByTerm = async (
 		const isNumeric = !isNaN(Number(term));
 
 		// Conditions
-		const whereTermCondition = isNumeric
+		const whereTermCondition: Prisma.categoriesWhereInput = isNumeric
 			? { category_id: Number(term) }
 			: { category_name: term as string };
 
-		const whereDeleteCondition = deleteds ? {} : { is_delete: false };
+		const whereDeleteCondition: Prisma.categoriesWhereInput = deleteds
+			? {}
+			: { is_delete: false };
 
-		const category = await prisma.categories.findFirst({
+		const category = await prismaClient.categories.findFirst({
 			where: { ...whereTermCondition, ...whereDeleteCondition },
 		});
 

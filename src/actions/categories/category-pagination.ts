@@ -1,7 +1,8 @@
 'use server';
 
 import { Category, Response } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import prismaClient from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 interface PaginationOptions {
 	page?: number;
@@ -20,7 +21,7 @@ export const getPaginatedCategories = async ({
 	if (page < 1) page = 1;
 
 	try {
-		const whereCondition = {
+		const whereCondition: Prisma.categoriesWhereInput = {
 			...(category_name && {
 				category_name: {
 					contains: category_name,
@@ -30,12 +31,12 @@ export const getPaginatedCategories = async ({
 		};
 
 		const [categories, totalCount] = await Promise.all([
-			prisma.categories.findMany({
+			prismaClient.categories.findMany({
 				take: take,
 				skip: (page - 1) * take,
 				where: whereCondition,
 			}),
-			prisma.categories.count({
+			prismaClient.categories.count({
 				where: whereCondition,
 			}),
 		]);

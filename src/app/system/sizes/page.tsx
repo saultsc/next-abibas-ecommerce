@@ -83,12 +83,11 @@ export default async function SizesPage({ searchParams }: Props) {
 
 	return (
 		<>
-			<Title title="Categorías" />
-
+			<Title title="Tallas" />
 			<div className="flex justify-end mb-5">
-				<Link href="categories/new" className="btn-primary flex items-center gap-2">
+				<Link href="sizes/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
-					Nueva Categoría
+					Nueva Talla
 				</Link>
 			</div>
 

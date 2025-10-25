@@ -9,4 +9,7 @@ export * from './products/create-update-product';
 export * from './products/get-product-by-term';
 
 // * Sizes
+export * from './sizes/create-update-size';
+export * from './sizes/delete-size';
+export * from './sizes/get-size-by-term';
 export * from './sizes/size-pagination';

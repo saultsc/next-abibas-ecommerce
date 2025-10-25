@@ -1,5 +1,6 @@
 import { Response, Size } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import prismaClient from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export const getPaginatedSizes = async ({
 	page = 1,
@@ -10,17 +11,17 @@ export const getPaginatedSizes = async ({
 	if (page < 1) page = 1;
 
 	try {
-		const whereCondition = {
+		const whereCondition: Prisma.sizesWhereInput = {
 			...(deleteds ? {} : { is_delete: false }),
 		};
 
 		const [sizes, totalCount] = await Promise.all([
-			prisma.sizes.findMany({
+			prismaClient.sizes.findMany({
 				take: limit,
 				skip: (page - 1) * limit,
 				where: whereCondition,
 			}),
-			prisma.sizes.count({
+			prismaClient.sizes.count({
 				where: whereCondition,
 			}),
 		]);

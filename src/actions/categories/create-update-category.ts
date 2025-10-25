@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import prismaClient from '@/lib/prisma';
 import { z } from 'zod';
 
 const categorySchema = {
@@ -27,12 +27,12 @@ export const createUpdateCategory = async (formData: FormData) => {
 	try {
 		let category;
 		if (category_id) {
-			category = await prisma.categories.update({
+			category = await prismaClient.categories.update({
 				where: { category_id },
 				data: { ...rest, updated_at: new Date() },
 			});
 		} else {
-			category = await prisma.categories.create({
+			category = await prismaClient.categories.create({
 				data: { ...rest },
 			});
 		}
