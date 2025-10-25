@@ -6,6 +6,7 @@ import { Product } from '@/interfaces';
 import { currencyFormat } from '@/utils';
 
 import Link from 'next/link';
+import { IoAddCircleOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
@@ -63,8 +64,9 @@ export default async function OrdersPage({ searchParams }: Props) {
 			<Title title="Productos" />
 
 			<div className="flex justify-end mb-5">
-				<Link href="products/new" className="btn-primary">
-					Nuevo producto
+				<Link href="sizes/new" className="btn-primary flex items-center gap-2">
+					<IoAddCircleOutline className="text-xl" />
+					Nueva Talla
 				</Link>
 			</div>
 
