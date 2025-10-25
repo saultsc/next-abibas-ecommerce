@@ -46,10 +46,10 @@ export const SizeForm = ({ size }: Props) => {
 		formData.append('size_code', size_code);
 		formData.append('is_active', is_active.toString());
 
-		const { success, size: createOrUpdateSize } = await createUpdateSize(formData);
+		const { success, size: createOrUpdateSize, message } = await createUpdateSize(formData);
 
 		if (!success) {
-			console.log('Error al guardar el talla');
+			console.log(message);
 			return;
 		}
 
@@ -57,11 +57,10 @@ export const SizeForm = ({ size }: Props) => {
 	};
 
 	const handleDelete = async () => {
-		if (!size.size_code) return;
-		const { success } = await deleteSize(size.size_code);
+		const { success, message } = await deleteSize(size.size_code);
 
 		if (!success) {
-			console.log('Error al eliminar el talla');
+			return console.log(message);
 		}
 
 		router.replace('/system/sizes');

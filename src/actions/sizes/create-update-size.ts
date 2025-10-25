@@ -8,7 +8,7 @@ const sizeSchema = {
 	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
 };
 
-export const createUpdateSize = async (formData: FormData) => {
+export const createUpdateSize = async (formData: FormData, term?: string) => {
 	const data = Object.fromEntries(formData.entries());
 	const sizeParsed = z.object(sizeSchema).parse(data);
 
@@ -22,7 +22,12 @@ export const createUpdateSize = async (formData: FormData) => {
 	const { size_code, ...rest } = sizeParsed;
 	try {
 		let size;
-		if (size_code) {
+
+		const existingSize = await prismaClient.sizes.findUnique({
+			where: { size_code },
+		});
+
+		if (existingSize) {
 			size = await prismaClient.sizes.update({
 				where: { size_code },
 				data: { ...rest, updated_at: new Date() },
