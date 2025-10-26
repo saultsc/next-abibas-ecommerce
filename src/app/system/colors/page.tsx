@@ -42,15 +42,16 @@ export default async function ColorsPage({ searchParams }: Props) {
 		},
 		{
 			header: 'Código HEX',
-			cell: (c: Color) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					<span
-						className="w-5 h-5 rounded-full border border-gray-300"
-						style={{ backgroundColor: c.hex_code || '#000' }}
-					/>
-					{c.hex_code}
-				</span>
-			),
+			cell: (c: Color) =>
+				c.hex_code ? (
+					<span className="flex items-center gap-2">
+						<span
+							className="w-5 h-5 rounded-full border border-gray-300"
+							style={{ backgroundColor: c.hex_code }}
+						/>
+						{c.hex_code}
+					</span>
+				) : null,
 		},
 		{
 			header: 'Creado',
@@ -95,11 +96,11 @@ export default async function ColorsPage({ searchParams }: Props) {
 
 	return (
 		<>
-			<Title title="Tallas" />
+			<Title title="Colores" />
 			<div className="flex justify-end mb-5">
-				<Link href="sizes/new" className="btn-primary flex items-center gap-2">
+				<Link href="colors/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
-					Nueva Talla
+					Nuevo Color
 				</Link>
 			</div>
 

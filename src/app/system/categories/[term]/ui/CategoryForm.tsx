@@ -1,6 +1,6 @@
 'use client';
 
-import { createUpdateCategory, deleteCategory } from '@/actions';
+import { createOrUpdateCategory, deleteCategory } from '@/actions';
 import { DeleteButton } from '@/components';
 import { Category } from '@/interfaces';
 import { Switch, TextField } from '@mui/material';
@@ -28,7 +28,7 @@ export const CategoryForm = ({ category }: Props) => {
 		watch,
 	} = useForm<FormInputs>({
 		defaultValues: {
-			category_name: category.category_name || '',
+			...category,
 			is_active: category.is_active ?? true,
 		},
 		mode: 'onChange',
@@ -46,14 +46,14 @@ export const CategoryForm = ({ category }: Props) => {
 		formData.append('category_name', category_name);
 		formData.append('is_active', is_active.toString());
 
-		const { success, category: createOrUpdateCategory } = await createUpdateCategory(formData);
+		const { success, data: categoryData } = await createOrUpdateCategory(formData);
 
 		if (!success) {
 			console.log('Error al guardar la categoría');
 			return;
 		}
 
-		router.replace(`/system/categories/${createOrUpdateCategory?.category_id}`);
+		router.replace(`/system/categories/${categoryData?.category_id}`);
 	};
 
 	const handleDelete = async () => {

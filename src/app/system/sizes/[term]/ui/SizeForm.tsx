@@ -1,6 +1,6 @@
 'use client';
 
-import { createUpdateSize, deleteSize } from '@/actions';
+import { createOrUpdateSize, deleteSize } from '@/actions';
 import { DeleteButton } from '@/components';
 import { Size } from '@/interfaces';
 import { Switch, TextField } from '@mui/material';
@@ -28,7 +28,7 @@ export const SizeForm = ({ size }: Props) => {
 		watch,
 	} = useForm<FormInputs>({
 		defaultValues: {
-			size_code: size.size_code || '',
+			...size,
 			is_active: size.is_active ?? true,
 		},
 		mode: 'onChange',
@@ -46,14 +46,14 @@ export const SizeForm = ({ size }: Props) => {
 		formData.append('size_code', size_code);
 		formData.append('is_active', is_active.toString());
 
-		const { success, size: createOrUpdateSize, message } = await createUpdateSize(formData);
+		const { success, data: sizeData, message } = await createOrUpdateSize(formData);
 
 		if (!success) {
 			console.log(message);
 			return;
 		}
 
-		router.replace(`/system/sizes/${createOrUpdateSize?.size_code}`);
+		router.replace(`/system/sizes/${sizeData?.size_code}`);
 	};
 
 	const handleDelete = async () => {

@@ -1,37 +1,37 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { Product, Response } from '@/interfaces';
+import prismaClient from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
-export const getProductByTerm = async (term: string) => {
+export const getProductByTerm = async (
+	term: string,
+	deleteds?: boolean
+): Promise<Response<Product>> => {
 	try {
-		const isNumeric = !isNaN(Number(term));
+		const whereCondition: Prisma.productsWhereInput = {
+			...(term ? { product_name: { contains: term } } : {}),
+			...(deleteds ? {} : { is_delete: false }),
+		};
 
-		const products = await prisma.products.findMany({
-			where: isNumeric
-				? {
-						product_id: Number(term),
-				  }
-				: {
-						product_name: {
-							contains: term,
-						},
-				  },
+		const size = await prismaClient.products.findFirst({
+			where: whereCondition,
 		});
 
-		if (!products)
+		if (!size)
 			return {
 				success: false,
-				message: 'Productos no encontrados',
+				message: 'Producto no encontrado',
 			};
 
 		return {
 			success: true,
-			data: products,
+			data: size,
 		};
 	} catch (error) {
 		return {
 			success: false,
-			message: 'Error al buscar productos',
+			message: 'Error al obtener el producto',
 		};
 	}
 };

@@ -1,5 +1,6 @@
 'use server';
 
+import { Category, Response } from '@/interfaces';
 import prismaClient from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -12,7 +13,7 @@ const categorySchema = {
 	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
 };
 
-export const createUpdateCategory = async (formData: FormData) => {
+export const createOrUpdateCategory = async (formData: FormData): Promise<Response<Category>> => {
 	const data = Object.fromEntries(formData.entries());
 	const categoryParsed = z.object(categorySchema).parse(data);
 
@@ -39,7 +40,7 @@ export const createUpdateCategory = async (formData: FormData) => {
 		return {
 			success: true,
 			message: 'Categoría guardada exitosamente',
-			category,
+			data: category,
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar la categoría:', error);

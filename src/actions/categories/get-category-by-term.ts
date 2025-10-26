@@ -36,6 +36,9 @@ export const getCategoryByTerm = async (
 		};
 	} catch (error) {
 		console.log(error);
-		throw new Error('Error al obtener categoría por término');
+		return {
+			success: false,
+			message: 'Error al obtener la categoría',
+		};
 	}
 };

@@ -15,5 +15,6 @@ export * from './sizes/get-size-by-term';
 export * from './sizes/size-pagination';
 
 // * Colors
-
 export * from './color/color-paginated';
+export * from './color/create-update-color';
+export * from './color/get-color-by-term';

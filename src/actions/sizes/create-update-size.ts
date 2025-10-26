@@ -1,5 +1,6 @@
 'use server';
 
+import { Response, Size } from '@/interfaces';
 import prismaClient from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -8,7 +9,10 @@ const sizeSchema = {
 	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
 };
 
-export const createUpdateSize = async (formData: FormData, term?: string) => {
+export const createOrUpdateSize = async (
+	formData: FormData,
+	term?: string
+): Promise<Response<Size>> => {
 	const data = Object.fromEntries(formData.entries());
 	const sizeParsed = z.object(sizeSchema).parse(data);
 
@@ -40,7 +44,7 @@ export const createUpdateSize = async (formData: FormData, term?: string) => {
 		return {
 			success: true,
 			message: 'Talla guardada exitosamente',
-			size,
+			data: size,
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar la talla:', error);

@@ -1,9 +1,10 @@
 'use server';
 
+import { Category, Response } from '@/interfaces';
 import prismaClient from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-export const deleteCategory = async (category_id: number) => {
+export const deleteCategory = async (category_id: number): Promise<Response<Category>> => {
 	try {
 		await prismaClient.categories.update({
 			where: { category_id },
