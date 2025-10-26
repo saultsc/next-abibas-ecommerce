@@ -27,26 +27,33 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 	const { category_id, ...rest } = categoryParsed;
 	try {
 		let category;
+		let message;
+
 		if (category_id) {
 			category = await prismaClient.categories.update({
 				where: { category_id },
 				data: { ...rest, updated_at: new Date() },
 			});
+
+			message = 'Categoría actualizada exitosamente';
 		} else {
 			category = await prismaClient.categories.create({
 				data: { ...rest },
 			});
+
+			message = 'Categoría creada exitosamente';
 		}
+
 		return {
 			success: true,
-			message: 'Categoría guardada exitosamente',
+			message: message,
 			data: category,
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar la categoría:', error);
 		return {
 			success: false,
-			message: 'Error al guardar la categoría',
+			message: 'Error al hacer la operación',
 		};
 	}
 };

@@ -42,28 +42,33 @@ export const createOrUpdateColor = async (formData: FormData): Promise<Response<
 	const { color_id, ...rest } = colorParsed;
 	try {
 		let color;
+		let message;
 
 		if (color_id) {
 			color = await prismaClient.colors.update({
 				where: { color_id },
 				data: { ...rest, updated_at: new Date() },
 			});
+
+			message = 'Color actualizado exitosamente';
 		} else {
 			color = await prismaClient.colors.create({
 				data: { ...rest },
 			});
+
+			message = 'Color creado exitosamente';
 		}
 
 		return {
 			success: true,
-			message: 'Color guardado exitosamente',
+			message: message,
 			data: color,
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar el color:', error);
 		return {
 			success: false,
-			message: 'Error al guardar el color',
+			message: 'Error al hacer la operación',
 		};
 	}
 };

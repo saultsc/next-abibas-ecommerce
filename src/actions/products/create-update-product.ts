@@ -31,6 +31,8 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 	const { product_id, ...rest } = productParsed;
 
 	try {
+		let message;
+
 		const prismaTx = await prisma.$transaction(async (tx) => {
 			let product: Product;
 
@@ -39,12 +41,16 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 					where: { product_id },
 					data: { ...rest },
 				});
+
+				message = 'Producto actualizado exitosamente';
 			} else {
 				const newProductId = (await prisma.products.count()) + 1;
 
 				product = await tx.products.create({
 					data: { product_id: newProductId, ...rest },
 				});
+
+				message = 'Producto actualizado exitosamente';
 			}
 
 			if (formData.getAll('images')) {
@@ -70,12 +76,14 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 
 		return {
 			success: true,
+			message: message,
 			data: prismaTx,
 		};
 	} catch (error) {
+		console.error('Error al crear/actualizar el producto:', error);
 		return {
 			success: false,
-			message: 'Error al guardar el producto',
+			message: 'Error al hacer la operación',
 		};
 	}
 };

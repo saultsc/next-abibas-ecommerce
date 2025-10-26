@@ -26,6 +26,7 @@ export const createOrUpdateSize = async (
 	const { size_code, ...rest } = sizeParsed;
 	try {
 		let size;
+		let message;
 
 		const existingSize = await prismaClient.sizes.findUnique({
 			where: { size_code },
@@ -36,21 +37,25 @@ export const createOrUpdateSize = async (
 				where: { size_code },
 				data: { ...rest, updated_at: new Date() },
 			});
+
+			message = 'Talla actualizada exitosamente';
 		} else {
 			size = await prismaClient.sizes.create({
 				data: { size_code, ...rest },
 			});
+
+			message = 'Talla creada exitosamente';
 		}
 		return {
 			success: true,
-			message: 'Talla guardada exitosamente',
+			message: message,
 			data: size,
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar la talla:', error);
 		return {
 			success: false,
-			message: 'Error al guardar la talla',
+			message: 'Error al hacer la operación',
 		};
 	}
 };
