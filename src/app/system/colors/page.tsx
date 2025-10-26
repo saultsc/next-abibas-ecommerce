@@ -23,9 +23,18 @@ export default async function ColorsPage({ searchParams }: Props) {
 
 	const page = resolved?.page ? parseInt(resolved.page) : 1;
 
-	const { data: colors = [], totalPages = 0 } = await getPaginatedColors({
+	const {
+		data: colors = [],
+		totalPages = 0,
+		success,
+		message,
+	} = await getPaginatedColors({
 		page,
 	});
+
+	if (!success) {
+		console.log(message);
+	}
 
 	const colorColumns: Column<Color>[] = [
 		{

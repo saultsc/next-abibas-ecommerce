@@ -35,6 +35,9 @@ export const getPaginatedColors = async ({
 			data: colors || [],
 		};
 	} catch (error) {
-		throw new Error('No se pudieron cargar los colores');
+		return {
+			success: false,
+			message: 'Error al obtener los colores',
+		};
 	}
 };

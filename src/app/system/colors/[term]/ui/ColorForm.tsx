@@ -1,6 +1,6 @@
 'use client';
 
-import { createOrUpdateColor, deleteCategory } from '@/actions';
+import { createOrUpdateColor, deleteColor } from '@/actions';
 import { DeleteButton } from '@/components';
 import { Color } from '@/interfaces';
 import { Switch, TextField } from '@mui/material';
@@ -49,10 +49,10 @@ export const ColorForm = ({ color }: Props) => {
 		formData.append('hex_code', hex_code);
 		formData.append('is_active', is_active.toString());
 
-		const { success, data: colorData } = await createOrUpdateColor(formData);
+		const { success, data: colorData, message } = await createOrUpdateColor(formData);
 
 		if (!success) {
-			console.log('Error al guardar el color');
+			console.log(message);
 			return;
 		}
 
@@ -62,18 +62,18 @@ export const ColorForm = ({ color }: Props) => {
 	const handleDelete = async () => {
 		if (!color.color_id) return;
 
-		const { success } = await deleteCategory(color.color_id);
+		const { success, message } = await deleteColor(color.color_id);
 
 		if (!success) {
-			console.log('Error al eliminar la categoría');
+			console.log(message);
 		}
 
-		router.replace('/system/categories');
+		router.replace('/system/colors');
 	};
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mb-6 pb-6">
-			{/* Nombre de la Categoría */}
+			{/* Nombre del Color */}
 			<div className="w-full mb-4">
 				<TextField
 					label="Color *"
@@ -93,6 +93,51 @@ export const ColorForm = ({ color }: Props) => {
 						},
 					})}
 				/>
+			</div>
+
+			{/* Código Hexadecimal */}
+			<div className="w-full mb-4">
+				<p className="mb-2 font-semibold text-gray-700">Código Hexadecimal (Opcional)</p>
+				<div className="flex gap-4 items-end">
+					<div className="flex-1">
+						<TextField
+							label="Código HEX"
+							variant="filled"
+							className="w-full"
+							placeholder="#FF5733"
+							error={!!errors.hex_code}
+							helperText={
+								errors.hex_code?.message || 'Formato: #RRGGBB (ejemplo: #FF5733)'
+							}
+							value={watch('hex_code') || ''}
+							{...register('hex_code', {
+								pattern: {
+									value: /^#[0-9A-Fa-f]{6}$/,
+									message:
+										'Formato inválido. Debe ser #RRGGBB (ejemplo: #FF5733)',
+								},
+								maxLength: {
+									value: 7,
+									message: 'El código no puede exceder 7 caracteres',
+								},
+							})}
+						/>
+					</div>
+					<div className="flex flex-col items-center gap-1 mb-6">
+						<label className="text-xs text-gray-600 font-medium">
+							Selector de Color
+						</label>
+						<div className="relative">
+							<input
+								type="color"
+								value={watch('hex_code') || '#000000'}
+								onChange={(e) => setValue('hex_code', e.target.value)}
+								className="w-20 h-12 rounded-lg border-2 border-gray-300 cursor-pointer hover:border-blue-500 transition-colors"
+								title="Selecciona un color"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			{/* Estado */}
