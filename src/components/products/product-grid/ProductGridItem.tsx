@@ -3,12 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Product } from '@/interfaces';
 import { SeedProduct } from '@/seed/seed';
 import { useState } from 'react';
 
 interface Props {
-	product: Product | SeedProduct;
+	product: SeedProduct;
 }
 
 export const ProductGridItem = ({ product }: Props) => {
@@ -22,6 +21,7 @@ export const ProductGridItem = ({ product }: Props) => {
 					alt={`foto del producto ${product.title}`}
 					width={500}
 					height={500}
+					priority
 					className="w-full object-cover"
 					onMouseEnter={() => setDisplayImage(product.productImage[1])}
 					onMouseLeave={() => setDisplayImage(product.productImage[0])}

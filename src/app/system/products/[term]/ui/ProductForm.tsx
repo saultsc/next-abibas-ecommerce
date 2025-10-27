@@ -14,7 +14,7 @@ interface Props {
 	categories?: Category[];
 }
 
-interface FormInputs extends Omit<Partial<Product>, 'product_id'> 
+interface FormInputs extends Omit<Partial<Product>, 'product_id'> {}
 
 export const ProductForm = ({ product, categories }: Props) => {
 	const router = useRouter();
@@ -39,11 +39,11 @@ export const ProductForm = ({ product, categories }: Props) => {
 		min: { value: 0, message: 'El precio debe ser mayor o igual a 0' },
 		valueAsNumber: true,
 	});
-	register('gender', { required: 'El género es requerido' });
-	register('categoryId', { required: 'La categoría es requerida' });
-	register('disponible');
+	register('category_id', { required: 'La categoría es requerida' });
+	register('is_active');
 	register('description', {
 		minLength: { value: 10, message: 'La descripción debe tener al menos 10 caracteres' },
+		maxLength: { value: 500, message: 'La descripción no debe exceder los 500 caracteres' },
 	});
 
 	const onSizeChanged = (size: string) => {

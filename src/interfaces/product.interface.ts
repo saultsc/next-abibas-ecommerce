@@ -14,6 +14,21 @@ export interface Product {
 	weight: Decimal | null;
 }
 
+export interface ProductVariant {
+	variant_id: number;
+	product_id: number;
+	color_id: number;
+	size_code: string;
+	sku_variant: string;
+	price_adjustment: Decimal;
+	stock_quantity: number;
+	reorder_level: number;
+	is_active: boolean;
+	is_delete: boolean;
+	created_at: Date;
+	updated_at: Date;
+}
+
 export interface ProductImages {
 	image_id: number;
 	product_id: number;

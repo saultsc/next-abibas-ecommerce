@@ -1,5 +1,3 @@
-import { Product } from '@/interfaces';
-
 export interface SeedProduct {
 	description: string;
 	productImage: string[];
@@ -17,7 +15,7 @@ type ValidSizes = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
 type ValidTypes = 'shirts' | 'pants' | 'hoodies' | 'hats';
 
 interface SeedData {
-	products: Product[] | SeedProduct[];
+	products: SeedProduct[];
 }
 
 export const initialData: SeedData = {

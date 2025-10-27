@@ -15,12 +15,11 @@ export const SizeSelector = ({ availableSize, selectedSize }: Props) => {
 			<div className="flex">
 				{availableSize.map((size) => (
 					<button
-						key={size}
+						key={size.size_code}
 						className={clsx('mx-2 hover:underline text-lg', {
 							underline: size === selectedSize,
-						})}
-					>
-						{size}
+						})}>
+						{size.size_code}
 					</button>
 				))}
 			</div>

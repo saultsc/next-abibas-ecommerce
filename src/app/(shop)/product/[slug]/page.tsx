@@ -50,7 +50,10 @@ export default async function ({ params }: Props) {
 				<p className="text-lg mb-5">${product.price}</p>
 
 				{/* Selector de tallas */}
-				<SizeSelector selectedSize={product.sizes[0]} availableSize={product.sizes} />
+				<SizeSelector
+					selectedSize={product.sizes[0] as any}
+					availableSize={product.sizes as any}
+				/>
 
 				{/* Selector de cantidad */}
 				<QuantitySelector quantity={1} />
