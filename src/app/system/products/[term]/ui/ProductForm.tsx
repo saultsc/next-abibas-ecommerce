@@ -14,7 +14,7 @@ interface Props {
 	categories?: Category[];
 }
 
-interface FormInputs extends Omit<Partial<Product>, 'product_id'> {}
+interface FormInputs {}
 
 export const ProductForm = ({ product, categories }: Props) => {
 	const router = useRouter();
