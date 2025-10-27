@@ -1,8 +1,10 @@
 'use client';
 
+import { createOrUpdateProduct } from '@/actions';
 import { CustomSelect, DeleteButton } from '@/components';
-import { Category, Product, ProductImages } from '@/interfaces';
+import { Category, Product, ProductImages, ProductVariants } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
+import { Decimal } from '@prisma/client/runtime/library';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -10,11 +12,21 @@ import { NumericFormat } from 'react-number-format';
 import { ProductUploadImages } from './ProductUploadImages';
 
 interface Props {
-	product: Partial<Product> & { ProductImage?: ProductImages[] };
+	product: Partial<Product> & { images: ProductImages[]; variants: ProductVariants[] };
 	categories?: Category[];
 }
 
-interface FormInputs {}
+interface FormInputs {
+	product_name: string;
+	sku: string;
+	description: string | null;
+	price: Decimal;
+	weight: Decimal | null;
+	category_id: number;
+	is_active: boolean;
+	variants?: ProductVariants[];
+	images?: FileList;
+}
 
 export const ProductForm = ({ product, categories }: Props) => {
 	const router = useRouter();
@@ -22,14 +34,15 @@ export const ProductForm = ({ product, categories }: Props) => {
 	const {
 		handleSubmit,
 		register,
-		formState: { isValid, errors },
+		formState: { errors },
 		getValues,
 		setValue,
 		watch,
 	} = useForm<FormInputs>({
 		defaultValues: {
 			...product,
-			price: product.price ?? 0,
+
+			images: undefined,
 		},
 		mode: 'onChange',
 	});
@@ -46,16 +59,12 @@ export const ProductForm = ({ product, categories }: Props) => {
 		maxLength: { value: 500, message: 'La descripción no debe exceder los 500 caracteres' },
 	});
 
-	const onSizeChanged = (size: string) => {
-		const sizes = new Set(getValues('sizes') as string[]);
-		sizes.has(size) ? sizes.delete(size) : sizes.add(size);
-		setValue('sizes', Array.from(sizes));
-	};
-
 	const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const cleanValue = event.target.value.replace(/[^0-9.]/g, '');
 		const numericValue = parseFloat(cleanValue);
-		setValue('price', isNaN(numericValue) ? 0 : numericValue, { shouldValidate: true });
+		setValue('price', isNaN(numericValue) ? new Decimal(0) : new Decimal(numericValue), {
+			shouldValidate: true,
+		});
 	};
 
 	const onSubmit = async (data: FormInputs) => {
@@ -65,16 +74,17 @@ export const ProductForm = ({ product, categories }: Props) => {
 
 		const { images, ...productToSave } = data;
 
-		if (product.id) {
-			formData.append('id', product.id ?? '');
+		if (product.product_id) {
+			formData.append('product_id', product.product_id.toString() ?? '');
 		}
 
-		formData.append('title', productToSave.title);
-		formData.append('description', productToSave.description);
+		formData.append('product_name', productToSave.product_name);
+		formData.append('sku', productToSave.sku);
+		formData.append('category_id', productToSave.category_id.toString());
+		formData.append('description', productToSave.description ?? '');
 		formData.append('price', productToSave.price.toString());
-		formData.append('sizes', productToSave.sizes.toString());
-		formData.append('categoryId', productToSave.categoryId);
-		formData.append('gender', productToSave.gender);
+		formData.append('weight', productToSave.weight?.toString() ?? '');
+		formData.append('is_active', productToSave.is_active ? 'true' : 'false');
 
 		if (images) {
 			for (let i = 0; i < images.length; i++) {
@@ -82,14 +92,13 @@ export const ProductForm = ({ product, categories }: Props) => {
 			}
 		}
 
-		const { ok, product: updatedProduct } = (await {}) as { ok: boolean; product?: Product };
-
-		if (!ok) {
-			console.log('Error al guardar el producto');
+		const { success, data: updatedProduct, message } = await createOrUpdateProduct(formData);
+		if (!success) {
+			console.log(message);
 			return;
 		}
 
-		router.replace(`/system/products/${updatedProduct?.slug}`);
+		router.replace(`/system/products/${updatedProduct?.product_id}`);
 	};
 
 	const handleDelete = async () => {
@@ -109,12 +118,14 @@ export const ProductForm = ({ product, categories }: Props) => {
 								label="Título *"
 								variant="filled"
 								className="w-full"
-								error={!!errors.title}
-								helperText={errors.title?.message}
-								{...register('title', { required: 'Este campo es requerido' })}
+								error={!!errors.product_name}
+								helperText={errors.product_name?.message}
+								{...register('product_name', {
+									required: 'Este campo es requerido',
+								})}
 							/>
 							<NumericFormat
-								value={watch('price') ?? 0}
+								value={Number(watch('price')) ?? 0}
 								onChange={handlePriceChange}
 								customInput={TextField}
 								thousandSeparator=","
@@ -130,41 +141,22 @@ export const ProductForm = ({ product, categories }: Props) => {
 								helperText={errors.price?.message}
 								allowNegative={false}
 							/>
-							<CustomSelect
-								className="w-full"
-								id="gender-select"
-								label="Genero"
-								value={watch('gender') || ''}
-								onChange={(value) =>
-									setValue('gender', value as Gender, { shouldValidate: true })
-								}
-								options={[
-									{ value: 'men', label: 'Hombres' },
-									{ value: 'women', label: 'Mujeres' },
-									{ value: 'kid', label: 'Niños' },
-									{ value: 'unisex', label: 'Unisex' },
-								]}
-								error={!!errors.gender}
-								helperText={errors.gender?.message}
-								clearable
-								required
-							/>
 
 							<CustomSelect
 								id="category-select"
 								label="Categoría"
-								value={watch('categoryId') || ''}
+								value={watch('category_id') || ''}
 								onChange={(value) =>
-									setValue('categoryId', value as string, {
+									setValue('category_id', value as number, {
 										shouldValidate: true,
 									})
 								}
-								options={categories.map((category) => ({
-									value: category.id,
-									label: category.name,
+								options={(categories ?? []).map((category) => ({
+									value: category.category_id,
+									label: category.category_name,
 								}))}
-								helperText={errors.categoryId?.message}
-								error={!!errors.categoryId}
+								helperText={errors.category_id?.message}
+								error={!!errors.category_id}
 								clearable
 								required
 							/>
@@ -195,8 +187,8 @@ export const ProductForm = ({ product, categories }: Props) => {
 				<div className="w-full">
 					<p className="mt-3 mb-2 font-semibold text-gray-700">Subir imágenes</p>
 					<ProductUploadImages
-						productImages={product.ProductImage}
-						productTitle={product.title}
+						productImages={product.images}
+						productTitle={product.product_name}
 						register={register}
 						setValue={setValue}
 						maxImages={3}
@@ -204,15 +196,33 @@ export const ProductForm = ({ product, categories }: Props) => {
 				</div>
 
 				{/* Disponible */}
-				<div>
-					<p className="mb-2 font-semibold text-gray-700">Diposible</p>
-					<Switch
-						checked={watch('disponible') ?? true}
-						onChange={(e) => {
-							setValue('disponible', e.target.checked);
-						}}
-						slotProps={{ input: { 'aria-label': 'controlled' } }}
-					/>
+				<div className="w-full mb-4">
+					<p className="mb-2 font-semibold text-gray-700">Estado</p>
+					<div className="flex items-center justify-between p-4 bg-gray-50 rounded border border-gray-300">
+						<div className="flex-1">
+							<p className="font-medium text-gray-700">Estado del producto</p>
+							<p className="text-sm text-gray-500 mt-1">
+								{watch('is_active')
+									? 'El producto está activo y visible para los usuarios'
+									: 'El producto está desactivado y no será visible'}
+							</p>
+						</div>
+						<div className="flex items-center gap-3">
+							<span
+								className={`text-sm font-medium ${
+									watch('is_active') ? 'text-green-600' : 'text-gray-400'
+								}`}>
+								{watch('is_active') ? 'Activa' : 'Inactiva'}
+							</span>
+							<Switch
+								checked={watch('is_active') ?? true}
+								onChange={(e) => {
+									setValue('is_active', e.target.checked);
+								}}
+								slotProps={{ input: { 'aria-label': 'Estado del producto' } }}
+							/>
+						</div>
+					</div>
 				</div>
 
 				{/* Botones */}
@@ -225,7 +235,7 @@ export const ProductForm = ({ product, categories }: Props) => {
 						Guardar
 					</button>
 
-					<DeleteButton onDelete={handleDelete} itemName={product.title} />
+					<DeleteButton onDelete={handleDelete} itemName={product.product_name} />
 				</div>
 			</div>
 

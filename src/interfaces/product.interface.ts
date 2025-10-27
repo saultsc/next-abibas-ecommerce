@@ -1,20 +1,22 @@
 import { Decimal } from '@prisma/client/runtime/library';
 
 export interface Product {
-	is_active: boolean;
-	is_delete: boolean;
-	created_at: Date;
-	updated_at: Date;
-	category_id: number;
 	product_id: number;
 	product_name: string;
 	sku: string;
 	description: string | null;
 	price: Decimal;
 	weight: Decimal | null;
+	category_id: number;
+	is_active: boolean;
+	is_delete: boolean;
+	created_at: Date;
+	updated_at: Date;
+	images?: ProductImages[];
+	variants?: ProductVariants[];
 }
 
-export interface ProductVariant {
+export interface ProductVariants {
 	variant_id: number;
 	product_id: number;
 	color_id: number;
