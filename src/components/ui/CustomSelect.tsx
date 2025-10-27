@@ -86,7 +86,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 						/>
 					)}
 				/>
-				{helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
 			</div>
 		);
 	}

@@ -4,7 +4,6 @@ import { createOrUpdateProduct } from '@/actions';
 import { CustomSelect, DeleteButton } from '@/components';
 import { Category, Product, ProductImages, ProductVariants } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
-import { Decimal } from '@prisma/client/runtime/library';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -20,8 +19,8 @@ interface FormInputs {
 	product_name: string;
 	sku: string;
 	description: string | null;
-	price: Decimal;
-	weight: Decimal | null;
+	price: number;
+	weight: number | null;
 	category_id: number;
 	is_active: boolean;
 	variants?: ProductVariants[];
@@ -41,7 +40,8 @@ export const ProductForm = ({ product, categories }: Props) => {
 	} = useForm<FormInputs>({
 		defaultValues: {
 			...product,
-
+			price: product.price ? Number(product.price) : 0,
+			weight: product.weight ? Number(product.weight) : null,
 			images: undefined,
 		},
 		mode: 'onChange',
@@ -62,7 +62,7 @@ export const ProductForm = ({ product, categories }: Props) => {
 	const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const cleanValue = event.target.value.replace(/[^0-9.]/g, '');
 		const numericValue = parseFloat(cleanValue);
-		setValue('price', isNaN(numericValue) ? new Decimal(0) : new Decimal(numericValue), {
+		setValue('price', isNaN(numericValue) ? 0 : numericValue, {
 			shouldValidate: true,
 		});
 	};
@@ -103,7 +103,7 @@ export const ProductForm = ({ product, categories }: Props) => {
 
 	const handleDelete = async () => {
 		console.log('Producto eliminado');
-		setTimeout(() => {}, 1500); // Simula tiempo de espera
+		setTimeout(() => {}, 1500);
 	};
 
 	return (
@@ -143,20 +143,23 @@ export const ProductForm = ({ product, categories }: Props) => {
 							/>
 
 							<CustomSelect
-								id="category-select"
-								label="Categoría"
+								className="w-full"
+								id="gender-select"
+								label="Genero"
 								value={watch('category_id') || ''}
 								onChange={(value) =>
 									setValue('category_id', value as number, {
 										shouldValidate: true,
 									})
 								}
-								options={(categories ?? []).map((category) => ({
-									value: category.category_id,
-									label: category.category_name,
-								}))}
-								helperText={errors.category_id?.message}
+								options={[
+									{ value: 1, label: 'Hombres' },
+									{ value: 2, label: 'Mujeres' },
+									{ value: 3, label: 'Niños' },
+									{ value: 4, label: 'Unisex' },
+								]}
 								error={!!errors.category_id}
+								helperText={errors.category_id?.message}
 								clearable
 								required
 							/>
