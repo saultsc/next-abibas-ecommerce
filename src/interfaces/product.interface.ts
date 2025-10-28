@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Color } from './color.interface';
+import { Size } from './size.interface';
 
 export interface Product {
 	product_id: number;
@@ -30,6 +32,8 @@ export interface ProductVariants {
 	is_delete: boolean;
 	created_at: Date;
 	updated_at: Date;
+	colors?: Color;
+	sizes?: Size;
 }
 
 export interface ProductImages {

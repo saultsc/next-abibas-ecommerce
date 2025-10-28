@@ -1,19 +1,23 @@
 'use client';
 
-import { createOrUpdateProduct, searchCategories } from '@/actions';
-import { CustomSelect, DeleteButton } from '@/components';
-import { Category, Product, ProductImages, ProductVariants } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
+
+import { createOrUpdateProduct, searchCategories } from '@/actions';
+import { CustomSelect, DeleteButton } from '@/components';
+import { useSearchWithDebounce } from '@/hooks';
+import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
+import { ProductAddVariants } from './ProductAddVariants';
 import { ProductUploadImages } from './ProductUploadImages';
 
 interface Props {
 	product: Partial<Product> & { images?: ProductImages[]; variants?: ProductVariants[] };
 	categories?: Category[];
+	colors?: Color[];
+	sizes?: Size[];
 }
 
 interface FormInputs {
@@ -28,11 +32,18 @@ interface FormInputs {
 	images?: FileList;
 }
 
-export const ProductForm = ({ product, categories = [] }: Props) => {
+export const ProductForm = ({ product, categories = [], colors = [], sizes = [] }: Props) => {
 	const router = useRouter();
-	const [categoryOptions, setCategoryOptions] = useState<Category[]>(categories);
-	const [isLoadingCategories, startTransition] = useTransition();
-	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	const {
+		results: categoryOptions,
+		handleSearch: handleCategorySearch,
+		isLoading: isLoadingCategories,
+	} = useSearchWithDebounce({
+		initialData: categories,
+		searchAction: searchCategories,
+		debounceMs: 500,
+	});
 
 	const {
 		handleSubmit,
@@ -47,6 +58,7 @@ export const ProductForm = ({ product, categories = [] }: Props) => {
 			price: product.price ? Number(product.price) : 0,
 			weight: product.weight ? Number(product.weight) : null,
 			images: undefined,
+			variants: product.variants || [],
 		},
 		mode: 'onChange',
 	});
@@ -58,6 +70,7 @@ export const ProductForm = ({ product, categories = [] }: Props) => {
 	});
 	register('category_id', { required: 'La categoría es requerida' });
 	register('is_active');
+	register('variants');
 	register('description', {
 		minLength: { value: 10, message: 'La descripción debe tener al menos 10 caracteres' },
 		maxLength: { value: 500, message: 'La descripción no debe exceder los 500 caracteres' },
@@ -71,32 +84,10 @@ export const ProductForm = ({ product, categories = [] }: Props) => {
 		});
 	};
 
-	const handleCategorySearch = async (searchTerm: string) => {
-		if (searchTimeoutRef.current) {
-			clearTimeout(searchTimeoutRef.current);
-		}
-
-		if (!searchTerm) {
-			setCategoryOptions(categories);
-			return;
-		}
-
-		searchTimeoutRef.current = setTimeout(() => {
-			startTransition(async () => {
-				const { success, data } = await searchCategories(searchTerm);
-				if (success) {
-					setCategoryOptions(data ?? []);
-				} else {
-					setCategoryOptions([]);
-				}
-			});
-		}, 500);
-	};
-
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { images, ...productToSave } = data;
+		const { images, variants, ...productToSave } = data;
 
 		if (product.product_id) {
 			formData.append('product_id', product.product_id.toString() ?? '');
@@ -109,6 +100,11 @@ export const ProductForm = ({ product, categories = [] }: Props) => {
 		formData.append('price', productToSave.price.toString());
 		formData.append('weight', productToSave.weight?.toString() ?? '');
 		formData.append('is_active', productToSave.is_active ? 'true' : 'false');
+
+		// Agregar variantes como JSON
+		if (variants && variants.length > 0) {
+			formData.append('variants', JSON.stringify(variants));
+		}
 
 		if (images) {
 			for (let i = 0; i < images.length; i++) {
@@ -268,12 +264,13 @@ export const ProductForm = ({ product, categories = [] }: Props) => {
 			</div>
 
 			{/* Columna Derecha */}
-			<div className="w-[40%] flex flex-col gap-4">
-				<div className="w-full h-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex items-center justify-center">
-					<p className="text-gray-400 text-center">
-						Espacio disponible para agregar más campos
-					</p>
-				</div>
+			<div className="w-[40%] flex flex-col">
+				<ProductAddVariants
+					variants={watch('variants') || []}
+					onVariantsChange={(variants) => setValue('variants', variants)}
+					colors={colors}
+					sizes={sizes}
+				/>
 			</div>
 		</form>
 	);
