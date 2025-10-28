@@ -14,7 +14,7 @@ interface Props {
 
 interface FormInputs {
 	size_code: string;
-	is_active: boolean;
+	state: string;
 }
 
 export const SizeForm = ({ size }: Props) => {
@@ -29,7 +29,7 @@ export const SizeForm = ({ size }: Props) => {
 	} = useForm<FormInputs>({
 		defaultValues: {
 			...size,
-			is_active: size.is_active ?? true,
+			state: size.state ?? 'A',
 		},
 		mode: 'onChange',
 	});
@@ -37,14 +37,14 @@ export const SizeForm = ({ size }: Props) => {
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { size_code, is_active } = data;
+		const { size_code, state } = data;
 
 		if (size.size_code) {
 			formData.append('size_code', size.size_code);
 		}
 
 		formData.append('size_code', size_code);
-		formData.append('is_active', is_active.toString());
+		formData.append('state', state);
 
 		const { success, data: sizeData, message } = await createOrUpdateSize(formData);
 
@@ -78,13 +78,9 @@ export const SizeForm = ({ size }: Props) => {
 					helperText={errors.size_code?.message}
 					{...register('size_code', {
 						required: 'El código del talla es requerido',
-						minLength: {
-							value: 2,
-							message: 'El código debe tener al menos 2 caracteres',
-						},
 						maxLength: {
-							value: 100,
-							message: 'El código no puede exceder 100 caracteres',
+							value: 10,
+							message: 'El código no puede exceder 10 caracteres',
 						},
 					})}
 				/>
@@ -97,7 +93,7 @@ export const SizeForm = ({ size }: Props) => {
 					<div className="flex-1">
 						<p className="font-medium text-gray-700">Estado del Talla</p>
 						<p className="text-sm text-gray-500 mt-1">
-							{watch('is_active')
+							{watch('state') === 'A'
 								? 'El talla está activo y visible para los usuarios'
 								: 'El talla está desactivado y no será visible'}
 						</p>
@@ -105,14 +101,14 @@ export const SizeForm = ({ size }: Props) => {
 					<div className="flex items-center gap-3">
 						<span
 							className={`text-sm font-medium ${
-								watch('is_active') ? 'text-green-600' : 'text-gray-400'
+								watch('state') === 'A' ? 'text-green-600' : 'text-gray-400'
 							}`}>
-							{watch('is_active') ? 'Activa' : 'Inactiva'}
+							{watch('state') === 'A' ? 'Activa' : 'Inactiva'}
 						</span>
 						<Switch
-							checked={watch('is_active') ?? true}
+							checked={watch('state') === 'A'}
 							onChange={(e) => {
-								setValue('is_active', e.target.checked);
+								setValue('state', e.target.checked ? 'A' : 'I');
 							}}
 							slotProps={{ input: { 'aria-label': 'Estado del talla' } }}
 						/>

@@ -15,9 +15,21 @@ export const deleteSize = async (size_code: string) => {
 				message: 'No se puede eliminar una talla que no existe',
 			};
 
-		await prisma.sizes.update({
+		const existingReferences = await prisma.sizes.findFirst({
 			where: { size_code },
-			data: { is_active: false, is_delete: true, updated_at: new Date() },
+			select: { product_variants: true },
+		});
+
+		if (existingReferences && existingReferences.product_variants.length > 0) {
+			return {
+				success: false,
+				message:
+					'No se puede eliminar la talla porque está asociada a variantes de productos',
+			};
+		}
+
+		await prisma.sizes.delete({
+			where: { size_code },
 		});
 
 		revalidatePath('/system/sizes');

@@ -1,22 +1,23 @@
 import { Color, ColorsWhereInput, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
-import { getDeletedFilter } from '@/utils';
 
 interface Params {
 	page?: number;
 	limit?: number;
 	term?: string;
-	deleteds?: boolean;
 }
 
 export const getPaginatedColors = async (params: Params): Promise<Response<Color[]>> => {
-	const { page = 1, limit = 10, term = '', deleteds = false } = params;
+	const { page = 1, limit = 10, term = '' } = params;
 
 	const isNumeric = !isNaN(Number(term));
 
 	const where: ColorsWhereInput = {
-		...(isNumeric ? { id: Number(term) } : { color_name: { contains: term } }),
-		...getDeletedFilter(deleteds),
+		...(term
+			? isNumeric
+				? { color_id: Number(term) }
+				: { color_name: { contains: term } }
+			: {}),
 	};
 
 	try {

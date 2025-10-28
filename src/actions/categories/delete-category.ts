@@ -6,9 +6,31 @@ import { revalidatePath } from 'next/cache';
 
 export const deleteCategory = async (category_id: number): Promise<Response<Category>> => {
 	try {
-		await prismaClient.categories.update({
+		const isExisting = await prismaClient.categories.findUnique({
 			where: { category_id },
-			data: { is_active: false, is_delete: true, updated_at: new Date() },
+		});
+
+		if (!isExisting) {
+			return {
+				success: false,
+				message: 'Categoría no encontrada',
+			};
+		}
+
+		const existingReferences = await prismaClient.categories.findFirst({
+			where: { category_id },
+			select: { products: true },
+		});
+
+		if (existingReferences && existingReferences.products.length > 0) {
+			return {
+				success: false,
+				message: 'No se puede eliminar la categoría porque está asociada a productos',
+			};
+		}
+
+		await prismaClient.categories.delete({
+			where: { category_id },
 		});
 
 		revalidatePath('/system/categories');

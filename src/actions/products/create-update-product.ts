@@ -14,7 +14,7 @@ const productSchema = {
 		.min(0)
 		.transform((val) => Number(val.toFixed(2))),
 	category_id: z.number(),
-	is_active: z.boolean().default(true),
+	state: z.enum(['A', 'I']).default('A'),
 };
 
 export const createOrUpdateProduct = async (formData: FormData): Promise<Response<Product>> => {

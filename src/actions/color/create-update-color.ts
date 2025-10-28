@@ -26,7 +26,7 @@ const colorSchema = {
 				message: 'El código hexadecimal debe tener el formato #RRGGBB (ejemplo: #FF5733)',
 			}
 		),
-	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
+	state: z.enum(['A', 'I']).default('A'),
 };
 
 export const createOrUpdateColor = async (formData: FormData): Promise<Response<Color>> => {

@@ -6,14 +6,14 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const sizeSchema = {
-	size_code: z.string().min(1, 'El código del talla es obligatorio'),
-	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
+	size_code: z
+		.string()
+		.min(1, 'El código del talla es obligatorio')
+		.max(10, 'El código del talla debe tener máximo 10 caracteres'),
+	state: z.enum(['A', 'I']).default('A'),
 };
 
-export const createOrUpdateSize = async (
-	formData: FormData,
-	term?: string
-): Promise<Response<Size>> => {
+export const createOrUpdateSize = async (formData: FormData): Promise<Response<Size>> => {
 	const data = Object.fromEntries(formData.entries());
 	const sizeParsed = z.object(sizeSchema).parse(data);
 

@@ -2,12 +2,10 @@
 
 import { Response, Size, SizesWhereInput } from '@/interfaces';
 import prisma from '@/lib/prisma';
-import { getDeletedFilter } from '@/utils';
 
-export const getSizeByTerm = async (term: string, deleteds?: boolean): Promise<Response<Size>> => {
+export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
 	const where: SizesWhereInput = {
 		...{ size_code: { contains: term } },
-		...getDeletedFilter(deleteds),
 	};
 
 	try {

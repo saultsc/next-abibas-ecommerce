@@ -1,7 +1,6 @@
+import { Color, Size } from '@/interfaces';
 import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { Color } from './color.interface';
-import { Size } from './size.interface';
 
 export interface Product {
 	product_id: number;
@@ -11,8 +10,7 @@ export interface Product {
 	price: Decimal;
 	weight: Decimal | null;
 	category_id: number;
-	is_active: boolean;
-	is_delete: boolean;
+	state: string;
 	created_at: Date;
 	updated_at: Date;
 	variants?: ProductVariants[];
@@ -28,8 +26,7 @@ export interface ProductVariants {
 	price_adjustment: Decimal;
 	stock_quantity: number;
 	reorder_level: number;
-	is_active: boolean;
-	is_delete: boolean;
+	state: string;
 	created_at: Date;
 	updated_at: Date;
 	colors?: Color;
@@ -41,7 +38,7 @@ export interface ProductImages {
 	product_id: number;
 	image_url: string;
 	is_primary: boolean;
-	is_active: boolean;
+	state: string;
 	created_at: Date;
 	updated_at: Date;
 }

@@ -1,16 +1,17 @@
 'use server';
 
-import { Response, Size } from '@/interfaces';
+import { Response, Size, SizesWhereInput } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
 export const searchSizes = async (term: string): Promise<Response<Size[]>> => {
+	const where: SizesWhereInput = {
+		...{ size_code: { contains: term } },
+		...{ state: 'A' },
+	};
+
 	try {
 		const sizes = await prisma.sizes.findMany({
-			where: {
-				size_code: {
-					contains: term,
-				},
-			},
+			where: where,
 		});
 
 		return { success: true, data: sizes, message: 'Tallas encontrados' };

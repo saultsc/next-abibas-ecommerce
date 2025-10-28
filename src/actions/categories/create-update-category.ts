@@ -11,7 +11,7 @@ const categorySchema = {
 		.optional()
 		.transform((val) => Number(val)),
 	category_name: z.string().min(1, 'El nombre de la categoría es obligatorio'),
-	is_active: z.preprocess((val) => val === 'true', z.boolean().default(true)),
+	state: z.enum(['A', 'I']).default('A'),
 };
 
 export const createOrUpdateCategory = async (formData: FormData): Promise<Response<Category>> => {

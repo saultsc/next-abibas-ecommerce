@@ -2,17 +2,12 @@
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
-import { getDeletedFilter } from '@/utils';
 
-export const getCategoryByTerm = async (
-	term: string,
-	deleteds?: boolean
-): Promise<Response<Category>> => {
+export const getCategoryByTerm = async (term: string): Promise<Response<Category>> => {
 	const isNumeric = !isNaN(Number(term));
 
 	const where: CategoryWhereInput = {
 		...(isNumeric ? { category_id: Number(term) } : { category_name: term }),
-		...getDeletedFilter(deleteds),
 	};
 
 	try {

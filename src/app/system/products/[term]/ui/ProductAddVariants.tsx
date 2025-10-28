@@ -46,8 +46,7 @@ export const ProductAddVariants = ({
 			product_id: 0,
 			...formData,
 			price_adjustment: formData.price_adjustment as any,
-			is_active: true,
-			is_delete: false,
+			state: 'A',
 			created_at: new Date(),
 			updated_at: new Date(),
 		};

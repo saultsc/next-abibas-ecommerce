@@ -2,7 +2,6 @@
 
 import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
-import { getDeletedFilter } from '@/utils';
 
 export const getProductByTerm = async (
 	term: string,
@@ -12,7 +11,6 @@ export const getProductByTerm = async (
 
 	const where: ProductWhereInput = {
 		...(isNumeric ? { product_id: Number(term) } : { product_name: term }),
-		...getDeletedFilter(deleteds),
 	};
 
 	const include: ProductInclude = {

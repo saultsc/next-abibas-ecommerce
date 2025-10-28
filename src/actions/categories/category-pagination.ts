@@ -2,17 +2,15 @@
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
-import { getDeletedFilter } from '@/utils';
 
 interface Params {
 	page?: number;
 	take?: number;
 	term?: string;
-	deleteds?: boolean;
 }
 
 export const getPaginatedCategories = async (params: Params): Promise<Response<Category[]>> => {
-	const { page = 1, take = 10, term, deleteds = false } = params;
+	const { page = 1, take = 10, term } = params;
 
 	const skip = (page - 1) * take;
 
@@ -24,18 +22,17 @@ export const getPaginatedCategories = async (params: Params): Promise<Response<C
 				? { category_id: Number(term) }
 				: { category_name: { contains: term } }
 			: {}),
-		...getDeletedFilter(deleteds),
 	};
 
 	try {
 		const [categories, totalCount] = await Promise.all([
 			prisma.categories.findMany({
-				take: take,
-				skip: skip,
-				where: where,
+				take,
+				skip,
+				where,
 			}),
 			prisma.categories.count({
-				where: where,
+				where,
 			}),
 		]);
 
