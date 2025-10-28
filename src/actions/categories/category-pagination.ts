@@ -1,43 +1,41 @@
 'use server';
 
-import { Category, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Category, CategoryWhereInput, Response } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
-interface PaginationOptions {
+interface Params {
 	page?: number;
 	take?: number;
-	category_name?: string;
+	term?: string;
 	deleteds?: boolean;
 }
 
-export const getPaginatedCategories = async ({
-	page = 1,
-	take = 12,
-	category_name,
-	deleteds = false,
-}: PaginationOptions): Promise<Response<Category[]>> => {
-	if (isNaN(Number(page))) page = 1;
-	if (page < 1) page = 1;
+export const getPaginatedCategories = async (params: Params): Promise<Response<Category[]>> => {
+	const { page = 1, take = 10, term, deleteds = false } = params;
+
+	const skip = (page - 1) * take;
+
+	const isNumeric = !isNaN(Number(page));
+
+	const where: CategoryWhereInput = {
+		...(term
+			? isNumeric
+				? { category_id: Number(term) }
+				: { category_name: { contains: term } }
+			: {}),
+		...getDeletedFilter(deleteds),
+	};
 
 	try {
-		const whereCondition: Prisma.categoriesWhereInput = {
-			...(category_name && {
-				category_name: {
-					contains: category_name,
-				},
-			}),
-			...(deleteds ? {} : { is_delete: false }),
-		};
-
 		const [categories, totalCount] = await Promise.all([
-			prismaClient.categories.findMany({
+			prisma.categories.findMany({
 				take: take,
-				skip: (page - 1) * take,
-				where: whereCondition,
+				skip: skip,
+				where: where,
 			}),
-			prismaClient.categories.count({
-				where: whereCondition,
+			prisma.categories.count({
+				where: where,
 			}),
 		]);
 
@@ -45,9 +43,9 @@ export const getPaginatedCategories = async ({
 
 		return {
 			success: true,
-			currPage: page,
-			totalPages,
 			data: categories,
+			totalPages,
+			currPage: page,
 		};
 	} catch (error) {
 		throw new Error('No se pudo cargar las categorías');

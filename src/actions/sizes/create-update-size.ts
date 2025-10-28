@@ -1,7 +1,8 @@
 'use server';
 
 import { Response, Size } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const sizeSchema = {
@@ -28,24 +29,28 @@ export const createOrUpdateSize = async (
 		let size;
 		let message;
 
-		const existingSize = await prismaClient.sizes.findUnique({
+		const existingSize = await prisma.sizes.findUnique({
 			where: { size_code },
 		});
 
 		if (existingSize) {
-			size = await prismaClient.sizes.update({
+			size = await prisma.sizes.update({
 				where: { size_code },
 				data: { ...rest, updated_at: new Date() },
 			});
 
 			message = 'Talla actualizada exitosamente';
 		} else {
-			size = await prismaClient.sizes.create({
+			size = await prisma.sizes.create({
 				data: { size_code, ...rest },
 			});
 
 			message = 'Talla creada exitosamente';
 		}
+
+		revalidatePath('/system/sizes');
+		revalidatePath(`/system/sizes/${size_code}`);
+
 		return {
 			success: true,
 			message: message,

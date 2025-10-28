@@ -1,27 +1,23 @@
 'use server';
 
-import { Category, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Category, CategoryWhereInput, Response } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
 export const getCategoryByTerm = async (
 	term: string,
 	deleteds?: boolean
 ): Promise<Response<Category>> => {
+	const isNumeric = !isNaN(Number(term));
+
+	const where: CategoryWhereInput = {
+		...(isNumeric ? { category_id: Number(term) } : { category_name: term }),
+		...getDeletedFilter(deleteds),
+	};
+
 	try {
-		const isNumeric = !isNaN(Number(term));
-
-		// Conditions
-		const whereTermCondition: Prisma.categoriesWhereInput = isNumeric
-			? { category_id: Number(term) }
-			: { category_name: term as string };
-
-		const whereDeleteCondition: Prisma.categoriesWhereInput = deleteds
-			? {}
-			: { is_delete: false };
-
-		const category = await prismaClient.categories.findFirst({
-			where: { ...whereTermCondition, ...whereDeleteCondition },
+		const category = await prisma.categories.findFirst({
+			where,
 		});
 
 		if (!category)

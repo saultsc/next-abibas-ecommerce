@@ -2,6 +2,7 @@
 
 import { Category, Response } from '@/interfaces';
 import prismaClient from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const categorySchema = {
@@ -44,13 +45,15 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 			message = 'Categoría creada exitosamente';
 		}
 
+		revalidatePath('/system/categories');
+		revalidatePath(`/system/categories/${category_id}`);
+
 		return {
 			success: true,
 			message: message,
 			data: category,
 		};
 	} catch (error) {
-		console.error('Error al crear/actualizar la categoría:', error);
 		return {
 			success: false,
 			message: 'Error al hacer la operación',

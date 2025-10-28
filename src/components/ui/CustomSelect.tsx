@@ -34,6 +34,8 @@ export interface CustomSelectProps {
 	required?: boolean;
 	searchable?: boolean;
 	clearable?: boolean;
+	loading?: boolean;
+	onSearch?: (searchTerm: string) => void | Promise<void>;
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -52,6 +54,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 	required,
 	searchable = false,
 	clearable = false,
+	loading = false,
+	onSearch,
 }) => {
 	const resolvedLabelId = labelId ?? `${id ?? 'custom-select'}-label`;
 	const resolvedId = id ?? `${resolvedLabelId}-input`;
@@ -73,8 +77,14 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 					onChange={(_, newValue) =>
 						onChange(newValue ? (newValue.value as string | number) : '')
 					}
+					onInputChange={(_, newInputValue) => {
+						if (onSearch) {
+							onSearch(newInputValue);
+						}
+					}}
 					disabled={disabled}
 					disableClearable={!clearable}
+					loading={loading}
 					renderInput={(params) => (
 						<TextField
 							{...params}

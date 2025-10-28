@@ -1,5 +1,6 @@
 // * Categories
 export * from './categories/category-pagination';
+export * from './categories/category-search';
 export * from './categories/create-update-category';
 export * from './categories/delete-category';
 export * from './categories/get-category-by-term';
@@ -13,9 +14,11 @@ export * from './sizes/create-update-size';
 export * from './sizes/delete-size';
 export * from './sizes/get-size-by-term';
 export * from './sizes/size-pagination';
+export * from './sizes/size-search';
 
 // * Colors
 export * from './color/color-paginated';
+export * from './color/color-search';
 export * from './color/create-update-color';
 export * from './color/delete-color';
 export * from './color/get-color-by-term';

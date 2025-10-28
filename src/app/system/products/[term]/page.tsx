@@ -1,6 +1,5 @@
-import { getProductByTerm } from '@/actions';
+import { getProductByTerm, searchCategories } from '@/actions';
 import { Title } from '@/components';
-import { Product } from '@/interfaces';
 import { ProductForm } from './ui/ProductForm';
 
 interface Props {
@@ -12,7 +11,10 @@ interface Props {
 export default async function ProductPage({ params }: Props) {
 	const { term } = await params;
 
-	const [product, categories] = await Promise.all([getProductByTerm(term), []]);
+	const [product, { data: categories }] = await Promise.all([
+		getProductByTerm(term),
+		searchCategories(''),
+	]);
 
 	const title = term === 'new' ? 'Nuevo producto' : 'Editar producto';
 
@@ -20,7 +22,7 @@ export default async function ProductPage({ params }: Props) {
 		<>
 			<Title title={title} backUrl="/system/products" />
 
-			<ProductForm product={product ?? ({} as Product)} />
+			<ProductForm product={product.data ?? {}} categories={categories ?? []} />
 		</>
 	);
 }

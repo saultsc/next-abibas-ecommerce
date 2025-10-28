@@ -24,7 +24,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 	const page = resolved?.page ? parseInt(resolved.page) : 1;
 
 	const {
-		data: colors = [],
+		data: colors,
 		totalPages = 0,
 		success,
 		message,
@@ -114,7 +114,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 			</div>
 
 			<div className="mb-10">
-				<Table columns={colorColumns} rows={colors} />
+				<Table columns={colorColumns} rows={colors ?? []} />
 				{totalPages > 0 && <Pagination totalPages={totalPages} />}
 			</div>
 		</>

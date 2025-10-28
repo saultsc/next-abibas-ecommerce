@@ -1,18 +1,18 @@
 'use server';
 
-import { Response, Size } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Response, Size, SizesWhereInput } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
 export const getSizeByTerm = async (term: string, deleteds?: boolean): Promise<Response<Size>> => {
-	try {
-		const whereCondition: Prisma.sizesWhereInput = {
-			size_code: term,
-			...(deleteds ? {} : { is_delete: false }),
-		};
+	const where: SizesWhereInput = {
+		...{ size_code: { contains: term } },
+		...getDeletedFilter(deleteds),
+	};
 
-		const size = await prismaClient.sizes.findFirst({
-			where: whereCondition,
+	try {
+		const size = await prisma.sizes.findFirst({
+			where: where,
 		});
 
 		if (!size)

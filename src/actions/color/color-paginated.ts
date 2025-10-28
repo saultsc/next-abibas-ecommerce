@@ -1,28 +1,33 @@
-import { Color, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Color, ColorsWhereInput, Response } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
-export const getPaginatedColors = async ({
-	page = 1,
-	limit = 10,
-	deleteds = false,
-}): Promise<Response<Color[]>> => {
-	if (isNaN(Number(page))) page = 1;
-	if (page < 1) page = 1;
+interface Params {
+	page?: number;
+	limit?: number;
+	term?: string;
+	deleteds?: boolean;
+}
+
+export const getPaginatedColors = async (params: Params): Promise<Response<Color[]>> => {
+	const { page = 1, limit = 10, term = '', deleteds = false } = params;
+
+	const isNumeric = !isNaN(Number(term));
+
+	const where: ColorsWhereInput = {
+		...(isNumeric ? { id: Number(term) } : { color_name: { contains: term } }),
+		...getDeletedFilter(deleteds),
+	};
 
 	try {
-		const whereCondition: Prisma.colorsWhereInput = {
-			...(deleteds ? {} : { is_delete: false }),
-		};
-
 		const [colors, totalCount] = await Promise.all([
-			prismaClient.colors.findMany({
+			prisma.colors.findMany({
 				take: limit,
 				skip: (page - 1) * limit,
-				where: whereCondition,
+				where: where,
 			}),
-			prismaClient.colors.count({
-				where: whereCondition,
+			prisma.colors.count({
+				where: where,
 			}),
 		]);
 

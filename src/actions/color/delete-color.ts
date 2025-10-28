@@ -1,12 +1,12 @@
 'use server';
 
 import { Color, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export const deleteColor = async (color_id: number): Promise<Response<Color>> => {
 	try {
-		await prismaClient.colors.update({
+		await prisma.colors.update({
 			where: { color_id },
 			data: { is_active: false, is_delete: true, updated_at: new Date() },
 		});

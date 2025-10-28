@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductImage as ProductWithImage } from '@/interfaces';
+import { ProductImages } from '@/interfaces';
 import Image from 'next/image';
 import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue } from 'react-hook-form';
@@ -8,7 +8,7 @@ import { IoCloudUploadOutline as CloudUpload } from 'react-icons/io5';
 import { LuTrash as Delete } from 'react-icons/lu';
 
 interface Props {
-	productImages?: ProductWithImage[];
+	productImages?: ProductImages[];
 	productTitle?: string;
 	register: UseFormRegister<any>;
 	setValue: UseFormSetValue<any>;
@@ -20,7 +20,7 @@ export const ProductUploadImages = ({
 	productTitle,
 	register,
 	setValue,
-	maxImages = 10,
+	maxImages = 5,
 }: Props) => {
 	const [previewImages, setPreviewImages] = useState<string[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -152,10 +152,10 @@ export const ProductUploadImages = ({
 					<p className="text-sm font-semibold text-gray-700">Imágenes actuales</p>
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
 						{productImages.map((image, index) => (
-							<div key={image.id} className="relative">
+							<div key={image.image_id} className="relative">
 								<div className="relative w-full h-32 rounded-lg overflow-hidden border-2 border-gray-200">
 									<Image
-										src={`/products/${image.url}`}
+										src={`/products/${image.image_url}`}
 										alt={productTitle || `Image ${index + 1}`}
 										fill
 										className="object-cover"

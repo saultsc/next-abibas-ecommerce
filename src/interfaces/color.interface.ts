@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 export interface Color {
 	color_id: number;
 	color_name: string;
@@ -7,3 +9,5 @@ export interface Color {
 	created_at: Date;
 	updated_at: Date;
 }
+
+export type ColorsWhereInput = Prisma.colorsWhereInput;

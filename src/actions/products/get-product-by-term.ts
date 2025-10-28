@@ -1,32 +1,52 @@
 'use server';
 
-import { Product, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
 export const getProductByTerm = async (
 	term: string,
 	deleteds?: boolean
 ): Promise<Response<Product>> => {
-	try {
-		const whereCondition: Prisma.productsWhereInput = {
-			...(term ? { product_name: { contains: term } } : {}),
-			...(deleteds ? {} : { is_delete: false }),
-		};
+	const isNumeric = !isNaN(Number(term));
 
-		const size = await prismaClient.products.findFirst({
-			where: whereCondition,
+	const where: ProductWhereInput = {
+		...(isNumeric ? { product_id: Number(term) } : { product_name: term }),
+		...getDeletedFilter(deleteds),
+	};
+
+	const include: ProductInclude = {
+		product_images: true,
+		product_variants: {
+			include: {
+				colors: true,
+				sizes: true,
+			},
+		},
+	};
+
+	try {
+		const product = await prisma.products.findFirst({
+			where: where,
+			include: include,
 		});
 
-		if (!size)
+		if (!product)
 			return {
 				success: false,
 				message: 'Producto no encontrado',
 			};
 
+		const { product_images, product_variants, ...rest } = product;
+
 		return {
+			message: 'Producto encontrado',
 			success: true,
-			data: size,
+			data: {
+				...rest,
+				images: product_images,
+				variants: product_variants,
+			},
 		};
 	} catch (error) {
 		return {

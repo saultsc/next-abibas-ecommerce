@@ -1,28 +1,32 @@
-import { Response, Size } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Response, Size, SizesWhereInput } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
-export const getPaginatedSizes = async ({
-	page = 1,
-	limit = 10,
-	deleteds = false,
-}): Promise<Response<Size[]>> => {
-	if (isNaN(Number(page))) page = 1;
-	if (page < 1) page = 1;
+interface Params {
+	page?: number;
+	limit?: number;
+	deleteds?: boolean;
+	term?: string;
+}
+
+export const getPaginatedSizes = async (params: Params): Promise<Response<Size[]>> => {
+	const { page = 1, limit = 10, deleteds = false, term } = params;
+	const skip = (page - 1) * limit;
+
+	const where: SizesWhereInput = {
+		...(term ? { size_code: { contains: term } } : {}),
+		...getDeletedFilter(deleteds),
+	};
 
 	try {
-		const whereCondition: Prisma.sizesWhereInput = {
-			...(deleteds ? {} : { is_delete: false }),
-		};
-
 		const [sizes, totalCount] = await Promise.all([
-			prismaClient.sizes.findMany({
+			prisma.sizes.findMany({
 				take: limit,
-				skip: (page - 1) * limit,
-				where: whereCondition,
+				skip: skip,
+				where: where,
 			}),
-			prismaClient.sizes.count({
-				where: whereCondition,
+			prisma.sizes.count({
+				where: where,
 			}),
 		]);
 

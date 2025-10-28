@@ -1,7 +1,8 @@
 'use server';
 
 import { Color, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const colorSchema = {
@@ -45,19 +46,22 @@ export const createOrUpdateColor = async (formData: FormData): Promise<Response<
 		let message;
 
 		if (color_id) {
-			color = await prismaClient.colors.update({
+			color = await prisma.colors.update({
 				where: { color_id },
 				data: { ...rest, updated_at: new Date() },
 			});
 
 			message = 'Color actualizado exitosamente';
 		} else {
-			color = await prismaClient.colors.create({
+			color = await prisma.colors.create({
 				data: { ...rest },
 			});
 
 			message = 'Color creado exitosamente';
 		}
+
+		revalidatePath('/system/colors');
+		revalidatePath(`/system/colors/${color_id}`);
 
 		return {
 			success: true,

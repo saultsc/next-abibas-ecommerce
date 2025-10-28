@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export interface Product {
@@ -12,8 +13,8 @@ export interface Product {
 	is_delete: boolean;
 	created_at: Date;
 	updated_at: Date;
-	images?: ProductImages[];
 	variants?: ProductVariants[];
+	images?: ProductImages[];
 }
 
 export interface ProductVariants {
@@ -40,3 +41,6 @@ export interface ProductImages {
 	created_at: Date;
 	updated_at: Date;
 }
+
+export type ProductWhereInput = Prisma.productsWhereInput;
+export type ProductInclude = Prisma.productsInclude;

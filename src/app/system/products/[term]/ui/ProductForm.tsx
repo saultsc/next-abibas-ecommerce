@@ -1,17 +1,18 @@
 'use client';
 
-import { createOrUpdateProduct } from '@/actions';
+import { createOrUpdateProduct, searchCategories } from '@/actions';
 import { CustomSelect, DeleteButton } from '@/components';
 import { Category, Product, ProductImages, ProductVariants } from '@/interfaces';
 import { Switch, TextareaAutosize, TextField } from '@mui/material';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
+import { useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
 import { ProductUploadImages } from './ProductUploadImages';
 
 interface Props {
-	product: Partial<Product> & { images: ProductImages[]; variants: ProductVariants[] };
+	product: Partial<Product> & { images?: ProductImages[]; variants?: ProductVariants[] };
 	categories?: Category[];
 }
 
@@ -27,8 +28,11 @@ interface FormInputs {
 	images?: FileList;
 }
 
-export const ProductForm = ({ product, categories }: Props) => {
+export const ProductForm = ({ product, categories = [] }: Props) => {
 	const router = useRouter();
+	const [categoryOptions, setCategoryOptions] = useState<Category[]>(categories);
+	const [isLoadingCategories, startTransition] = useTransition();
+	const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const {
 		handleSubmit,
@@ -67,10 +71,30 @@ export const ProductForm = ({ product, categories }: Props) => {
 		});
 	};
 
+	const handleCategorySearch = async (searchTerm: string) => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current);
+		}
+
+		if (!searchTerm) {
+			setCategoryOptions(categories);
+			return;
+		}
+
+		searchTimeoutRef.current = setTimeout(() => {
+			startTransition(async () => {
+				const { success, data } = await searchCategories(searchTerm);
+				if (success) {
+					setCategoryOptions(data ?? []);
+				} else {
+					setCategoryOptions([]);
+				}
+			});
+		}, 500);
+	};
+
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
-
-		console.log({ data });
 
 		const { images, ...productToSave } = data;
 
@@ -144,24 +168,25 @@ export const ProductForm = ({ product, categories }: Props) => {
 
 							<CustomSelect
 								className="w-full"
-								id="gender-select"
-								label="Genero"
+								id="category-select"
+								label="Categoría"
 								value={watch('category_id') || ''}
 								onChange={(value) =>
 									setValue('category_id', value as number, {
 										shouldValidate: true,
 									})
 								}
-								options={[
-									{ value: 1, label: 'Hombres' },
-									{ value: 2, label: 'Mujeres' },
-									{ value: 3, label: 'Niños' },
-									{ value: 4, label: 'Unisex' },
-								]}
+								onSearch={handleCategorySearch}
+								options={categoryOptions.map((category) => ({
+									value: category.category_id,
+									label: category.category_name,
+								}))}
 								error={!!errors.category_id}
 								helperText={errors.category_id?.message}
 								clearable
 								required
+								searchable
+								loading={isLoadingCategories}
 							/>
 						</div>
 					</div>

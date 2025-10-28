@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 export interface Size {
 	size_code: string;
 	is_active: boolean;
@@ -5,3 +7,5 @@ export interface Size {
 	created_at: Date;
 	updated_at: Date;
 }
+
+export type SizesWhereInput = Prisma.sizesWhereInput;

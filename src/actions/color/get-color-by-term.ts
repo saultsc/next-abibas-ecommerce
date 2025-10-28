@@ -1,25 +1,23 @@
 'use server';
 
-import { Color, Response } from '@/interfaces';
-import prismaClient from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Color, ColorsWhereInput, Response } from '@/interfaces';
+import prisma from '@/lib/prisma';
+import { getDeletedFilter } from '@/utils';
 
 export const getColorByTerm = async (
 	term: string,
 	deleteds?: boolean
 ): Promise<Response<Color>> => {
+	const isNumeric = !isNaN(Number(term));
+
+	const where: ColorsWhereInput = {
+		...(term ? (isNumeric ? { color_id: Number(term) } : { color_name: term }) : {}),
+		...getDeletedFilter(deleteds),
+	};
+
 	try {
-		const isNumeric = !isNaN(Number(term));
-
-		// Conditions
-		const whereTermCondition: Prisma.colorsWhereInput = isNumeric
-			? { color_id: Number(term) }
-			: { color_name: term as string };
-
-		const whereDeleteCondition: Prisma.colorsWhereInput = deleteds ? {} : { is_delete: false };
-
-		const color = await prismaClient.colors.findFirst({
-			where: { ...whereTermCondition, ...whereDeleteCondition },
+		const color = await prisma.colors.findFirst({
+			where: where,
 		});
 
 		if (!color)
@@ -31,6 +29,7 @@ export const getColorByTerm = async (
 		return {
 			success: true,
 			data: color,
+			message: 'Color encontrado',
 		};
 	} catch (error) {
 		return {
