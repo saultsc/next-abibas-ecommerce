@@ -27,7 +27,7 @@ interface FormInputs {
 	price: number;
 	weight: number | null;
 	category_id: number;
-	is_active: boolean;
+	state: string;
 	variants?: ProductVariants[];
 	images?: FileList;
 }
@@ -69,7 +69,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		valueAsNumber: true,
 	});
 	register('category_id', { required: 'La categoría es requerida' });
-	register('is_active');
+	register('state');
 	register('variants');
 	register('description', {
 		minLength: { value: 10, message: 'La descripción debe tener al menos 10 caracteres' },
@@ -99,7 +99,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		formData.append('description', productToSave.description ?? '');
 		formData.append('price', productToSave.price.toString());
 		formData.append('weight', productToSave.weight?.toString() ?? '');
-		formData.append('is_active', productToSave.is_active ? 'true' : 'false');
+		formData.append('state', productToSave.state);
 
 		// Agregar variantes como JSON
 		if (variants && variants.length > 0) {
@@ -226,7 +226,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 						<div className="flex-1">
 							<p className="font-medium text-gray-700">Estado del producto</p>
 							<p className="text-sm text-gray-500 mt-1">
-								{watch('is_active')
+								{watch('state') === 'A'
 									? 'El producto está activo y visible para los usuarios'
 									: 'El producto está desactivado y no será visible'}
 							</p>
@@ -234,32 +234,32 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 						<div className="flex items-center gap-3">
 							<span
 								className={`text-sm font-medium ${
-									watch('is_active') ? 'text-green-600' : 'text-gray-400'
+									watch('state') === 'A' ? 'text-green-600' : 'text-gray-400'
 								}`}>
-								{watch('is_active') ? 'Activa' : 'Inactiva'}
+								{watch('state') === 'A' ? 'Activa' : 'Inactiva'}
 							</span>
 							<Switch
-								checked={watch('is_active') ?? true}
+								checked={watch('state') === 'A'}
 								onChange={(e) => {
-									setValue('is_active', e.target.checked);
+									setValue('state', e.target.checked ? 'A' : 'I');
 								}}
-								slotProps={{ input: { 'aria-label': 'Estado del producto' } }}
+								slotProps={{ input: { 'aria-label': 'Estado del talla' } }}
 							/>
 						</div>
 					</div>
-				</div>
 
-				{/* Botones */}
-				<div className="flex gap-4">
-					<button
-						type="submit"
-						className={
-							'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-						}>
-						Guardar
-					</button>
+					{/* Botones */}
+					<div className="flex gap-4">
+						<button
+							type="submit"
+							className={
+								'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+							}>
+							Guardar
+						</button>
 
-					<DeleteButton onDelete={handleDelete} itemName={product.product_name} />
+						<DeleteButton onDelete={handleDelete} itemName={product.product_name} />
+					</div>
 				</div>
 			</div>
 

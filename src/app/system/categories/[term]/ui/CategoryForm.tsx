@@ -14,7 +14,7 @@ interface Props {
 
 interface FormInputs {
 	category_name: string;
-	is_active: boolean;
+	state: string;
 }
 
 export const CategoryForm = ({ category }: Props) => {
@@ -29,7 +29,7 @@ export const CategoryForm = ({ category }: Props) => {
 	} = useForm<FormInputs>({
 		defaultValues: {
 			...category,
-			is_active: category.is_active ?? true,
+			state: category.state ?? 'A',
 		},
 		mode: 'onChange',
 	});
@@ -37,14 +37,14 @@ export const CategoryForm = ({ category }: Props) => {
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { category_name, is_active } = data;
+		const { category_name, state } = data;
 
 		if (category.category_id) {
 			formData.append('category_id', category.category_id.toString());
 		}
 
 		formData.append('category_name', category_name);
-		formData.append('is_active', is_active.toString());
+		formData.append('state', state);
 
 		const { success, data: categoryData } = await createOrUpdateCategory(formData);
 
@@ -99,7 +99,7 @@ export const CategoryForm = ({ category }: Props) => {
 					<div className="flex-1">
 						<p className="font-medium text-gray-700">Estado de la Categoría</p>
 						<p className="text-sm text-gray-500 mt-1">
-							{watch('is_active')
+							{watch('state')
 								? 'La categoría está activa y visible para los usuarios'
 								: 'La categoría está desactivada y no será visible'}
 						</p>
@@ -107,16 +107,16 @@ export const CategoryForm = ({ category }: Props) => {
 					<div className="flex items-center gap-3">
 						<span
 							className={`text-sm font-medium ${
-								watch('is_active') ? 'text-green-600' : 'text-gray-400'
+								watch('state') ? 'text-green-600' : 'text-gray-400'
 							}`}>
-							{watch('is_active') ? 'Activa' : 'Inactiva'}
+							{watch('state') ? 'Activa' : 'Inactiva'}
 						</span>
 						<Switch
-							checked={watch('is_active') ?? true}
+							checked={watch('state') === 'A'}
 							onChange={(e) => {
-								setValue('is_active', e.target.checked);
+								setValue('state', e.target.checked ? 'A' : 'I');
 							}}
-							slotProps={{ input: { 'aria-label': 'Estado de categoría' } }}
+							slotProps={{ input: { 'aria-label': 'Estado de la categoria' } }}
 						/>
 					</div>
 				</div>

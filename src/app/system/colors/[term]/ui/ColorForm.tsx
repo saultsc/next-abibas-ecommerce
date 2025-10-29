@@ -15,7 +15,7 @@ interface Props {
 interface FormInputs {
 	color_name: string;
 	hex_code: string;
-	is_active: boolean;
+	state: string;
 }
 
 export const ColorForm = ({ color }: Props) => {
@@ -31,7 +31,7 @@ export const ColorForm = ({ color }: Props) => {
 		defaultValues: {
 			...color,
 			hex_code: color.hex_code ?? '',
-			is_active: color.is_active ?? true,
+			state: color.state ?? 'A',
 		},
 		mode: 'onChange',
 	});
@@ -39,7 +39,7 @@ export const ColorForm = ({ color }: Props) => {
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { color_name, is_active, hex_code } = data;
+		const { color_name, state, hex_code } = data;
 
 		if (color.color_id) {
 			formData.append('color_id', color.color_id.toString());
@@ -47,7 +47,7 @@ export const ColorForm = ({ color }: Props) => {
 
 		formData.append('color_name', color_name);
 		formData.append('hex_code', hex_code);
-		formData.append('is_active', is_active.toString());
+		formData.append('state', state.toString());
 
 		const { success, data: colorData, message } = await createOrUpdateColor(formData);
 
@@ -147,24 +147,25 @@ export const ColorForm = ({ color }: Props) => {
 					<div className="flex-1">
 						<p className="font-medium text-gray-700">Estado de la Categoría</p>
 						<p className="text-sm text-gray-500 mt-1">
-							{watch('is_active')
+							{watch('state')
 								? 'La categoría está activa y visible para los usuarios'
 								: 'La categoría está desactivada y no será visible'}
 						</p>
 					</div>
+
 					<div className="flex items-center gap-3">
 						<span
 							className={`text-sm font-medium ${
-								watch('is_active') ? 'text-green-600' : 'text-gray-400'
+								watch('state') === 'A' ? 'text-green-600' : 'text-gray-400'
 							}`}>
-							{watch('is_active') ? 'Activa' : 'Inactiva'}
+							{watch('state') === 'A' ? 'Activa' : 'Inactiva'}
 						</span>
 						<Switch
-							checked={watch('is_active') ?? true}
+							checked={watch('state') === 'A'}
 							onChange={(e) => {
-								setValue('is_active', e.target.checked);
+								setValue('state', e.target.checked ? 'A' : 'I');
 							}}
-							slotProps={{ input: { 'aria-label': 'Estado de categoría' } }}
+							slotProps={{ input: { 'aria-label': 'Estado del color' } }}
 						/>
 					</div>
 				</div>

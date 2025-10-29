@@ -85,9 +85,9 @@ export default async function ColorsPage({ searchParams }: Props) {
 			cell: (c: Color) => (
 				<span
 					className={`flex items-center gap-2 font-medium ${
-						c.is_active ? 'text-green-600' : 'text-gray-400'
+						c.state === 'A' ? 'text-green-600' : 'text-gray-400'
 					}`}>
-					{c.is_active ? (
+					{c.state === 'A' ? (
 						<>
 							<IoCheckmarkCircle className="text-xl" />
 							Activo
