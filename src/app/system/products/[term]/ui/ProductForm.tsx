@@ -69,12 +69,12 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		valueAsNumber: true,
 	});
 	register('category_id', { required: 'La categoría es requerida' });
-	register('state');
-	register('variants');
 	register('description', {
 		minLength: { value: 10, message: 'La descripción debe tener al menos 10 caracteres' },
 		maxLength: { value: 500, message: 'La descripción no debe exceder los 500 caracteres' },
 	});
+	register('state');
+	register('variants');
 
 	const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const cleanValue = event.target.value.replace(/[^0-9.]/g, '');
