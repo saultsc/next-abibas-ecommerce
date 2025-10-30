@@ -32,10 +32,7 @@ export const getProductByTerm = async (
 		});
 
 		if (!product) {
-			return {
-				message: 'Producto no encontrado',
-				success: true,
-			};
+			throw AppError.notFound(ErrorCode.PRODUCT_NOT_FOUND);
 		}
 
 		const { product_images, product_variants, categories, price, weight, ...rest } = product;
