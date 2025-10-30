@@ -1,9 +1,9 @@
 'use client';
 
 import { createOrUpdateColor, deleteColor } from '@/actions';
-import { DeleteButton } from '@/components';
+import { DeleteButton, StateSwitch } from '@/components';
 import { Color } from '@/interfaces';
-import { Switch, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
@@ -141,35 +141,12 @@ export const ColorForm = ({ color }: Props) => {
 			</div>
 
 			{/* Estado */}
-			<div className="w-full mb-4">
-				<p className="mb-2 font-semibold text-gray-700">Estado</p>
-				<div className="flex items-center justify-between p-4 bg-gray-50 rounded border border-gray-300">
-					<div className="flex-1">
-						<p className="font-medium text-gray-700">Estado de la Categoría</p>
-						<p className="text-sm text-gray-500 mt-1">
-							{watch('state')
-								? 'La categoría está activa y visible para los usuarios'
-								: 'La categoría está desactivada y no será visible'}
-						</p>
-					</div>
-
-					<div className="flex items-center gap-3">
-						<span
-							className={`text-sm font-medium ${
-								watch('state') === 'A' ? 'text-green-600' : 'text-gray-400'
-							}`}>
-							{watch('state') === 'A' ? 'Activa' : 'Inactiva'}
-						</span>
-						<Switch
-							checked={watch('state') === 'A'}
-							onChange={(e) => {
-								setValue('state', e.target.checked ? 'A' : 'I');
-							}}
-							slotProps={{ input: { 'aria-label': 'Estado del color' } }}
-						/>
-					</div>
-				</div>
-			</div>
+			<StateSwitch
+				state={watch('state')}
+				onStateChange={(newState) => setValue('state', newState)}
+				entityName="color"
+				gender="el"
+			/>
 
 			{/* Información del Sistema */}
 			{color.color_id && (

@@ -45,6 +45,10 @@ export const getPaginatedCategories = async (params: Params): Promise<Response<C
 			currPage: page,
 		};
 	} catch (error) {
-		throw new Error('No se pudo cargar las categorías');
+		return {
+			success: false,
+			message: 'Error al obtener las categorías',
+			data: [],
+		};
 	}
 };

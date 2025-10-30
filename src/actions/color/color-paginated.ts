@@ -9,6 +9,7 @@ interface Params {
 
 export const getPaginatedColors = async (params: Params): Promise<Response<Color[]>> => {
 	const { page = 1, limit = 10, term = '' } = params;
+	const skip = (page - 1) * limit;
 
 	const isNumeric = !isNaN(Number(term));
 
@@ -23,12 +24,12 @@ export const getPaginatedColors = async (params: Params): Promise<Response<Color
 	try {
 		const [colors, totalCount] = await Promise.all([
 			prisma.colors.findMany({
+				skip,
 				take: limit,
-				skip: (page - 1) * limit,
-				where: where,
+				where,
 			}),
 			prisma.colors.count({
-				where: where,
+				where,
 			}),
 		]);
 

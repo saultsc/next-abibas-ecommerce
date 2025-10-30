@@ -15,6 +15,7 @@ export * from './ui/DeleteButton';
 export * from './ui/PageNotfound';
 export * from './ui/Pagination';
 export * from './ui/Sidebar';
+export * from './ui/StateSwitch';
 export * from './ui/Table';
 export * from './ui/Title';
 export * from './ui/TopMenu';

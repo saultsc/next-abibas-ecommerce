@@ -24,7 +24,9 @@ export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
 			data: size,
 		};
 	} catch (error) {
-		console.log(error);
-		throw new Error('Error al obtener talla por término');
+		return {
+			success: false,
+			message: 'Error al obtener la talla',
+		};
 	}
 };

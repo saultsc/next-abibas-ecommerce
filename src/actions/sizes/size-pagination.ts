@@ -19,11 +19,11 @@ export const getPaginatedSizes = async (params: Params): Promise<Response<Size[]
 		const [sizes, totalCount] = await Promise.all([
 			prisma.sizes.findMany({
 				take: limit,
-				skip: skip,
-				where: where,
+				skip,
+				where,
 			}),
 			prisma.sizes.count({
-				where: where,
+				where,
 			}),
 		]);
 
@@ -36,6 +36,10 @@ export const getPaginatedSizes = async (params: Params): Promise<Response<Size[]
 			data: sizes,
 		};
 	} catch (error) {
-		throw new Error('No se pudieron cargar los tamaños');
+		return {
+			success: false,
+			message: 'Error al obtener las tallas',
+			data: [],
+		};
 	}
 };

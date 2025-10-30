@@ -1,13 +1,13 @@
 'use client';
 
-import { Switch, TextareaAutosize, TextField } from '@mui/material';
+import { TextareaAutosize, TextField } from '@mui/material';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
 
 import { createOrUpdateProduct, searchCategories } from '@/actions';
-import { CustomSelect, DeleteButton } from '@/components';
+import { CustomSelect, DeleteButton, StateSwitch } from '@/components';
 import { useSearchWithDebounce } from '@/hooks';
 import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
 import { ProductAddVariants } from './ProductAddVariants';
@@ -57,6 +57,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 			...product,
 			price: product.price ? Number(product.price) : 0,
 			weight: product.weight ? Number(product.weight) : null,
+			state: product.state ?? 'A',
 			images: undefined,
 			variants: product.variants || [],
 		},
@@ -219,47 +220,25 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 					/>
 				</div>
 
-				{/* Disponible */}
-				<div className="w-full mb-4">
-					<p className="mb-2 font-semibold text-gray-700">Estado</p>
-					<div className="flex items-center justify-between p-4 bg-gray-50 rounded border border-gray-300">
-						<div className="flex-1">
-							<p className="font-medium text-gray-700">Estado del producto</p>
-							<p className="text-sm text-gray-500 mt-1">
-								{watch('state') === 'A'
-									? 'El producto está activo y visible para los usuarios'
-									: 'El producto está desactivado y no será visible'}
-							</p>
-						</div>
-						<div className="flex items-center gap-3">
-							<span
-								className={`text-sm font-medium ${
-									watch('state') === 'A' ? 'text-green-600' : 'text-gray-400'
-								}`}>
-								{watch('state') === 'A' ? 'Activa' : 'Inactiva'}
-							</span>
-							<Switch
-								checked={watch('state') === 'A'}
-								onChange={(e) => {
-									setValue('state', e.target.checked ? 'A' : 'I');
-								}}
-								slotProps={{ input: { 'aria-label': 'Estado del talla' } }}
-							/>
-						</div>
-					</div>
+				{/* Estado */}
+				<StateSwitch
+					state={watch('state')}
+					onStateChange={(newState) => setValue('state', newState)}
+					entityName="producto"
+					gender="el"
+				/>
 
-					{/* Botones */}
-					<div className="flex gap-4">
-						<button
-							type="submit"
-							className={
-								'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-							}>
-							Guardar
-						</button>
+				{/* Botones */}
+				<div className="flex gap-4">
+					<button
+						type="submit"
+						className={
+							'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+						}>
+						Guardar
+					</button>
 
-						<DeleteButton onDelete={handleDelete} itemName={product.product_name} />
-					</div>
+					<DeleteButton onDelete={handleDelete} itemName={product.product_name} />
 				</div>
 			</div>
 
