@@ -1,6 +1,7 @@
 'use server';
 
 import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfaces';
+import { ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 interface Params {
@@ -55,12 +56,27 @@ export const getPaginatedProducts = async (params: Params): Promise<Response<Pro
 
 		return {
 			success: true,
-			message: 'Productos paginados obtenidos',
-			data: products,
-			totalPages,
 			currPage: page,
+			totalPages,
+			data: products.map((product) => ({
+				...product,
+				price: Number(product.price),
+				weight: product.weight ? Number(product.weight) : null,
+				variants: product.product_variants?.map((variant) => ({
+					...variant,
+					price_adjustment: Number(variant.price_adjustment),
+				})),
+				category: product.categories,
+			})),
 		};
 	} catch (error) {
-		return { success: false, message: 'Error al obtener los productos' };
+		console.error('Error al obtener productos paginados:', error);
+
+		return {
+			success: false,
+			code: ErrorCode.INTERNAL_ERROR,
+			message: 'Error al obtener productos',
+			data: [],
+		};
 	}
 };

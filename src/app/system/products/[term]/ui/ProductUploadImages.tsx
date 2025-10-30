@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { UseFormRegister, UseFormSetValue } from 'react-hook-form';
 import { IoCloudUploadOutline as CloudUpload } from 'react-icons/io5';
 import { LuTrash as Delete } from 'react-icons/lu';
+import { toast } from 'sonner';
 
 interface Props {
 	productImages?: ProductImages[];
@@ -33,7 +34,7 @@ export const ProductUploadImages = ({
 		const availableSlots = maxImages - currentTotal;
 
 		if (availableSlots <= 0) {
-			// Todo: Alerta con toast
+			toast.error(`Solo se permiten un máximo de ${maxImages} imágenes por producto.`);
 			return;
 		}
 
@@ -60,11 +61,13 @@ export const ProductUploadImages = ({
 		}
 
 		if (duplicates.length > 0) {
-			// Todo: Reemplazar con toast
+			toast.error(
+				`Las siguientes imágenes ya fueron seleccionadas: ${duplicates.join(', ')}`
+			);
 		}
 
 		if (files.length > filesToProcess) {
-			// Todo: Alerta con toast
+			toast.error(`Se seleccionaron ${files.length - filesToProcess} imágenes adicionales.`);
 		}
 
 		if (newFiles.length === 0) return;

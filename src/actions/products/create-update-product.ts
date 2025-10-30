@@ -8,7 +8,7 @@ import { z } from 'zod';
 const productSchema = {
 	product_id: z.coerce.number().optional(),
 	product_name: z.string().min(1, 'El nombre del producto es obligatorio'),
-	description: z.string().min(10).max(500),
+	description: z.string().min(10).max(500).optional().or(z.literal('')),
 	price: z.coerce
 		.number()
 		.min(0)

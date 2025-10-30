@@ -1,18 +1,11 @@
 export const revalidate = 0;
 
 import { getPaginatedColors } from '@/actions';
-import { Column, Pagination, Table, Title } from '@/components';
+import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { Color } from '@/interfaces';
 import { dateFormat } from '@/utils/dateFormat';
 import Link from 'next/link';
-import {
-	IoAddCircleOutline,
-	IoCheckmarkCircle,
-	IoCloseCircle,
-	IoEyeOffOutline,
-	IoEyeOutline,
-	IoTimeOutline,
-} from 'react-icons/io5';
+import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
@@ -82,24 +75,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 		},
 		{
 			header: 'Estado',
-			cell: (c: Color) => (
-				<span
-					className={`flex items-center gap-2 font-medium ${
-						c.state === 'A' ? 'text-green-600' : 'text-gray-400'
-					}`}>
-					{c.state === 'A' ? (
-						<>
-							<IoCheckmarkCircle className="text-xl" />
-							Activo
-						</>
-					) : (
-						<>
-							<IoCloseCircle className="text-xl" />
-							Inactivo
-						</>
-					)}
-				</span>
-			),
+			cell: (c: Color) => <StateBadge state={c.state} />,
 		},
 	];
 

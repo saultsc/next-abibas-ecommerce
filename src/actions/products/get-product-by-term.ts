@@ -1,6 +1,7 @@
 'use server';
 
 import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 export const getProductByTerm = async (
@@ -21,6 +22,7 @@ export const getProductByTerm = async (
 				sizes: true,
 			},
 		},
+		categories: true,
 	};
 
 	try {
@@ -29,13 +31,14 @@ export const getProductByTerm = async (
 			include: include,
 		});
 
-		if (!product)
+		if (!product) {
 			return {
-				success: false,
 				message: 'Producto no encontrado',
+				success: true,
 			};
+		}
 
-		const { product_images, product_variants, price, weight, ...rest } = product;
+		const { product_images, product_variants, categories, price, weight, ...rest } = product;
 
 		return {
 			message: 'Producto encontrado',
@@ -45,6 +48,7 @@ export const getProductByTerm = async (
 				price: Number(price),
 				weight: weight ? Number(weight) : null,
 				images: product_images,
+				category: categories,
 				variants: product_variants?.map((variant) => ({
 					...variant,
 					price_adjustment: Number(variant.price_adjustment),
@@ -52,9 +56,20 @@ export const getProductByTerm = async (
 			},
 		};
 	} catch (error) {
+		console.error('Error al obtener el producto por término:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: true,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
 		return {
 			success: false,
 			message: 'Error al obtener el producto',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

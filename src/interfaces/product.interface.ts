@@ -1,4 +1,4 @@
-import { Color, Size } from '@/interfaces';
+import { Category, Color, Size } from '@/interfaces';
 import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -14,6 +14,7 @@ export interface Product {
 	updated_at: Date;
 	variants?: ProductVariants[];
 	images?: ProductImages[];
+	category?: Category;
 }
 
 export interface ProductVariants {

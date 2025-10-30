@@ -1,23 +1,16 @@
 export const revalidate = 0;
 
 import { getPaginatedProducts } from '@/actions';
-import { Column, Pagination, Table, Title } from '@/components';
+import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { ProductImage } from '@/components/product/ProductImage';
 import { Product } from '@/interfaces';
-import { currencyFormat } from '@/utils';
+import { currencyFormat, dateFormat } from '@/utils';
 
 import Link from 'next/link';
 import { IoAddCircleOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
-}
-
-// Momentaneo
-interface fetchingProductsResponse {
-	products: Product[];
-	currentPage: number;
-	totalPages: number;
 }
 
 export default async function OrdersPage({ searchParams }: Props) {
@@ -53,12 +46,68 @@ export default async function OrdersPage({ searchParams }: Props) {
 			),
 		},
 		{
-			header: 'Precio',
+			header: 'Precio Base',
 			cell: (p: Product) => <span className="font-bold">{currencyFormat(p.price)}</span>,
 		},
 		{
+			header: 'Size(s)',
+			cell: (p: Product) => {
+				const sizes = Array.from(
+					new Set((p.variants ?? []).map((v) => v.size_code).filter((s) => s && s.length))
+				);
+
+				return (
+					<span className="block truncate">
+						{sizes.length > 0 ? sizes.join(', ') : 'N/A'}
+					</span>
+				);
+			},
+		},
+		{
+			header: 'Color(es)',
+			cell: (p: Product) => {
+				const colors = Array.from(
+					new Set(
+						(p.variants ?? [])
+							.map((v) => v.colors?.color_name)
+							.filter((c) => c && c.length)
+					)
+				);
+
+				return (
+					<span className="block truncate">
+						{colors.length > 0 ? colors.join(', ') : 'N/A'}
+					</span>
+				);
+			},
+		},
+		{
 			header: 'Categoría',
-			cell: (p: Product) => <>{p.category_id}</>,
+			cell: (p: Product) => <>{p.category?.category_name}</>,
+		},
+		{
+			header: 'Creado',
+			cell: (p: Product) => (
+				<span className="flex items-center gap-2 text-gray-600 text-sm">
+					{dateFormat(p.created_at)}
+				</span>
+			),
+		},
+		{
+			header: 'Actualizado',
+			cell: (p: Product) => (
+				<span className="flex items-center gap-2 text-gray-600 text-sm">
+					{dateFormat(p.updated_at)}
+				</span>
+			),
+		},
+		{
+			header: 'Estado',
+			cell: (p: Product) => (
+				<>
+					<StateBadge state={p.state} />
+				</>
+			),
 		},
 	];
 
