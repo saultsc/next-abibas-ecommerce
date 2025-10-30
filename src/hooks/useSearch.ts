@@ -1,6 +1,6 @@
 import { useRef, useState, useTransition } from 'react';
 
-interface UseSearchWithDebounceProps<T> {
+interface Props<T> {
 	initialData: T[];
 	searchAction: (term: string) => Promise<{ success: boolean; data?: T[] }>;
 	debounceMs?: number;
@@ -13,11 +13,7 @@ interface UseSearchWithDebounceProps<T> {
  * @param debounceMs - Tiempo de espera en milisegundos (default: 500ms)
  * @returns Objeto con los resultados, función de búsqueda y estado de carga
  */
-export function useSearchWithDebounce<T>({
-	initialData,
-	searchAction,
-	debounceMs = 500,
-}: UseSearchWithDebounceProps<T>) {
+export function useSearch<T>({ initialData, searchAction, debounceMs = 500 }: Props<T>) {
 	const [results, setResults] = useState<T[]>(initialData);
 	const [isLoading, startTransition] = useTransition();
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);

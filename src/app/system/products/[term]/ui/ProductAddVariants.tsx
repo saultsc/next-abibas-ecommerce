@@ -1,15 +1,17 @@
 'use client';
 
-import { deleteProductVariant, searchColors, searchSizes } from '@/actions';
-import { CustomSelect } from '@/components';
-import { useSearchWithDebounce } from '@/hooks';
-import { Color, ProductVariants, Size } from '@/interfaces';
-import { ErrorCode } from '@/lib';
-import { Dialog, DialogContent, DialogTitle, IconButton, Switch, TextField } from '@mui/material';
-import { useState } from 'react';
-import { IoAdd, IoClose } from 'react-icons/io5';
 import { NumericFormat } from 'react-number-format';
 import { toast } from 'sonner';
+
+import { Dialog, DialogContent, DialogTitle, IconButton, Switch, TextField } from '@mui/material';
+import { IoAdd, IoClose } from 'react-icons/io5';
+
+import { deleteProductVariant, searchColors, searchSizes } from '@/actions';
+import { CustomSelect } from '@/components';
+import { useSearch } from '@/hooks';
+import { Color, ProductVariants, Size } from '@/interfaces';
+import { ErrorCode } from '@/lib';
+import { useState } from 'react';
 
 interface Props {
 	variants: ProductVariants[];
@@ -45,7 +47,7 @@ export const ProductAddVariants = ({
 
 	const handleAddVariant = () => {
 		const newVariant: ProductVariants = {
-			variant_id: Date.now(), // Temporal ID único
+			variant_id: Date.now(),
 			product_id: 0,
 			...formData,
 			price_adjustment: formData.price_adjustment as any,
@@ -89,7 +91,7 @@ export const ProductAddVariants = ({
 		results: sizeOptions,
 		handleSearch: handleSizeSearch,
 		isLoading: isLoadingSizes,
-	} = useSearchWithDebounce({
+	} = useSearch({
 		initialData: sizes,
 		searchAction: searchSizes,
 		debounceMs: 500,
@@ -99,7 +101,7 @@ export const ProductAddVariants = ({
 		results: colorOptions,
 		handleSearch: handleColorSearch,
 		isLoading: isLoadingColors,
-	} = useSearchWithDebounce({
+	} = useSearch({
 		initialData: colors,
 		searchAction: searchColors,
 		debounceMs: 500,

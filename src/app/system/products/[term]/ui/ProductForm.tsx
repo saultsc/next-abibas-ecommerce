@@ -5,13 +5,13 @@ import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
+import { toast } from 'sonner';
 
 import { createOrUpdateProduct, deleteProduct, searchCategories } from '@/actions';
 import { CustomSelect, DeleteButton, StateSwitch } from '@/components';
-import { useSearchWithDebounce } from '@/hooks';
+import { useSearch } from '@/hooks';
 import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
 import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
-import { toast } from 'sonner';
 import { ProductAddVariants } from './ProductAddVariants';
 import { ProductUploadImages } from './ProductUploadImages';
 
@@ -41,7 +41,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		results: categoryOptions,
 		handleSearch: handleCategorySearch,
 		isLoading: isLoadingCategories,
-	} = useSearchWithDebounce({
+	} = useSearch({
 		initialData: categories,
 		searchAction: searchCategories,
 		debounceMs: 500,

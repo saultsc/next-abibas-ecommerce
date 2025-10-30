@@ -1,1 +1,1 @@
-export * from './useSearchWithDebounce';
+export * from './useSearch';
