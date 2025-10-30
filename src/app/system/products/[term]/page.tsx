@@ -15,9 +15,7 @@ export default async function ProductPage({ params }: Props) {
 	const title = term === 'new' ? 'Nuevo producto' : 'Editar producto';
 
 	const productPromise =
-		title === 'Editar producto'
-			? getProductByTerm(term)
-			: Promise.resolve({} as Response<Product>);
+		term === 'new' ? getProductByTerm(term) : Promise.resolve({} as Response<Product>);
 
 	const [categories, colors, sizes, product] = await Promise.all([
 		searchCategories(''),

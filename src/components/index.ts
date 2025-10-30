@@ -17,6 +17,7 @@ export * from './ui/Pagination';
 export * from './ui/Sidebar';
 export * from './ui/StateBadge';
 export * from './ui/StateSwitch';
+export * from './ui/SystemInfoCard';
 export * from './ui/Table';
 export * from './ui/Title';
 export * from './ui/Toaster';

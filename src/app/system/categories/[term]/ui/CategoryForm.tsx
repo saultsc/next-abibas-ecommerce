@@ -1,12 +1,11 @@
 'use client';
 
 import { createOrUpdateCategory, deleteCategory } from '@/actions';
-import { DeleteButton, StateSwitch } from '@/components';
+import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Category } from '@/interfaces';
 import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
 import { toast } from 'sonner';
 
 interface Props {
@@ -106,43 +105,11 @@ export const CategoryForm = ({ category }: Props) => {
 
 			{/* Información del Sistema */}
 			{category.category_id && (
-				<div className="w-full mb-6 p-4 bg-gray-50 rounded border border-gray-300">
-					<p className="mb-3 font-semibold text-gray-700 flex items-center gap-2">
-						<IoInformationCircleOutline className="text-xl text-gray-600" />
-						Información del Sistema
-					</p>
-					<div className="space-y-3 text-sm">
-						<div className="flex items-center justify-between">
-							<span className="text-gray-600 font-medium flex items-center gap-2">
-								<IoKeyOutline className="text-base" />
-								ID:
-							</span>
-							<span className="text-gray-900 font-semibold">
-								{category.category_id}
-							</span>
-						</div>
-						<div className="flex items-center justify-between">
-							<span className="text-gray-600 font-medium flex items-center gap-2">
-								<IoCalendarOutline className="text-base" />
-								Creada:
-							</span>
-							<span className="text-gray-900">
-								{new Date(category.created_at).toLocaleDateString('es-ES')}
-							</span>
-						</div>
-						{category.updated_at && (
-							<div className="flex items-center justify-between">
-								<span className="text-gray-600 font-medium flex items-center gap-2">
-									<IoCalendarOutline className="text-base" />
-									Actualizada:
-								</span>
-								<span className="text-gray-900">
-									{new Date(category.updated_at).toLocaleDateString('es-ES')}
-								</span>
-							</div>
-						)}
-					</div>
-				</div>
+				<SystemInfoCard
+					idValue={category.category_id}
+					createdAt={category.created_at}
+					updatedAt={category.updated_at}
+				/>
 			)}
 
 			{/* Botones */}

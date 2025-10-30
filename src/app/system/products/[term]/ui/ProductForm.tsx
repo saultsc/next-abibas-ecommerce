@@ -8,10 +8,9 @@ import { NumericFormat } from 'react-number-format';
 import { toast } from 'sonner';
 
 import { createOrUpdateProduct, deleteProduct, searchCategories } from '@/actions';
-import { CustomSelect, DeleteButton, StateSwitch } from '@/components';
+import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { useSearch } from '@/hooks';
 import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
-import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
 import { ProductAddVariants } from './ProductAddVariants';
 import { ProductUploadImages } from './ProductUploadImages';
 
@@ -241,43 +240,11 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 
 				{/* Información del Sistema */}
 				{product.product_id && (
-					<div className="w-full mb-6 p-4 bg-gray-50 rounded border border-gray-300">
-						<p className="mb-3 font-semibold text-gray-700 flex items-center gap-2">
-							<IoInformationCircleOutline className="text-xl text-gray-600" />
-							Información del Sistema
-						</p>
-						<div className="space-y-3 text-sm">
-							<div className="flex items-center justify-between">
-								<span className="text-gray-600 font-medium flex items-center gap-2">
-									<IoKeyOutline className="text-base" />
-									ID:
-								</span>
-								<span className="text-gray-900 font-semibold">
-									{product.product_id}
-								</span>
-							</div>
-							<div className="flex items-center justify-between">
-								<span className="text-gray-600 font-medium flex items-center gap-2">
-									<IoCalendarOutline className="text-base" />
-									Creada:
-								</span>
-								<span className="text-gray-900">
-									{new Date(product.created_at!).toLocaleDateString('es-ES')}
-								</span>
-							</div>
-							{product.updated_at && (
-								<div className="flex items-center justify-between">
-									<span className="text-gray-600 font-medium flex items-center gap-2">
-										<IoCalendarOutline className="text-base" />
-										Actualizada:
-									</span>
-									<span className="text-gray-900">
-										{new Date(product.updated_at).toLocaleDateString('es-ES')}
-									</span>
-								</div>
-							)}
-						</div>
-					</div>
+					<SystemInfoCard
+						idValue={product.product_id}
+						createdAt={product.created_at}
+						updatedAt={product.updated_at}
+					/>
 				)}
 
 				{/* Botones */}
