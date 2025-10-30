@@ -1,12 +1,15 @@
 'use client';
 
-import { searchColors, searchSizes } from '@/actions';
+import { deleteProductVariant, searchColors, searchSizes } from '@/actions';
 import { CustomSelect } from '@/components';
 import { useSearchWithDebounce } from '@/hooks';
 import { Color, ProductVariants, Size } from '@/interfaces';
-import { Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
+import { ErrorCode } from '@/lib';
+import { Dialog, DialogContent, DialogTitle, IconButton, Switch, TextField } from '@mui/material';
 import { useState } from 'react';
 import { IoAdd, IoClose } from 'react-icons/io5';
+import { NumericFormat } from 'react-number-format';
+import { toast } from 'sonner';
 
 interface Props {
 	variants: ProductVariants[];
@@ -18,10 +21,10 @@ interface Props {
 interface VariantFormData {
 	color_id: number;
 	size_code: string;
-	sku_variant: string;
 	price_adjustment: number;
 	stock_quantity: number;
 	reorder_level: number;
+	state: string;
 }
 
 export const ProductAddVariants = ({
@@ -34,10 +37,10 @@ export const ProductAddVariants = ({
 	const [formData, setFormData] = useState<VariantFormData>({
 		color_id: 0,
 		size_code: '',
-		sku_variant: '',
 		price_adjustment: 0,
 		stock_quantity: 0,
 		reorder_level: 0,
+		state: 'A',
 	});
 
 	const handleAddVariant = () => {
@@ -58,15 +61,28 @@ export const ProductAddVariants = ({
 		setFormData({
 			color_id: 0,
 			size_code: '',
-			sku_variant: '',
 			price_adjustment: 0,
 			stock_quantity: 0,
 			reorder_level: 0,
+			state: 'A',
 		});
 	};
 
-	const handleRemoveVariant = (variantId: number) => {
-		onVariantsChange(variants.filter((v) => v.variant_id !== variantId));
+	const handleRemoveVariant = async (variant_id: number) => {
+		const { success, code, message } = await deleteProductVariant(variant_id);
+
+		if (code === ErrorCode.VARIANT_NOT_FOUND) {
+			onVariantsChange(variants.filter((v) => v.variant_id !== variant_id));
+			return;
+		}
+
+		if (success) {
+			onVariantsChange(variants.filter((v) => v.variant_id !== variant_id));
+			toast.success(message || 'Variante eliminada correctamente');
+			return;
+		}
+
+		toast.error(message || 'No se pudo eliminar la variante');
 	};
 
 	const {
@@ -137,14 +153,6 @@ export const ProductAddVariants = ({
 									{variant.stock_quantity} uni.
 								</span>
 							</div>
-							<div className="flex flex-col">
-								<span className="text-[10px] font-semibold text-gray-500 uppercase">
-									SKU
-								</span>
-								<span className="text-xs font-mono text-gray-600">
-									{variant.sku_variant}
-								</span>
-							</div>
 						</div>
 
 						{Number(variant.price_adjustment) !== 0 && (
@@ -182,114 +190,180 @@ export const ProductAddVariants = ({
 			<Dialog
 				open={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				maxWidth="sm"
-				fullWidth>
-				<DialogTitle className="flex items-center justify-between">
-					<span>Agregar Nueva Variante</span>
-					<IconButton onClick={() => setIsModalOpen(false)}>
-						<IoClose />
+				maxWidth="md"
+				fullWidth
+				PaperProps={{
+					className: 'rounded-xl',
+				}}>
+				<DialogTitle className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+					<div>
+						<h2 className="text-xl font-bold text-gray-800">Agregar Nueva Variante</h2>
+						<p className="text-sm text-gray-600 mt-1">
+							Complete los detalles de la variante del producto
+						</p>
+					</div>
+					<IconButton
+						onClick={() => setIsModalOpen(false)}
+						className="hover:bg-blue-200 transition-colors">
+						<IoClose size={24} />
 					</IconButton>
 				</DialogTitle>
-				<DialogContent>
-					<div className="space-y-4 pt-2">
-						<CustomSelect
-							className="w-full"
-							label="Color"
-							value={formData.color_id || ''}
-							onChange={(value) =>
-								setFormData({ ...formData, color_id: value as number })
-							}
-							onSearch={handleColorSearch}
-							loading={isLoadingColors}
-							options={colors.map((color) => ({
-								value: color.color_id,
-								label: color.color_name,
-							}))}
-							required
-							clearable
-							searchable
-						/>
+				<DialogContent className="pt-6 pb-4">
+					<div className="space-y-5 mt-12">
+						{/* Fila 1: Color y Talla */}
+						<div className="grid grid-cols-2 gap-4">
+							<CustomSelect
+								className="w-full"
+								label="Color"
+								value={formData.color_id || ''}
+								onChange={(value) =>
+									setFormData({ ...formData, color_id: value as number })
+								}
+								onSearch={handleColorSearch}
+								loading={isLoadingColors}
+								options={colorOptions.map((color) => ({
+									value: color.color_id,
+									label: color.color_name,
+								}))}
+								required
+								clearable
+								searchable
+							/>
 
-						<CustomSelect
-							className="w-full"
-							label="Talla"
-							value={formData.size_code || ''}
-							onChange={(handleSizeSearch) =>
-								setFormData({ ...formData, size_code: handleSizeSearch as string })
-							}
-							loading={isLoadingSizes}
-							onSearch={handleSizeSearch}
-							options={sizes.map((size) => ({
-								value: size.size_code,
-								label: size.size_code,
-							}))}
-							required
-							clearable
-							searchable
-						/>
+							<CustomSelect
+								className="w-full"
+								label="Talla"
+								value={formData.size_code || ''}
+								onChange={(value) =>
+									setFormData({ ...formData, size_code: value as string })
+								}
+								loading={isLoadingSizes}
+								onSearch={handleSizeSearch}
+								options={sizeOptions.map((size) => ({
+									value: size.size_code,
+									label: size.size_code,
+								}))}
+								required
+								clearable
+								searchable
+							/>
+						</div>
 
-						<TextField
-							label="SKU Variante *"
-							variant="filled"
-							fullWidth
-							value={formData.sku_variant}
-							onChange={(e) =>
-								setFormData({ ...formData, sku_variant: e.target.value })
-							}
-						/>
+						{/* Fila 2: SKU y Ajuste de Precio */}
+						<div className="grid grid-cols-2 gap-4">
+							<NumericFormat
+								value={formData.price_adjustment}
+								onValueChange={(values) => {
+									setFormData({
+										...formData,
+										price_adjustment: values.floatValue || 0,
+									});
+								}}
+								customInput={TextField}
+								thousandSeparator=","
+								decimalSeparator="."
+								decimalScale={2}
+								fixedDecimalScale
+								valueIsNumericString
+								prefix="$"
+								variant="filled"
+								label="Ajuste de Precio"
+								fullWidth
+								allowNegative
+								placeholder="$0.00"
+								helperText="Positivo para aumentar, negativo para reducir"
+							/>
+						</div>
 
-						<TextField
-							label="Ajuste de Precio"
-							variant="filled"
-							fullWidth
-							type="number"
-							value={formData.price_adjustment}
-							onChange={(e) =>
-								setFormData({
-									...formData,
-									price_adjustment: Number(e.target.value),
-								})
-							}
-						/>
+						{/* Fila 3: Stock y Nivel de Reorden */}
+						<div className="grid grid-cols-2 gap-4">
+							<TextField
+								label="Cantidad en Stock"
+								variant="filled"
+								fullWidth
+								type="number"
+								value={formData.stock_quantity}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										stock_quantity: Number(e.target.value),
+									})
+								}
+								inputProps={{ min: 0 }}
+							/>
 
-						<TextField
-							label="Cantidad en Stock *"
-							variant="filled"
-							fullWidth
-							type="number"
-							value={formData.stock_quantity}
-							onChange={(e) =>
-								setFormData({ ...formData, stock_quantity: Number(e.target.value) })
-							}
-						/>
+							<TextField
+								label="Nivel de Reorden"
+								variant="filled"
+								fullWidth
+								type="number"
+								value={formData.reorder_level}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										reorder_level: Number(e.target.value),
+									})
+								}
+								inputProps={{ min: 0 }}
+								helperText="Alerta cuando el stock sea menor a este valor"
+							/>
+						</div>
 
-						<TextField
-							label="Nivel de Reorden"
-							variant="filled"
-							fullWidth
-							type="number"
-							value={formData.reorder_level}
-							onChange={(e) =>
-								setFormData({ ...formData, reorder_level: Number(e.target.value) })
-							}
-						/>
+						{/* Estado */}
+						<div className="border-t border-gray-200 pt-4">
+							<div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-300">
+								<div className="flex-1">
+									<p className="font-medium text-gray-700">
+										Estado de la variante
+									</p>
+									<p className="text-sm text-gray-500 mt-1">
+										{formData.state === 'A'
+											? 'La variante estará activa y disponible para la venta'
+											: 'La variante estará desactivada y no será visible'}
+									</p>
+								</div>
+								<div className="flex items-center gap-3">
+									<span
+										className={`text-sm font-medium ${
+											formData.state === 'A'
+												? 'text-green-600'
+												: 'text-gray-400'
+										}`}>
+										{formData.state === 'A' ? 'Activa' : 'Inactiva'}
+									</span>
+									<Switch
+										checked={formData.state === 'A'}
+										onChange={(e) => {
+											setFormData({
+												...formData,
+												state: e.target.checked ? 'A' : 'I',
+											});
+										}}
+										slotProps={{
+											input: { 'aria-label': 'Estado de la variante' },
+										}}
+									/>
+								</div>
+							</div>
+						</div>
 
-						<div className="flex gap-3 pt-2">
+						{/* Botones */}
+						<div className="flex gap-3 pt-2 border-t border-gray-200">
 							<button
 								type="button"
 								onClick={handleAddVariant}
 								disabled={
 									!formData.color_id ||
 									!formData.size_code ||
-									!formData.sku_variant
+									formData.stock_quantity < 0
 								}
-								className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+								className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
 								Agregar
 							</button>
 							<button
 								type="button"
 								onClick={() => setIsModalOpen(false)}
-								className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">
+								className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
 								Cancelar
 							</button>
 						</div>

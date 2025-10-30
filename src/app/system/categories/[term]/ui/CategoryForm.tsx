@@ -7,6 +7,7 @@ import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
+import { toast } from 'sonner';
 
 interface Props {
 	category: Category;
@@ -46,25 +47,28 @@ export const CategoryForm = ({ category }: Props) => {
 		formData.append('category_name', category_name);
 		formData.append('state', state);
 
-		const { success, data: categoryData } = await createOrUpdateCategory(formData);
+		const { success, data: categoryData, message } = await createOrUpdateCategory(formData);
 
 		if (!success) {
-			console.log('Error al guardar la categoría');
+			toast.error(message || 'Error al guardar la categoría');
 			return;
 		}
 
+		toast.success(message || 'Categoría guardada exitosamente');
 		router.replace(`/system/categories/${categoryData?.category_id}`);
 	};
 
 	const handleDelete = async () => {
 		if (!category.category_id) return;
 
-		const { success } = await deleteCategory(category.category_id);
+		const { success, message } = await deleteCategory(category.category_id);
 
 		if (!success) {
-			console.log('Error al eliminar la categoría');
+			toast.error(message || 'No se pudo eliminar la categoría');
+			return;
 		}
 
+		toast.success('Categoría eliminada exitosamente');
 		router.replace('/system/categories');
 	};
 

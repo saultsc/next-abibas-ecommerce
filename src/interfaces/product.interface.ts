@@ -5,10 +5,9 @@ import { Decimal } from '@prisma/client/runtime/library';
 export interface Product {
 	product_id: number;
 	product_name: string;
-	sku: string;
 	description: string | null;
-	price: Decimal;
-	weight: Decimal | null;
+	price: Decimal | number;
+	weight: Decimal | number | null;
 	category_id: number;
 	state: string;
 	created_at: Date;
@@ -22,8 +21,7 @@ export interface ProductVariants {
 	product_id: number;
 	color_id: number;
 	size_code: string;
-	sku_variant: string;
-	price_adjustment: Decimal;
+	price_adjustment: Decimal | number;
 	stock_quantity: number;
 	reorder_level: number;
 	state: string;

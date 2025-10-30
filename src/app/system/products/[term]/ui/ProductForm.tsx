@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
 
-import { createOrUpdateProduct, searchCategories } from '@/actions';
+import { createOrUpdateProduct, deleteProduct, searchCategories } from '@/actions';
 import { CustomSelect, DeleteButton, StateSwitch } from '@/components';
 import { useSearchWithDebounce } from '@/hooks';
 import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
+import { toast } from 'sonner';
 import { ProductAddVariants } from './ProductAddVariants';
 import { ProductUploadImages } from './ProductUploadImages';
 
@@ -114,17 +115,26 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		}
 
 		const { success, data: updatedProduct, message } = await createOrUpdateProduct(formData);
+
 		if (!success) {
-			console.log(message);
+			toast.error(message || 'No se pudo actualizar el producto');
 			return;
 		}
 
+		toast.success(message || 'Producto actualizado exitosamente');
 		router.replace(`/system/products/${updatedProduct?.product_id}`);
 	};
 
 	const handleDelete = async () => {
-		console.log('Producto eliminado');
-		setTimeout(() => {}, 1500);
+		const { success, message } = await deleteProduct(product.product_id!);
+
+		if (!success) {
+			toast.error(message || 'No se pudo eliminar el producto');
+			return;
+		}
+
+		toast.success(message || 'Producto eliminado exitosamente');
+		router.replace('/system/products');
 	};
 
 	return (

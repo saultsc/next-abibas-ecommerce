@@ -7,6 +7,7 @@ import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
+import { toast } from 'sonner';
 
 interface Props {
 	color: Color;
@@ -52,9 +53,11 @@ export const ColorForm = ({ color }: Props) => {
 		const { success, data: colorData, message } = await createOrUpdateColor(formData);
 
 		if (!success) {
-			console.log(message);
+			toast.error(message || 'Error al guardar el color');
 			return;
 		}
+
+		toast.success(message || 'Color guardado exitosamente');
 
 		router.replace(`/system/colors/${colorData?.color_id}`);
 	};
@@ -65,8 +68,11 @@ export const ColorForm = ({ color }: Props) => {
 		const { success, message } = await deleteColor(color.color_id);
 
 		if (!success) {
-			console.log(message);
+			toast.error(message || 'No se pudo eliminar el color');
+			return;
 		}
+
+		toast.success(message || 'Color eliminado exitosamente');
 
 		router.replace('/system/colors');
 	};

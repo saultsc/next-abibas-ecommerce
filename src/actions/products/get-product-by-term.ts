@@ -35,15 +35,20 @@ export const getProductByTerm = async (
 				message: 'Producto no encontrado',
 			};
 
-		const { product_images, product_variants, ...rest } = product;
+		const { product_images, product_variants, price, weight, ...rest } = product;
 
 		return {
 			message: 'Producto encontrado',
 			success: true,
 			data: {
 				...rest,
+				price: Number(price),
+				weight: weight ? Number(weight) : null,
 				images: product_images,
-				variants: product_variants,
+				variants: product_variants?.map((variant) => ({
+					...variant,
+					price_adjustment: Number(variant.price_adjustment),
+				})),
 			},
 		};
 	} catch (error) {

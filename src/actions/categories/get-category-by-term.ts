@@ -26,7 +26,6 @@ export const getCategoryByTerm = async (term: string): Promise<Response<Category
 			data: category,
 		};
 	} catch (error) {
-		console.log(error);
 		return {
 			success: false,
 			message: 'Error al obtener la categoría',

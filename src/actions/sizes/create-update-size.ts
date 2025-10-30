@@ -1,6 +1,7 @@
 'use server';
 
 import { Response, Size } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -41,6 +42,14 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 
 			message = 'Talla actualizada exitosamente';
 		} else {
+			const isExisting = await prisma.sizes.findUnique({
+				where: { size_code },
+			});
+
+			if (isExisting) {
+				throw new AppError(ErrorCode.SIZE_ALREADY_EXISTS);
+			}
+
 			size = await prisma.sizes.create({
 				data: { size_code, ...rest },
 			});
@@ -58,9 +67,20 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar la talla:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al hacer la operación',
+			message: 'Error inesperado al procesar la talla',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

@@ -1,19 +1,19 @@
 'use server';
 import { Product, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const productSchema = {
-	product_id: z.number().optional(),
+	product_id: z.coerce.number().optional(),
 	product_name: z.string().min(1, 'El nombre del producto es obligatorio'),
-	sku: z.string().min(1, 'El SKU es obligatorio'),
-	descripcion: z.string().min(10).max(500),
+	description: z.string().min(10).max(500),
 	price: z.coerce
 		.number()
 		.min(0)
 		.transform((val) => Number(val.toFixed(2))),
-	category_id: z.number(),
+	category_id: z.coerce.number().transform((val) => Number(val)),
 	state: z.enum(['A', 'I']).default('A'),
 };
 
@@ -27,6 +27,8 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 			message: 'Datos del producto inválidos',
 		};
 	}
+
+	console.log({ productParsed });
 
 	const { product_id, ...rest } = productParsed;
 
@@ -44,19 +46,25 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 
 				message = 'Producto actualizado exitosamente';
 			} else {
-				const newProductId = (await prisma.products.count()) + 1;
-
-				product = await tx.products.create({
-					data: { product_id: newProductId, ...rest },
+				const isExisting = await tx.products.findFirst({
+					where: { product_name: rest.product_name },
 				});
 
-				message = 'Producto actualizado exitosamente';
+				if (isExisting) {
+					throw new AppError(ErrorCode.PRODUCT_ALREADY_EXISTS);
+				}
+
+				product = await tx.products.create({
+					data: { ...rest },
+				});
+
+				message = 'Producto creado exitosamente';
 			}
 
 			if (formData.getAll('images')) {
 				const images = await uploadImages(formData.getAll('images') as File[]);
 				if (!images) {
-					throw new Error('No se pudo cargar las imágenes, rollingback');
+					throw new AppError(ErrorCode.PRODUCT_UPLOAD_IMAGES_FAILED);
 				}
 
 				await prisma.product_images.createMany({
@@ -74,16 +82,40 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 		revalidatePath(`/system/products/${product_id}`);
 		revalidatePath(`/products/${product_id}`);
 
+		const { price, weight, ...restProduct } = prismaTx;
+
 		return {
 			success: true,
 			message: message,
-			data: prismaTx,
+			data: {
+				...restProduct,
+				price: Number(price),
+				weight: weight ? Number(weight) : null,
+			},
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar el producto:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				message: 'Datos de producto inválidos',
+				code: ErrorCode.VALIDATION_ERROR,
+			};
+		}
+
 		return {
 			success: false,
-			message: 'Error al hacer la operación',
+			message: 'Error inesperado al procesar el producto',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

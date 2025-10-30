@@ -1,5 +1,6 @@
 export const revalidate = 0;
 
+import { getPaginatedProducts } from '@/actions';
 import { Column, Pagination, Table, Title } from '@/components';
 import { ProductImage } from '@/components/product/ProductImage';
 import { Product } from '@/interfaces';
@@ -24,7 +25,9 @@ export default async function OrdersPage({ searchParams }: Props) {
 
 	const page = resolved?.page ? parseInt(resolved.page) : 1;
 
-	const { products = [], currentPage, totalPages } = {} as fetchingProductsResponse;
+	const { data: products = [], totalPages = 0 } = await getPaginatedProducts({
+		page,
+	});
 
 	const productColumns: Column<Product>[] = [
 		{
@@ -66,7 +69,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 			<div className="flex justify-end mb-5">
 				<Link href="products/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
-					Nueva Producto
+					Nuevo
 				</Link>
 			</div>
 

@@ -109,7 +109,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 			<div className="flex justify-end mb-5">
 				<Link href="colors/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
-					Nuevo Color
+					Nuevo
 				</Link>
 			</div>
 

@@ -7,6 +7,7 @@ import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { IoCalendarOutline, IoInformationCircleOutline, IoKeyOutline } from 'react-icons/io5';
+import { toast } from 'sonner';
 
 interface Props {
 	size: Size;
@@ -49,10 +50,11 @@ export const SizeForm = ({ size }: Props) => {
 		const { success, data: sizeData, message } = await createOrUpdateSize(formData);
 
 		if (!success) {
-			console.log(message);
+			toast.error(message || 'Error al guardar la talla');
 			return;
 		}
 
+		toast.success(message || 'Talla guardada exitosamente');
 		router.replace(`/system/sizes/${sizeData?.size_code}`);
 	};
 
@@ -60,9 +62,11 @@ export const SizeForm = ({ size }: Props) => {
 		const { success, message } = await deleteSize(size.size_code);
 
 		if (!success) {
-			return console.log(message);
+			toast.error(message || 'No se pudo eliminar la talla');
+			return;
 		}
 
+		toast.success(message || 'Talla eliminada exitosamente');
 		router.replace('/system/sizes');
 	};
 

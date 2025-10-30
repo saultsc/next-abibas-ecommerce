@@ -25,7 +25,6 @@ export const getPaginatedProducts = async (params: Params): Promise<Response<Pro
 			: {}),
 		...(color_id ? { product_variants: { some: { color_id } } } : {}),
 		...(size_code ? { product_variants: { some: { size_code } } } : {}),
-		...{ state: 'A' },
 	};
 
 	const include: ProductInclude = {

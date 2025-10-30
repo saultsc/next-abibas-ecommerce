@@ -1,18 +1,11 @@
 export const revalidate = 0;
 
 import { getPaginatedCategories } from '@/actions';
-import { Column, Pagination, Table, Title } from '@/components';
+import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { Category } from '@/interfaces';
 import { dateFormat } from '@/utils/dateFormat';
 import Link from 'next/link';
-import {
-	IoAddCircleOutline,
-	IoCheckmarkCircle,
-	IoCloseCircle,
-	IoEyeOffOutline,
-	IoEyeOutline,
-	IoTimeOutline,
-} from 'react-icons/io5';
+import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
@@ -60,24 +53,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 		},
 		{
 			header: 'Estado',
-			cell: (c: Category) => (
-				<span
-					className={`flex items-center gap-2 font-medium ${
-						c.is_active ? 'text-green-600' : 'text-gray-400'
-					}`}>
-					{c.is_active ? (
-						<>
-							<IoCheckmarkCircle className="text-xl" />
-							Activo
-						</>
-					) : (
-						<>
-							<IoCloseCircle className="text-xl" />
-							Inactivo
-						</>
-					)}
-				</span>
-			),
+			cell: (c: Category) => <StateBadge state={c.state} />,
 		},
 	];
 
@@ -88,7 +64,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 			<div className="flex justify-end mb-5">
 				<Link href="categories/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
-					Nueva Categoría
+					Nueva
 				</Link>
 			</div>
 

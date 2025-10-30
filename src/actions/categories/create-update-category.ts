@@ -1,6 +1,7 @@
 'use server';
 
 import { Category, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prismaClient from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -38,6 +39,14 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 
 			message = 'Categoría actualizada exitosamente';
 		} else {
+			const isExisting = await prismaClient.categories.findFirst({
+				where: { category_name: rest.category_name },
+			});
+
+			if (isExisting) {
+				throw new AppError(ErrorCode.CATEGORY_ALREADY_EXISTS);
+			}
+
 			category = await prismaClient.categories.create({
 				data: { ...rest },
 			});
@@ -54,9 +63,22 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 			data: category,
 		};
 	} catch (error) {
+		console.error('Error al crear/actualizar la categoría:', error);
+
+		// Si es un error personalizado, devolver su mensaje y código
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al hacer la operación',
+			message: 'Error inesperado al procesar la categoría',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

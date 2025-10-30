@@ -1,6 +1,7 @@
 'use server';
 
 import { Color, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -53,6 +54,14 @@ export const createOrUpdateColor = async (formData: FormData): Promise<Response<
 
 			message = 'Color actualizado exitosamente';
 		} else {
+			const isExisting = await prisma.colors.findFirst({
+				where: { color_name: rest.color_name },
+			});
+
+			if (isExisting) {
+				throw new AppError(ErrorCode.COLOR_ALREADY_EXISTS);
+			}
+
 			color = await prisma.colors.create({
 				data: { ...rest },
 			});
@@ -70,9 +79,20 @@ export const createOrUpdateColor = async (formData: FormData): Promise<Response<
 		};
 	} catch (error) {
 		console.error('Error al crear/actualizar el color:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al hacer la operación',
+			message: 'Error inesperado al procesar el color',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

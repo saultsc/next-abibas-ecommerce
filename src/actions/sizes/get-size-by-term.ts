@@ -1,6 +1,7 @@
 'use server';
 
 import { Response, Size, SizesWhereInput } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
@@ -13,20 +14,30 @@ export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
 			where: where,
 		});
 
-		if (!size)
-			return {
-				success: false,
-				message: 'Talla no encontrada',
-			};
+		if (!size) {
+			throw AppError.notFound(ErrorCode.SIZE_NOT_FOUND);
+		}
 
 		return {
 			success: true,
 			data: size,
 		};
 	} catch (error) {
+		console.error('Error al obtener la talla:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al obtener la talla',
+			message: 'Error inesperado al obtener la talla',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

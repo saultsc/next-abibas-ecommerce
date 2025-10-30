@@ -1,5 +1,6 @@
 'use server';
 
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
@@ -9,11 +10,9 @@ export const deleteSize = async (size_code: string) => {
 			where: { size_code },
 		});
 
-		if (!existingSize)
-			return {
-				success: false,
-				message: 'No se puede eliminar una talla que no existe',
-			};
+		if (!existingSize) {
+			throw AppError.notFound(ErrorCode.SIZE_NOT_FOUND);
+		}
 
 		const existingReferences = await prisma.sizes.findFirst({
 			where: { size_code },
@@ -21,11 +20,7 @@ export const deleteSize = async (size_code: string) => {
 		});
 
 		if (existingReferences && existingReferences.product_variants.length > 0) {
-			return {
-				success: false,
-				message:
-					'No se puede eliminar la talla porque está asociada a variantes de productos',
-			};
+			throw new AppError(ErrorCode.SIZE_HAS_VARIANTS);
 		}
 
 		await prisma.sizes.delete({
@@ -39,9 +34,21 @@ export const deleteSize = async (size_code: string) => {
 			message: 'Talla eliminada exitosamente',
 		};
 	} catch (error) {
+		console.error('Error al eliminar la talla:', error);
+
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al eliminar la talla',
+			message: 'Error inesperado al eliminar la talla',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

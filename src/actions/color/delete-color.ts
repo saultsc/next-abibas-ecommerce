@@ -1,6 +1,7 @@
 'use server';
 
 import { Color, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
@@ -11,10 +12,7 @@ export const deleteColor = async (color_id: number): Promise<Response<Color>> =>
 		});
 
 		if (!isExisting) {
-			return {
-				success: false,
-				message: 'Color no encontrado',
-			};
+			throw AppError.notFound(ErrorCode.COLOR_NOT_FOUND);
 		}
 
 		const existingReferences = await prisma.colors.findFirst({
@@ -23,11 +21,7 @@ export const deleteColor = async (color_id: number): Promise<Response<Color>> =>
 		});
 
 		if (existingReferences && existingReferences.product_variants.length > 0) {
-			return {
-				success: false,
-				message:
-					'No se puede eliminar el color porque está asociado a variantes de productos',
-			};
+			throw new AppError(ErrorCode.COLOR_HAS_VARIANTS);
 		}
 
 		await prisma.colors.delete({
@@ -41,9 +35,22 @@ export const deleteColor = async (color_id: number): Promise<Response<Color>> =>
 			message: 'Color eliminado exitosamente',
 		};
 	} catch (error) {
+		console.error('Error al eliminar el color:', error);
+
+		// Si es un error personalizado, devolver su mensaje y código
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
+		// Error desconocido
 		return {
 			success: false,
-			message: 'Error al eliminar el color',
+			message: 'Error inesperado al eliminar el color',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };
