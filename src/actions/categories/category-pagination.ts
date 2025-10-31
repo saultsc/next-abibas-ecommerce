@@ -14,7 +14,7 @@ export const getPaginatedCategories = async (params: Params): Promise<Response<C
 
 	const skip = (page - 1) * take;
 
-	const isNumeric = !isNaN(Number(page));
+	const isNumeric = !isNaN(Number(term));
 
 	const where: CategoryWhereInput = {
 		...(term

@@ -12,7 +12,6 @@ import { IoAddCircleOutline } from 'react-icons/io5';
 interface Props {
 	searchParams: Promise<{ page?: string }>;
 }
-
 export default async function OrdersPage({ searchParams }: Props) {
 	const resolved = await searchParams;
 
@@ -124,7 +123,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 
 			<div className="mb-10">
 				<Table columns={productColumns} rows={products} />
-				{totalPages > 1 && <Pagination totalPages={totalPages} />}
+				<Pagination totalPages={totalPages} />
 			</div>
 		</>
 	);
