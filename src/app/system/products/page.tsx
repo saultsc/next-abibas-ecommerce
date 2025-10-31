@@ -24,17 +24,23 @@ export default async function OrdersPage({ searchParams }: Props) {
 	const productColumns: Column<Product>[] = [
 		{
 			header: 'Imagen',
-			cell: (p: Product) => (
-				<Link href={`products/${p.product_id}`}>
-					<ProductImage
-						src={p.images?.[0]?.image_url || ''}
-						width={80}
-						height={80}
-						alt={p.product_name}
-						className="w-20 h-20 object-cover rounded"
-					/>
-				</Link>
-			),
+			cell: (p: Product) => {
+				const hasImage = p.images && p.images.length > 0 && p.images[0]?.image_url;
+
+				if (!hasImage) return null;
+
+				return (
+					<Link href={`products/${p.product_id}`}>
+						<ProductImage
+							src={p.images![0].image_url}
+							width={80}
+							height={80}
+							alt={p.product_name}
+							className="w-20 h-20 object-cover rounded"
+						/>
+					</Link>
+				);
+			},
 		},
 		{
 			header: 'Titulo',
@@ -55,11 +61,9 @@ export default async function OrdersPage({ searchParams }: Props) {
 					new Set((p.variants ?? []).map((v) => v.size_code).filter((s) => s && s.length))
 				);
 
-				return (
-					<span className="block truncate">
-						{sizes.length > 0 ? sizes.join(', ') : 'N/A'}
-					</span>
-				);
+				return sizes.length > 0 ? (
+					<span className="block truncate">{sizes.join(', ')}</span>
+				) : null;
 			},
 		},
 		{
@@ -73,27 +77,21 @@ export default async function OrdersPage({ searchParams }: Props) {
 					)
 				);
 
-				return (
-					<span className="block truncate">
-						{colors.length > 0 ? colors.join(', ') : 'N/A'}
-					</span>
-				);
+				return colors.length > 0 ? (
+					<span className="block truncate">{colors.join(', ')}</span>
+				) : null;
 			},
 		},
 		{
 			header: 'N.º variantes',
 			cell: (p: Product) => {
 				const variants = p.variants ?? [];
-				return (
-					<span className="block truncate">
-						{variants.length === 0 ? 'N/A' : variants.length}
-					</span>
-				);
+				return variants.length > 0 ? variants.length : null;
 			},
 		},
 		{
 			header: 'Categoría',
-			cell: (p: Product) => <>{p.category?.category_name}</>,
+			cell: (p: Product) => p.category?.category_name || null,
 		},
 		{
 			header: 'Creado',
