@@ -34,7 +34,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 			header: 'Color',
 			cell: (c: Color) => (
 				<Link
-					href={`colors/${c.color_name}`}
+					href={`colors/${c.color_id}`}
 					className="group hover:underline flex items-center gap-2 text-gray-800 hover:text-gray-900 font-semibold">
 					<IoEyeOffOutline className="text-lg group-hover:hidden transition-all" />
 					<IoEyeOutline className="text-lg hidden group-hover:block transition-all" />

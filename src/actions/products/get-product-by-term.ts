@@ -4,10 +4,7 @@ import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfac
 import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
-export const getProductByTerm = async (
-	term: string,
-	deleteds?: boolean
-): Promise<Response<Product>> => {
+export const getProductByTerm = async (term: string): Promise<Response<Product>> => {
 	const isNumeric = !isNaN(Number(term));
 
 	const where: ProductWhereInput = {
