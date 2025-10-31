@@ -1,7 +1,7 @@
 import { getProductByTerm, searchCategories, searchColors, searchSizes } from '@/actions';
 import { Title } from '@/components';
-import { Product, Response } from '@/interfaces';
 
+import { ErrorCode } from '@/lib';
 import { ProductForm } from './ui/ProductForm';
 
 interface Props {
@@ -15,22 +15,31 @@ export default async function ProductPage({ params }: Props) {
 
 	const title = term === 'new' ? 'Nuevo producto' : 'Editar producto';
 
-	const productPromise =
-		term === 'new' ? getProductByTerm(term) : Promise.resolve({} as Response<Product>);
-
 	const [categories, colors, sizes, product] = await Promise.all([
 		searchCategories(''),
 		searchColors(''),
 		searchSizes(''),
-		productPromise,
+		getProductByTerm(term),
 	]);
+
+	// TODO: Mejorar not found page y reutilizarla
+
+	const { success, code, ...rest } = product;
+
+	if (term !== 'new' && code === ErrorCode.PRODUCT_NOT_FOUND) {
+		return (
+			<>
+				<Title title="Producto no encontrado" backUrl="/system/products" />
+			</>
+		);
+	}
 
 	return (
 		<>
 			<Title title={title} backUrl="/system/products" />
 
 			<ProductForm
-				product={product.data ?? {}}
+				product={rest.data ?? {}}
 				categories={categories.data ?? []}
 				colors={colors.data ?? []}
 				sizes={sizes.data ?? []}

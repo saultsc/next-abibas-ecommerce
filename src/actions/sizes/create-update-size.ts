@@ -7,7 +7,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const sizeSchema = {
-	size_code: z
+	size_code: z.string().optional(),
+	new_size_code: z
 		.string()
 		.min(1, 'El código del talla es obligatorio')
 		.max(10, 'El código del talla debe tener máximo 10 caracteres'),
@@ -25,7 +26,7 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 		};
 	}
 
-	const { size_code, ...rest } = sizeParsed;
+	const { size_code, new_size_code, ...rest } = sizeParsed;
 	try {
 		let size;
 		let message;
@@ -37,7 +38,7 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 		if (existingSize) {
 			size = await prisma.sizes.update({
 				where: { size_code },
-				data: { ...rest, updated_at: new Date() },
+				data: { size_code: new_size_code, ...rest, updated_at: new Date() },
 			});
 
 			message = 'Talla actualizada exitosamente';
@@ -46,12 +47,10 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 				where: { size_code },
 			});
 
-			if (isExisting) {
-				throw new AppError(ErrorCode.SIZE_ALREADY_EXISTS);
-			}
+			if (isExisting) throw new AppError(ErrorCode.SIZE_ALREADY_EXISTS);
 
 			size = await prisma.sizes.create({
-				data: { size_code, ...rest },
+				data: { size_code: new_size_code, ...rest },
 			});
 
 			message = 'Talla creada exitosamente';
@@ -66,8 +65,6 @@ export const createOrUpdateSize = async (formData: FormData): Promise<Response<S
 			data: size,
 		};
 	} catch (error) {
-		console.error('Error al crear/actualizar la talla:', error);
-
 		if (AppError.isAppError(error)) {
 			return {
 				success: false,

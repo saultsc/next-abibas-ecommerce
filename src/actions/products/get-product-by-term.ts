@@ -31,9 +31,7 @@ export const getProductByTerm = async (
 			include: include,
 		});
 
-		if (!product) {
-			throw AppError.notFound(ErrorCode.PRODUCT_NOT_FOUND);
-		}
+		if (!product) throw AppError.notFound(ErrorCode.PRODUCT_NOT_FOUND);
 
 		const { product_images, product_variants, categories, price, weight, ...rest } = product;
 
@@ -53,11 +51,9 @@ export const getProductByTerm = async (
 			},
 		};
 	} catch (error) {
-		console.error('Error al obtener el producto por término:', error);
-
 		if (AppError.isAppError(error)) {
 			return {
-				success: true,
+				success: false,
 				message: error.message,
 				code: error.code,
 			};

@@ -104,14 +104,6 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 			};
 		}
 
-		if (error instanceof z.ZodError) {
-			return {
-				success: false,
-				message: 'Datos de producto inválidos',
-				code: ErrorCode.VALIDATION_ERROR,
-			};
-		}
-
 		return {
 			success: false,
 			message: 'Error inesperado al procesar el producto',

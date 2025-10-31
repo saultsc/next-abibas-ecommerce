@@ -1,12 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
+import { TextField } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
 import { createOrUpdateSize, deleteSize } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Size } from '@/interfaces';
-import { TextField } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 interface Props {
 	size: Size;
@@ -14,6 +16,7 @@ interface Props {
 
 interface FormInputs {
 	size_code: string;
+	new_size_code: string;
 	state: string;
 }
 
@@ -30,6 +33,7 @@ export const SizeForm = ({ size }: Props) => {
 		defaultValues: {
 			...size,
 			state: size.state ?? 'A',
+			new_size_code: size.size_code ?? '',
 		},
 		mode: 'onChange',
 	});
@@ -37,13 +41,14 @@ export const SizeForm = ({ size }: Props) => {
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { size_code, state } = data;
+		const { size_code, new_size_code, state } = data;
 
 		if (size.size_code) {
 			formData.append('size_code', size.size_code);
 		}
 
 		formData.append('size_code', size_code);
+		formData.append('new_size_code', new_size_code);
 		formData.append('state', state);
 
 		const { success, data: sizeData, message } = await createOrUpdateSize(formData);
@@ -54,7 +59,7 @@ export const SizeForm = ({ size }: Props) => {
 		}
 
 		toast.success(message || 'Talla guardada exitosamente');
-		router.replace(`/system/sizes/${sizeData?.size_code}`);
+		router.replace(`/system/sizes`);
 	};
 
 	const handleDelete = async () => {
@@ -77,9 +82,9 @@ export const SizeForm = ({ size }: Props) => {
 					label="Código del Talla *"
 					variant="filled"
 					className="w-full"
-					error={!!errors.size_code}
-					helperText={errors.size_code?.message}
-					{...register('size_code', {
+					error={!!errors.new_size_code}
+					helperText={errors.new_size_code?.message}
+					{...register('new_size_code', {
 						required: 'El código del talla es requerido',
 						maxLength: {
 							value: 10,
