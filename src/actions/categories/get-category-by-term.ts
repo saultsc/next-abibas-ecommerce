@@ -1,6 +1,7 @@
 'use server';
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
+import { AppError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 export const getCategoryByTerm = async (term: string): Promise<Response<Category>> => {
@@ -15,20 +16,25 @@ export const getCategoryByTerm = async (term: string): Promise<Response<Category
 			where,
 		});
 
-		if (!category)
-			return {
-				success: false,
-				message: 'Categoría no encontrada',
-			};
+		if (!category) throw AppError.notFound(ErrorCode.CATEGORY_NOT_FOUND);
 
 		return {
 			success: true,
 			data: category,
 		};
 	} catch (error) {
+		if (AppError.isAppError(error)) {
+			return {
+				success: false,
+				message: error.message,
+				code: error.code,
+			};
+		}
+
 		return {
 			success: false,
 			message: 'Error al obtener la categoría',
+			code: ErrorCode.INTERNAL_ERROR,
 		};
 	}
 };

@@ -12,9 +12,9 @@ interface Props {
 export default async function CategoryByTermPage({ params }: Props) {
 	const { term } = await params;
 
-	const { data: color } = await getColorByTerm(term);
-
 	const title = term === 'new' ? 'Nuevo color' : 'Editar color';
+
+	const { data: color } = await getColorByTerm(term);
 
 	return (
 		<>
