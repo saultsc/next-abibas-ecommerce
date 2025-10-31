@@ -38,6 +38,9 @@ export enum ErrorCode {
 
 	// Errores de imágenes de productos
 	PRODUCT_IMAGE_NOT_FOUND = 'PRODUCT_IMAGE_NOT_FOUND',
+
+	// Errores de tipos de vehículos
+	VEHICLE_TYPE_NOT_FOUND = 'VEHICLE_TYPE_NOT_FOUND',
 }
 
 /**
@@ -77,6 +80,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 
 	[ErrorCode.UNAUTHORIZED]: 'No autorizado',
 	[ErrorCode.FORBIDDEN]: 'Acceso prohibido',
+
+	[ErrorCode.VEHICLE_TYPE_NOT_FOUND]: 'Tipo de vehículo no encontrado',
 };
 
 /**

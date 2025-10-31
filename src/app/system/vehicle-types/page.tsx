@@ -2,7 +2,9 @@ export const revalidate = 0;
 
 import { Column, Pagination, Table, Title } from '@/components';
 import { VehicleType } from '@/interfaces';
+import { getPaginatedVehicleTypes } from '@/actions';
 import { dateFormat } from '@/utils/dateFormat';
+import { Decimal } from '@prisma/client/runtime/library';
 import Link from 'next/link';
 import {
     IoAddCircleOutline,
@@ -22,7 +24,9 @@ export default async function VehicleTypesPage({ searchParams }: Props) {
 
     const page = resolved?.page ? parseInt(resolved.page) : 1;
 
-    const { data: vehicleTypes = [], totalPages = 0 } = [] as any;
+    const { data: vehicleTypes = [], totalPages = 0 } = await getPaginatedVehicleTypes({
+        page,
+    });
 
     const vehicleTypeColumns: Column<VehicleType>[] = [
         {
@@ -35,6 +39,24 @@ export default async function VehicleTypesPage({ searchParams }: Props) {
                     <IoEyeOutline className="text-lg hidden group-hover:block transition-all" />
                     {c.type_name }
                 </Link>
+            ),
+        },
+         {
+            header: 'Descripción',
+            cell: (c: VehicleType) => (
+                <span className="flex items-center gap-2 text-gray-600 text-sm">
+                    <IoTimeOutline className="text-base" />
+                    {c.description}
+                </span>
+            ),
+        },
+        {
+            header: 'Capacidad',
+            cell: (c: VehicleType) => (
+                <span className="flex items-center gap-2 text-gray-600 text-sm">
+                    <IoTimeOutline className="text-base" />
+                    {Decimal(c.load_capacity_kg).toNumber()} kg
+                </span>
             ),
         },
         {

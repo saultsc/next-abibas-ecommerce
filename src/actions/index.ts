@@ -27,3 +27,7 @@ export * from './color/color-search';
 export * from './color/create-update-color';
 export * from './color/delete-color';
 export * from './color/get-color-by-term';
+
+// * Vehicle Types
+export * from './vehicleTypes/vehicleTypes-Pagination';
+

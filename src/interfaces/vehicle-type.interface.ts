@@ -1,4 +1,6 @@
 import { Decimal } from "@prisma/client/runtime/library";
+import { Prisma } from '@prisma/client';
+
 
 export interface VehicleType {
     vehicle_type_id: number;
@@ -9,6 +11,8 @@ export interface VehicleType {
     created_at: Date;
     updated_at: Date; 
 }
+
+export type VehicleTypesWhereInput = Prisma.vehicle_typesWhereInput;
 
 
 
