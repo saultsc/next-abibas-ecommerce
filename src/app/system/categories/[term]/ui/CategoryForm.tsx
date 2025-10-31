@@ -1,12 +1,13 @@
 'use client';
+import { useRouter } from 'next/navigation';
+
+import { TextField } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { createOrUpdateCategory, deleteCategory } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Category } from '@/interfaces';
-import { TextField } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 interface Props {
 	category: Category;
