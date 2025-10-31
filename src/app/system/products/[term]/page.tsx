@@ -1,6 +1,7 @@
 import { getProductByTerm, searchCategories, searchColors, searchSizes } from '@/actions';
 import { Title } from '@/components';
 import { Product, Response } from '@/interfaces';
+
 import { ProductForm } from './ui/ProductForm';
 
 interface Props {

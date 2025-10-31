@@ -14,17 +14,13 @@ export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
 			where: where,
 		});
 
-		if (!size) {
-			throw AppError.notFound(ErrorCode.SIZE_NOT_FOUND);
-		}
+		if (!size) throw AppError.notFound(ErrorCode.SIZE_NOT_FOUND);
 
 		return {
 			success: true,
 			data: size,
 		};
 	} catch (error) {
-		console.error('Error al obtener la talla:', error);
-
 		if (AppError.isAppError(error)) {
 			return {
 				success: false,
