@@ -7,7 +7,7 @@ export interface VehicleType {
     type_name: string;
     description: string | null;
     state: string;
-    load_capacity_kg: number | Decimal;
+    load_capacity_kg: Decimal | number;
     created_at: Date;
     updated_at: Date; 
 }
