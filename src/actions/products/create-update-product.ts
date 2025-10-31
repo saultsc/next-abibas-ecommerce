@@ -28,13 +28,23 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 		};
 	}
 
-	console.log({ productParsed });
-
 	const { product_id, ...rest } = productParsed;
 
 	try {
 		let message;
+		let uploadedImageUrls: (string | null)[] = [];
 
+		// 1. PRIMERO: Subir las imágenes al sistema de archivos (FUERA de la transacción)
+		const imageFiles = formData.getAll('images') as File[];
+		if (imageFiles && imageFiles.length > 0) {
+			const uploadResult = await uploadImages(imageFiles);
+			if (!uploadResult || uploadResult.every((url) => url === null)) {
+				throw new AppError(ErrorCode.PRODUCT_UPLOAD_IMAGES_FAILED);
+			}
+			uploadedImageUrls = uploadResult;
+		}
+
+		// 2. DESPUÉS: Ejecutar la transacción de BD (rápida, solo operaciones de BD)
 		const prismaTx = await prisma.$transaction(async (tx) => {
 			let product: Product;
 
@@ -61,18 +71,17 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 				message = 'Producto creado exitosamente';
 			}
 
-			if (formData.getAll('images')) {
-				const images = await uploadImages(formData.getAll('images') as File[]);
-				if (!images) {
-					throw new AppError(ErrorCode.PRODUCT_UPLOAD_IMAGES_FAILED);
-				}
+			if (uploadedImageUrls.length > 0) {
+				const validImages = uploadedImageUrls.filter((url) => url !== null);
 
-				await prisma.product_images.createMany({
-					data: images.map((image) => ({
-						image_url: image!,
-						product_id: product.product_id,
-					})),
-				});
+				if (validImages.length > 0) {
+					await tx.product_images.createMany({
+						data: validImages.map((image) => ({
+							image_url: image!,
+							product_id: product.product_id,
+						})),
+					});
+				}
 			}
 
 			return product;
@@ -94,8 +103,6 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 			},
 		};
 	} catch (error) {
-		console.error('Error al crear/actualizar el producto:', error);
-
 		if (AppError.isAppError(error)) {
 			return {
 				success: false,

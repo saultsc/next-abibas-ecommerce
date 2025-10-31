@@ -66,6 +66,7 @@ export const getPaginatedProducts = async (params: Params): Promise<Response<Pro
 					...variant,
 					price_adjustment: Number(variant.price_adjustment),
 				})),
+				images: product.product_images,
 				category: product.categories,
 			})),
 		};

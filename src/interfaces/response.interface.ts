@@ -1,10 +1,10 @@
 import { ErrorCode } from '@/lib';
 
-export interface Response<T> {
+export interface Response<T = unknown> {
 	success: boolean;
 	message?: string;
 	currPage?: number;
 	totalPages?: number;
-	data?: T;
 	code?: number | ErrorCode;
+	data?: T;
 }

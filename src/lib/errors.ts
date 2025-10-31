@@ -35,6 +35,9 @@ export enum ErrorCode {
 	// Errores de autenticación
 	UNAUTHORIZED = 'UNAUTHORIZED',
 	FORBIDDEN = 'FORBIDDEN',
+
+	// Errores de imágenes de productos
+	PRODUCT_IMAGE_NOT_FOUND = 'PRODUCT_IMAGE_NOT_FOUND',
 }
 
 /**
@@ -69,6 +72,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 		'No se puede eliminar la variante porque está asociada a órdenes',
 	[ErrorCode.VARIANT_HAS_MOVEMENTS]:
 		'No se puede eliminar la variante porque está asociada a movimientos de inventario',
+
+	[ErrorCode.PRODUCT_IMAGE_NOT_FOUND]: 'Imagen del producto no encontrada',
 
 	[ErrorCode.UNAUTHORIZED]: 'No autorizado',
 	[ErrorCode.FORBIDDEN]: 'Acceso prohibido',

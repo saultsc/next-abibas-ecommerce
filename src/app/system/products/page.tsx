@@ -49,7 +49,7 @@ export default async function OrdersPage({ searchParams }: Props) {
 			cell: (p: Product) => <span className="font-bold">{currencyFormat(p.price)}</span>,
 		},
 		{
-			header: 'Size(s)',
+			header: 'Talla(s)',
 			cell: (p: Product) => {
 				const sizes = Array.from(
 					new Set((p.variants ?? []).map((v) => v.size_code).filter((s) => s && s.length))
@@ -76,6 +76,17 @@ export default async function OrdersPage({ searchParams }: Props) {
 				return (
 					<span className="block truncate">
 						{colors.length > 0 ? colors.join(', ') : 'N/A'}
+					</span>
+				);
+			},
+		},
+		{
+			header: 'N.º variantes',
+			cell: (p: Product) => {
+				const variants = p.variants ?? [];
+				return (
+					<span className="block truncate">
+						{variants.length === 0 ? 'N/A' : variants.length}
 					</span>
 				);
 			},

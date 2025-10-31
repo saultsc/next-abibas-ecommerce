@@ -21,6 +21,8 @@ interface Props {
 	sizes?: Size[];
 }
 
+type ProductImageInput = ProductImages | File;
+
 interface FormInputs {
 	product_name: string;
 	sku: string;
@@ -30,7 +32,7 @@ interface FormInputs {
 	category_id: number;
 	state: string;
 	variants?: ProductVariants[];
-	images?: FileList;
+	images?: ProductImageInput[];
 }
 
 export const ProductForm = ({ product, categories = [], colors = [], sizes = [] }: Props) => {
@@ -59,7 +61,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 			price: product.price ? Number(product.price) : 0,
 			weight: product.weight ? Number(product.weight) : null,
 			state: product.state ?? 'A',
-			images: undefined,
+			images: product.images ?? [],
 			variants: product.variants || [],
 		},
 		mode: 'onChange',
@@ -108,13 +110,33 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 			formData.append('variants', JSON.stringify(variants));
 		}
 
-		if (images) {
-			for (let i = 0; i < images.length; i++) {
-				formData.append('images', images[i]);
-			}
-		}
+		if (images && images.length > 0) {
+			// Separar imágenes existentes y nuevas
+			const existingImages: ProductImages[] = [];
+			const newFiles: File[] = [];
 
-		const { success, data: updatedProduct, message } = await createOrUpdateProduct(formData);
+			images.forEach((img) => {
+				if (img instanceof File) {
+					newFiles.push(img);
+				} else {
+					existingImages.push(img);
+				}
+			});
+
+			// Agregar IDs de imágenes existentes que se mantienen
+			if (existingImages.length > 0) {
+				formData.append(
+					'existingImages',
+					JSON.stringify(existingImages.map((img) => img.image_id))
+				);
+			}
+
+			// Agregar nuevos archivos
+			newFiles.forEach((file) => {
+				formData.append('images', file);
+			});
+		}
+		const { success, message } = await createOrUpdateProduct(formData);
 
 		if (!success) {
 			toast.error(message || 'No se pudo actualizar el producto');
@@ -122,7 +144,7 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 		}
 
 		toast.success(message || 'Producto actualizado exitosamente');
-		router.replace(`/system/products/${updatedProduct?.product_id}`);
+		router.replace(`/system/products`);
 	};
 
 	const handleDelete = async () => {
@@ -222,11 +244,8 @@ export const ProductForm = ({ product, categories = [], colors = [], sizes = [] 
 				<div className="w-full">
 					<p className="mt-3 mb-2 font-semibold text-gray-700">Subir imágenes</p>
 					<ProductUploadImages
-						productImages={product.images}
-						productTitle={product.product_name}
-						register={register}
-						setValue={setValue}
-						maxImages={3}
+						images={watch('images') || []}
+						onImagesChange={(images: ProductImageInput[]) => setValue('images', images)}
 					/>
 				</div>
 

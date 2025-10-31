@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface Props {
 	src?: string;
@@ -10,20 +13,24 @@ interface Props {
 }
 
 export const ProductImage = ({ src, alt, className, style, width, height }: Props) => {
-	const localSrc = src
-		? src.startsWith('http') // https://urlcompletodelaimagen.jpg
-			? src
-			: `/products/${src}`
-		: '/imgs/placeholder.jpg';
+	const [imgSrc, setImgSrc] = useState(() => {
+		if (!src) return '/imgs/placeholder.jpg';
+		if (src.startsWith('http')) return src;
+		if (src.startsWith('/products/')) return src;
+		return `/products/${src}`;
+	});
 
 	return (
 		<Image
-			src={localSrc}
+			src={imgSrc}
 			width={width}
 			height={height}
 			alt={alt}
 			className={className}
 			style={style}
+			onError={() => {
+				setImgSrc('/imgs/placeholder.jpg');
+			}}
 		/>
 	);
 };
