@@ -29,8 +29,7 @@ export * from './color/delete-color';
 export * from './color/get-color-by-term';
 
 // * Vehicle Types
-export * from './vehicleTypes/vehicleTypes-Pagination';
-export * from './vehicleTypes/create-update-vehicleTypes';
-export * from './vehicleTypes/delete-vehicleTypes';
-export * from './vehicleTypes/get-vehicleTypes-by-term';
-
+export * from './vehicle-types/create-update-vehicleTypes';
+export * from './vehicle-types/delete-vehicleTypes';
+export * from './vehicle-types/get-vehicleTypes-by-term';
+export * from './vehicle-types/vehicleTypes-Pagination';
