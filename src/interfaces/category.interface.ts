@@ -9,3 +9,4 @@ export interface Category {
 }
 
 export type CategoryWhereInput = Prisma.categoriesWhereInput;
+export type CategoryInclude = Prisma.categoriesInclude;

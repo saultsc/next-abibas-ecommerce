@@ -2,20 +2,20 @@
 
 import prisma from '@/lib/prisma';
 
-import { Response, User, UsersInclude, UsersWhereInput } from '@/interfaces';
+import { Response, User, UserInclude, UserWhereInput } from '@/interfaces';
 import { CustomError, ErrorCode } from '@/lib';
 
 export const getCustomerByTerm = async (term: string): Promise<Response<User>> => {
 	const isNumeric = !isNaN(Number(term));
 
-	const where: UsersWhereInput = {
+	const where: UserWhereInput = {
 		...(term ? (isNumeric ? { user_id: Number(term) } : { username: term }) : {}),
 		customers: {
 			isNot: null,
 		},
 	};
 
-	const include: UsersInclude = {
+	const include: UserInclude = {
 		persons: {
 			include: {
 				phones: true,

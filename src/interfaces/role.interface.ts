@@ -8,5 +8,5 @@ export interface Role {
 	updated_at: Date;
 }
 
-export type RolesWhereInput = Prisma.rolesWhereInput;
-export type RolesInclude = Prisma.rolesInclude;
+export type RoleWhereInput = Prisma.rolesWhereInput;
+export type RoleInclude = Prisma.rolesInclude;

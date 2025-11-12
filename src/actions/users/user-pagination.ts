@@ -1,6 +1,6 @@
 'use server';
 
-import { Response, User, UsersInclude, UsersWhereInput } from '@/interfaces';
+import { Response, User, UserInclude, UserWhereInput } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
 interface Params {
@@ -15,14 +15,14 @@ export const getPaginatedUsers = async (params: Params): Promise<Response<User[]
 
 	const isNumeric = !isNaN(Number(term));
 
-	const where: UsersWhereInput = {
+	const where: UserWhereInput = {
 		...(term ? (isNumeric ? { user_id: Number(term) } : { username: { contains: term } }) : {}),
 		employees: {
 			isNot: null,
 		},
 	};
 
-	const include: UsersInclude = {
+	const include: UserInclude = {
 		persons: {
 			include: {
 				phones: true,

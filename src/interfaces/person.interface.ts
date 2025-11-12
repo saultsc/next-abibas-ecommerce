@@ -2,8 +2,8 @@ import { Prisma } from '@prisma/client';
 import { Phone } from './pohone.interface';
 
 export interface Party {
-	party_id: number;
 	party_type: string;
+	description: string;
 	state: string;
 	created_at: Date;
 	updated_at: Date;
@@ -20,13 +20,15 @@ export interface DocumentType {
 export interface Person {
 	person_id: number;
 	first_name: string;
-	last_name: string;
+	last_name: string | null;
 	date_of_birth: Date | null;
 	email: string | null;
+	party_type: string;
 	created_at: Date;
 	updated_at: Date;
 	document_types?: DocumentType;
 	phones?: Phone[];
+	parties?: Party[];
 }
 
 export type PartiesWhereInput = Prisma.partiesWhereInput;

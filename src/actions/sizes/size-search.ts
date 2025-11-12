@@ -2,11 +2,11 @@
 
 import prisma from '@/lib/prisma';
 
-import { Response, Size, SizesWhereInput } from '@/interfaces';
+import { Response, Size, SizeWhereInput } from '@/interfaces';
 import { ErrorCode } from '@/lib';
 
 export const searchSizes = async (term: string): Promise<Response<Size[]>> => {
-	const where: SizesWhereInput = {
+	const where: SizeWhereInput = {
 		...{ size_code: { contains: term } },
 		...{ state: 'A' },
 	};

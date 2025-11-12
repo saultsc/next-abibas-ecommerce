@@ -18,5 +18,5 @@ export interface User {
 	roles?: Role | null;
 }
 
-export type UsersWhereInput = Prisma.usersWhereInput;
-export type UsersInclude = Prisma.usersInclude;
+export type UserWhereInput = Prisma.usersWhereInput;
+export type UserInclude = Prisma.usersInclude;

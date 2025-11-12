@@ -1,4 +1,4 @@
-import { Response, Size, SizesWhereInput } from '@/interfaces';
+import { Response, Size, SizeWhereInput } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
 interface Params {
@@ -11,7 +11,7 @@ export const getPaginatedSizes = async (params: Params): Promise<Response<Size[]
 	const { page = 1, limit = 10, term } = params;
 	const skip = (page - 1) * limit;
 
-	const where: SizesWhereInput = {
+	const where: SizeWhereInput = {
 		...(term ? { size_code: { contains: term } } : {}),
 	};
 

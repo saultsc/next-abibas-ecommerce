@@ -1,13 +1,13 @@
 'use server';
 
-import { Response, VehicleType, VehicleTypesWhereInput } from '@/interfaces';
+import { Response, VehicleType, VehicleTypeWhereInput } from '@/interfaces';
 import { CustomError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 export const getVehicleTypeByTerm = async (term: string): Promise<Response<VehicleType>> => {
 	const isNumeric = !isNaN(Number(term));
 
-	const where: VehicleTypesWhereInput = {
+	const where: VehicleTypeWhereInput = {
 		...(isNumeric ? { vehicle_type_id: Number(term) } : { type_name: term }),
 	};
 

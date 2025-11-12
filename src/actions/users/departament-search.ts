@@ -2,13 +2,13 @@
 
 import prisma from '@/lib/prisma';
 
-import { DepartmentsWhereInput } from '@/interfaces';
+import { DepartmentWhereInput } from '@/interfaces';
 import { ErrorCode } from '@/lib';
 
 export const searchDepartments = async (term: string) => {
 	const isNumeric = !isNaN(Number(term));
 
-	const where: DepartmentsWhereInput = {
+	const where: DepartmentWhereInput = {
 		...(term
 			? isNumeric
 				? { department_id: Number(term) }

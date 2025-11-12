@@ -48,14 +48,14 @@ export interface Vehicle {
 	updated_at: Date;
 }
 
-export type VehiclesWhereInput = Prisma.vehiclesWhereInput;
-export type VehiclesInclude = Prisma.vehiclesInclude;
+export type VehicleWhereInput = Prisma.vehiclesWhereInput;
+export type VehicleInclude = Prisma.vehiclesInclude;
 
-export type VehicleTypesWhereInput = Prisma.vehicle_typesWhereInput;
-export type VehicleTypesInclude = Prisma.vehicle_typesInclude;
+export type VehicleTypeWhereInput = Prisma.vehicle_typesWhereInput;
+export type VehicleTypeInclude = Prisma.vehicle_typesInclude;
 
 export type VehicleStatusWhereInput = Prisma.vehicle_statusesWhereInput;
 export type VehicleStatusInclude = Prisma.vehicle_statusesInclude;
 
-export type VehicleDocumentTypesWhereInput = Prisma.vehicle_document_typesWhereInput;
-export type VehicleDocumentTypesInclude = Prisma.vehicle_document_typesInclude;
+export type VehicleDocumentTypeWhereInput = Prisma.vehicle_document_typesWhereInput;
+export type VehicleDocumentTypeInclude = Prisma.vehicle_document_typesInclude;

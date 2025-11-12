@@ -1,11 +1,11 @@
 'use server';
 
-import { Response, Size, SizesWhereInput } from '@/interfaces';
+import { Response, Size, SizeWhereInput } from '@/interfaces';
 import { CustomError, ErrorCode } from '@/lib';
 import prisma from '@/lib/prisma';
 
 export const getSizeByTerm = async (term: string): Promise<Response<Size>> => {
-	const where: SizesWhereInput = {
+	const where: SizeWhereInput = {
 		...{ size_code: { contains: term } },
 	};
 

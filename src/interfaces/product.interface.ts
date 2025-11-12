@@ -44,3 +44,9 @@ export interface ProductImages {
 
 export type ProductWhereInput = Prisma.productsWhereInput;
 export type ProductInclude = Prisma.productsInclude;
+
+export type ProductVariantsWhereInput = Prisma.product_variantsWhereInput;
+export type ProductVariantsInclude = Prisma.product_variantsInclude;
+
+export type ProductImageWhereInput = Prisma.product_imagesWhereInput;
+export type ProductImageInclude = Prisma.product_imagesInclude;

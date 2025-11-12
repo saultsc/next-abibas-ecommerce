@@ -1,6 +1,6 @@
 'use server';
 
-import { VehiclesInclude, VehiclesWhereInput } from '@/interfaces';
+import { VehicleInclude, VehicleWhereInput } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
 interface Params {
@@ -12,9 +12,9 @@ export const getPaginatedVehicles = async (params: Params) => {
 	const { page = 1, take = 10 } = params;
 	const skip = (page - 1) * take;
 
-	const where: VehiclesWhereInput = {};
+	const where: VehicleWhereInput = {};
 
-	const include: VehiclesInclude = {
+	const include: VehicleInclude = {
 		vehicle_types: {
 			select: {
 				type_name: true,

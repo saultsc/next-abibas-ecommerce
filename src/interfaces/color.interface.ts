@@ -9,4 +9,5 @@ export interface Color {
 	updated_at: Date;
 }
 
-export type ColorsWhereInput = Prisma.colorsWhereInput;
+export type ColorWhereInput = Prisma.colorsWhereInput;
+export type ColorInclude = Prisma.colorsInclude;

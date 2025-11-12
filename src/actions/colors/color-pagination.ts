@@ -1,4 +1,4 @@
-import { Color, ColorsWhereInput, Response } from '@/interfaces';
+import { Color, ColorWhereInput, Response } from '@/interfaces';
 import prisma from '@/lib/prisma';
 
 interface Params {
@@ -13,7 +13,7 @@ export const getPaginatedColors = async (params: Params): Promise<Response<Color
 
 	const isNumeric = !isNaN(Number(term));
 
-	const where: ColorsWhereInput = {
+	const where: ColorWhereInput = {
 		...(term
 			? isNumeric
 				? { color_id: Number(term) }

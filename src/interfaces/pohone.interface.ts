@@ -1,4 +1,3 @@
-import { Party } from '@/interfaces';
 import { Prisma } from '@prisma/client';
 
 export interface PhoneType {
@@ -11,7 +10,6 @@ export interface PhoneType {
 
 export interface Phone {
 	phone_id: number;
-	party_id: number;
 	phone_type_id: number;
 	phone_number: string;
 	is_primary: boolean;
@@ -19,7 +17,6 @@ export interface Phone {
 	created_at: Date;
 	updated_at: Date;
 	phone_types?: PhoneType;
-	parties?: Party;
 }
 
 export type PhoneTypesWhereInput = Prisma.phone_typesWhereInput;

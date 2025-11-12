@@ -2,13 +2,13 @@
 
 import prisma from '@/lib/prisma';
 
-import { Response, Role, RolesWhereInput } from '@/interfaces';
+import { Response, Role, RoleWhereInput } from '@/interfaces';
 import { ErrorCode } from '@/lib';
 
 export const searchRoles = async (term: string): Promise<Response<Role[]>> => {
 	const isNumeric = !isNaN(Number(term));
 
-	const where: RolesWhereInput = {
+	const where: RoleWhereInput = {
 		...(term
 			? isNumeric
 				? { role_id: Number(term) }

@@ -7,4 +7,5 @@ export interface Size {
 	updated_at: Date;
 }
 
-export type SizesWhereInput = Prisma.sizesWhereInput;
+export type SizeWhereInput = Prisma.sizesWhereInput;
+export type SizeInclude = Prisma.sizesInclude;
