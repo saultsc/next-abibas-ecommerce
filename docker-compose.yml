@@ -1,0 +1,11 @@
+services:
+    sqlserver-db:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        environment:
+            ACCEPT_EULA: Y
+            SA_PASSWORD: ${DB_PASSWORD}
+            MSSQL_DB: ${DB_NAME}
+        volumes:
+            - ./sqlserver:/var/opt/mssql/data
+        ports:
+            - 1433:1433
