@@ -21,7 +21,7 @@ export interface Employee {
 }
 
 export type DepartmentWhereInput = Prisma.departmentsWhereInput;
-export type DepartmentsInclude = Prisma.departmentsInclude;
+export type DepartmentInclude = Prisma.departmentsInclude;
 
 export type EmployeeWhereInput = Prisma.employeesWhereInput;
 export type EmployeeInclude = Prisma.employeesInclude;

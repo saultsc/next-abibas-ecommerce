@@ -15,6 +15,7 @@ import { IoIosColorFilter } from 'react-icons/io';
 import {
 	IoChevronBackOutline,
 	IoChevronForwardOutline,
+	IoCubeOutline,
 	IoShirtOutline,
 	IoTicketOutline,
 } from 'react-icons/io5';
@@ -52,6 +53,7 @@ const groupedMenus: MenuGroup[] = [
 		items: [
 			{ href: '/system/vehicle-types', icon: MdCategory, label: 'Tipos' },
 			{ href: '/system/vehicle-status', icon: MdOutlineToggleOn, label: 'Estados' },
+			{ href: '/system/maintenance', icon: MdOutlineToggleOn, label: 'Mantenimientos' },
 		],
 	},
 ];
@@ -60,6 +62,7 @@ const otherMenus: MenuItem[] = [
 	{ href: '/system/customers', icon: FaUser, label: 'Clientes' },
 	{ href: '/system/users', icon: FaUsers, label: 'Usuarios' },
 	{ href: '/system/orders', icon: IoTicketOutline, label: 'Órdenes' },
+	{ href: '/system/shipments', icon: IoCubeOutline, label: 'Envíos' },
 	{ href: '/system/suppliers', icon: FaTruck, label: 'Proveedores' },
 ];
 
