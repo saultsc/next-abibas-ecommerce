@@ -7,12 +7,16 @@ import { useForm } from 'react-hook-form';
 import { NumericFormat } from 'react-number-format';
 import { toast } from 'sonner';
 
-import { createOrUpdateProduct, deleteProduct, searchCategories } from '@/actions';
 import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { useSearch } from '@/hooks';
 import { Category, Color, Product, ProductImages, ProductVariants, Size } from '@/interfaces';
+
 import { ProductAddVariants } from './ProductAddVariants';
 import { ProductUploadImages } from './ProductUploadImages';
+
+import { searchCategories } from '@/actions/categories/category-search';
+import { createOrUpdateProduct } from '@/actions/products/create-update-product';
+import { deleteProduct } from '@/actions/products/delete-product';
 
 interface Props {
 	product: Partial<Product> & { images?: ProductImages[]; variants?: ProductVariants[] };

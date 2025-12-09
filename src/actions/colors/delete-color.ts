@@ -1,8 +1,7 @@
 'use server';
 
 import { Color, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 import { revalidatePath } from 'next/cache';
 
 export const deleteColor = async (color_id: number): Promise<Response<Color>> => {

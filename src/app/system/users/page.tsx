@@ -36,7 +36,7 @@ export default async function EmployeesPage({ searchParams }: Props) {
 			header: 'Departamento',
 			cell: (p: User) =>
 				p.employees?.departments ? (
-					<span>{p.employees?.departments.department_name}</span>
+					<span>{p.employees?.departments?.department_name}</span>
 				) : null,
 		},
 		{
@@ -56,22 +56,7 @@ export default async function EmployeesPage({ searchParams }: Props) {
 					</span>
 				) : null,
 		},
-		{
-			header: 'Creado',
-			cell: (p: User) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.created_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (p: User) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.updated_at)}
-				</span>
-			),
-		},
+
 		{
 			header: 'Estado',
 			cell: (p: User) => (

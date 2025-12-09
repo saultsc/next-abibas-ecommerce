@@ -1,7 +1,7 @@
 import { getProductByTerm, searchCategories, searchColors, searchSizes } from '@/actions';
 import { Title } from '@/components';
 
-import { ErrorCode } from '@/lib';
+import { ErrorCode } from '@/lib/errors';
 import { ProductForm } from './ui/ProductForm';
 
 interface Props {

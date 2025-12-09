@@ -1,6 +1,6 @@
 export const revalidate = 0;
 
-import { Column, Pagination, StateBadge, Table, Title } from '@/components';
+import { Column, Pagination, Table, Title } from '@/components';
 import { dateOnlyFormat } from '@/utils';
 import Link from 'next/link';
 import {
@@ -216,7 +216,7 @@ export default async function MaintenancePage({ searchParams }: Props) {
 				<Link
 					href={`/system/maintenance/${m.maintenance_id}`}
 					className="hover:underline flex items-center gap-2 text-gray-800 hover:text-gray-900 font-semibold">
-					<IoCarOutline className="text-lg flex-shrink-0" />
+					<IoCarOutline className="text-lg shrink-0" />
 					<span
 						className="truncate max-w-[150px]"
 						title={`${m.vehicle_make} ${m.vehicle_model}`}>
@@ -275,26 +275,6 @@ export default async function MaintenancePage({ searchParams }: Props) {
 					{m.service_provider}
 				</span>
 			),
-		},
-		{
-			header: 'Próximo Mantenimiento',
-			cell: (m: MaintenanceRecord) => (
-				<span className="text-gray-600 text-sm whitespace-nowrap">
-					{m.next_maintenance_date ? dateOnlyFormat(m.next_maintenance_date) : '-'}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (m: MaintenanceRecord) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm whitespace-nowrap">
-					{dateOnlyFormat(m.updated_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Estado',
-			cell: (m: MaintenanceRecord) => <StateBadge state={m.state} />,
 		},
 	];
 

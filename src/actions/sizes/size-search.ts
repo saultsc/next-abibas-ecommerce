@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 import { Response, Size, SizeWhereInput } from '@/interfaces';
 import { ErrorCode } from '@/lib';

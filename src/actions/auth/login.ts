@@ -4,8 +4,7 @@ import { cookies } from 'next/headers';
 
 import { envs } from '@/config';
 import { Response, User } from '@/interfaces';
-import { CustomError, ErrorCode, generateToken, verifyPassword } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, generateToken, prisma, verifyPassword } from '@/lib';
 import z from 'zod';
 
 interface LoginResponse extends User {

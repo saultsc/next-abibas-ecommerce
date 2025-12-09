@@ -1,7 +1,8 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 import { User } from '@/interfaces';
-import { Decimal } from '@prisma/client/runtime/library';
+
+import { Decimal } from '@prisma/client/runtime/client';
 
 export interface Customer {
 	customer_id: number;

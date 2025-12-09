@@ -3,7 +3,6 @@ export const revalidate = 0;
 import { getPaginatedCustomers } from '@/actions';
 import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { User } from '@/interfaces';
-import { dateFormat } from '@/utils';
 
 import Link from 'next/link';
 
@@ -41,22 +40,6 @@ export default async function CustomersPage({ searchParams }: Props) {
 		{
 			header: 'Correo',
 			cell: (p: User) => (p.persons?.email ? <span>{p.persons.email}</span> : null),
-		},
-		{
-			header: 'Creado',
-			cell: (p: User) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.created_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (p: User) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.updated_at)}
-				</span>
-			),
 		},
 		{
 			header: 'Estado',

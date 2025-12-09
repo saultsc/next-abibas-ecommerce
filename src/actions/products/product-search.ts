@@ -1,7 +1,7 @@
 'use server';
 
 import { Product, ProductWhereInput, Response } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 export const searchProducts = async (term: string): Promise<Response<Product[]>> => {
 	const where: ProductWhereInput = {

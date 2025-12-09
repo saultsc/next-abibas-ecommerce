@@ -1,5 +1,5 @@
 import { Response, Shipment, ShipmentInclude, ShipmentWhereInput } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 interface Params {
 	page?: number;

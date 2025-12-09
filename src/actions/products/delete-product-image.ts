@@ -1,8 +1,8 @@
 'use server';
 
 import { Response } from '@/interfaces';
+import { prisma } from '@/lib';
 import { CustomError, ErrorCode } from '@/lib/errors';
-import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export const deleteProductImage = async (image_id: number): Promise<Response> => {

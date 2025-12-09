@@ -75,3 +75,9 @@ export * from './auth/register';
 // * Customers
 export * from './customers/customer-pagination';
 export * from './customers/get-customer-by-term';
+
+// * Suppliers
+export * from './suppilers/create-update-supplier';
+export * from './suppilers/get-supplier-by-term';
+export * from './suppilers/supplier-pagination';
+export * from './suppilers/supplier-search';

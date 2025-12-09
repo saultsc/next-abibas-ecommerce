@@ -8,11 +8,15 @@ import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { createOrUpdateUser, searchDepartments, searchDocumentTypes, searchRoles } from '@/actions';
 import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { useSearch } from '@/hooks';
 import { Department, DocumentType, Party, Phone, PhoneType, Role, User } from '@/interfaces';
 import { validateDateOfBirth } from '@/utils';
+
+import { searchDocumentTypes } from '@/actions/document-types/document-type-search';
+import { searchRoles } from '@/actions/roles/role-search';
+import { createOrUpdateUser } from '@/actions/users/create-update-user';
+import { searchDepartments } from '@/actions/users/departament-search';
 
 interface Props {
 	user: User;
@@ -68,8 +72,8 @@ export const UserForm = (props: Props) => {
 			department_id: user.employees?.department_id ?? ('' as any),
 			email: user.persons?.email ?? '',
 			date_of_birth: user.persons?.date_of_birth ?? (null as any),
-			document_type_id: user.employees?.document_type_id ?? ('' as any),
-			document_number: user.employees?.document_number ?? '',
+			document_type_id: user.persons?.document_type_id ?? ('' as any),
+			document_number: user.persons?.document_number ?? '',
 			role_id: user.role_id ?? ('' as any),
 
 			password: isEditMode ? FAKE_PASSWORD : '',

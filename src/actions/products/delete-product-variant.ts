@@ -1,7 +1,6 @@
 'use server';
 
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const deleteProductVariant = async (variant_id: number) => {
 	try {

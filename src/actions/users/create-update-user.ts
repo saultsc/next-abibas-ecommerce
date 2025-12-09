@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 import dayjs from 'dayjs';
 import z from 'zod';
 
@@ -81,13 +81,13 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 		if (isEmailExist && isEmailExist.person_id !== userData.person_id)
 			throw CustomError.badRequest(ErrorCode.EMAIL_ALREADY_EXISTS);
 
-		const isDocumentExist = await prisma.employees.findFirst({
+		const isDocumentExist = await prisma.persons.findFirst({
 			where: {
 				document_number: userData.document_number,
 			},
 		});
 
-		if (isDocumentExist && isDocumentExist.user_id !== user_id)
+		if (isDocumentExist && isDocumentExist.person_id !== userData.person_id)
 			throw CustomError.badRequest(ErrorCode.DOCUMENT_ALREADY_EXISTS);
 
 		let message;
@@ -102,6 +102,8 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 						first_name: userData.first_name,
 						last_name: userData.last_name,
 						email: userData.email,
+						document_type_id: userData.document_type_id,
+						document_number: userData.document_number,
 						date_of_birth: userData.date_of_birth,
 						updated_at: new Date(),
 					},
@@ -129,8 +131,6 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 					data: {
 						hire_date: userData.hire_date,
 						department_id: userData.department_id,
-						document_type_id: userData.document_type_id,
-						document_number: userData.document_number,
 						updated_at: new Date(),
 					},
 				});
@@ -150,6 +150,8 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 						first_name: userData.first_name,
 						last_name: userData.last_name,
 						email: userData.email,
+						document_type_id: userData.document_type_id,
+						document_number: userData.document_number,
 						date_of_birth: userData.date_of_birth,
 					},
 				});
@@ -171,8 +173,6 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 						hire_date: userData.hire_date,
 						department_id: userData.department_id,
 						user_id: newUser.user_id,
-						document_type_id: userData.document_type_id,
-						document_number: userData.document_number,
 					},
 				});
 

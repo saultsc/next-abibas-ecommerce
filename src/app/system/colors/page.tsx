@@ -3,9 +3,8 @@ export const revalidate = 0;
 import { getPaginatedColors } from '@/actions';
 import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { Color } from '@/interfaces';
-import { dateFormat } from '@/utils/dateFormat';
 import Link from 'next/link';
-import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
+import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
@@ -55,24 +54,7 @@ export default async function ColorsPage({ searchParams }: Props) {
 					</span>
 				) : null,
 		},
-		{
-			header: 'Creado',
-			cell: (c: Color) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					<IoTimeOutline className="text-base" />
-					{dateFormat(c.created_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (c: Color) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					<IoTimeOutline className="text-base" />
-					{dateFormat(c.updated_at)}
-				</span>
-			),
-		},
+
 		{
 			header: 'Estado',
 			cell: (c: Color) => <StateBadge state={c.state} />,

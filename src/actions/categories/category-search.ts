@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
 import { ErrorCode } from '@/lib';

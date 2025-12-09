@@ -4,7 +4,7 @@ import { getPaginatedVehicleTypes } from '@/actions';
 import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { VehicleType } from '@/interfaces';
 import { dateFormat } from '@/utils/dateFormat';
-import { Decimal } from '@prisma/client/runtime/library';
+import { Decimal } from '@prisma/client/runtime/client';
 import Link from 'next/link';
 import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
 

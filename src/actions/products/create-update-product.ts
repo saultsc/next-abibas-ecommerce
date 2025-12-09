@@ -4,8 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { Product, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 const productSchema = {
 	product_id: z.coerce.number().optional(),

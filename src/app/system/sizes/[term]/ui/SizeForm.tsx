@@ -6,9 +6,11 @@ import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { createOrUpdateSize, deleteSize } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Size } from '@/interfaces';
+
+import { createOrUpdateSize } from '@/actions/sizes/create-update-size';
+import { deleteSize } from '@/actions/sizes/delete-size';
 
 interface Props {
 	size: Size;

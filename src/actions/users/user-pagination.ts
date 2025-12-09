@@ -1,7 +1,7 @@
 'use server';
 
 import { Response, User, UserInclude, UserWhereInput } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 interface Params {
 	page?: number;
@@ -31,7 +31,6 @@ export const getPaginatedUsers = async (params: Params): Promise<Response<User[]
 		employees: {
 			include: {
 				departments: true,
-				document_types: true,
 			},
 		},
 		roles: true,

@@ -167,7 +167,7 @@ export default async function ShipmentsPage({ searchParams }: Props) {
 			header: 'Vehículo',
 			cell: (shipment: ShipmentRecord) => (
 				<span className="flex items-center gap-2 text-gray-800">
-					<IoCarOutline className="text-lg flex-shrink-0" />
+					<IoCarOutline className="text-lg shrink-0" />
 					<span className="truncate max-w-[200px]" title={shipment.vehicle}>
 						{shipment.vehicle}
 					</span>

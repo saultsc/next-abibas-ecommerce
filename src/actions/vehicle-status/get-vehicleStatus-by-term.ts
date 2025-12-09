@@ -1,8 +1,7 @@
 'use server';
 
 import { Response, VehicleStatus, VehicleStatusWhereInput } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const getVehicleStatusByTerm = async (term: string): Promise<Response<VehicleStatus>> => {
 	const isNumeric = !isNaN(Number(term));

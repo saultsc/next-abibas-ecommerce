@@ -2,7 +2,6 @@
 
 import { Category, Response } from '@/interfaces';
 import { CustomError, ErrorCode } from '@/lib';
-import prismaClient from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 

@@ -8,69 +8,69 @@ import Link from 'next/link';
 import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
 
 interface Props {
-    searchParams: Promise<{ page?: string }>;
+	searchParams: Promise<{ page?: string }>;
 }
 
 export default async function VehicleStatusPage({ searchParams }: Props) {
-    const resolved = await searchParams;
+	const resolved = await searchParams;
 
-    const page = resolved?.page ? parseInt(resolved.page) : 1;
+	const page = resolved?.page ? parseInt(resolved.page) : 1;
 
-    const { data: vehicleStatuses = [], totalPages = 0 } = await getPaginatedVehicleStatuses({
-        page,
-    });
+	const { data: vehicleStatuses = [], totalPages = 0 } = await getPaginatedVehicleStatuses({
+		page,
+	});
 
-    const vehicleStatusColumns: Column<VehicleStatus>[] = [
-        {
-            header: 'Nombre Estado',
-            cell: (c: VehicleStatus) => (
-                <Link
-                    href={`vehicle-status/${c.vehicle_status_id}`}
-                    className="group hover:underline flex items-center gap-2 text-gray-800 hover:text-gray-900 font-semibold">
-                    <IoEyeOffOutline className="text-lg group-hover:hidden transition-all" />
-                    <IoEyeOutline className="text-lg hidden group-hover:block transition-all" />
-                    {c.status_name}
-                </Link>
-            ),
-        },
-        {
-            header: 'Creado',
-            cell: (c: VehicleStatus) => (
-                <span className="flex items-center gap-2 text-gray-600 text-sm">
-                    <IoTimeOutline className="text-base" />
-                    {dateFormat(c.created_at)}
-                </span>
-            ),
-        },
-        {
-            header: 'Actualizado',
-            cell: (c: VehicleStatus) => (
-                <span className="flex items-center gap-2 text-gray-600 text-sm">
-                    <IoTimeOutline className="text-base" />
-                    {dateFormat(c.updated_at)}
-                </span>
-            ),
-                },
-        {
-            header: 'Estado',
-            cell: (c: VehicleStatus) => <StateBadge state={c.state} />,
-        }, 
-    ];
+	const vehicleStatusColumns: Column<VehicleStatus>[] = [
+		{
+			header: 'Nombre Estado',
+			cell: (c: VehicleStatus) => (
+				<Link
+					href={`vehicle-status/${c.vehicle_status_id}`}
+					className="group hover:underline flex items-center gap-2 text-gray-800 hover:text-gray-900 font-semibold">
+					<IoEyeOffOutline className="text-lg group-hover:hidden transition-all" />
+					<IoEyeOutline className="text-lg hidden group-hover:block transition-all" />
+					{c.status_name}
+				</Link>
+			),
+		},
+		{
+			header: 'Creado',
+			cell: (c: VehicleStatus) => (
+				<span className="flex items-center gap-2 text-gray-600 text-sm">
+					<IoTimeOutline className="text-base" />
+					{dateFormat(c.created_at)}
+				</span>
+			),
+		},
+		{
+			header: 'Actualizado',
+			cell: (c: VehicleStatus) => (
+				<span className="flex items-center gap-2 text-gray-600 text-sm">
+					<IoTimeOutline className="text-base" />
+					{dateFormat(c.updated_at)}
+				</span>
+			),
+		},
+		{
+			header: 'Estado',
+			cell: (c: VehicleStatus) => <StateBadge state={c.state} />,
+		},
+	];
 
-    return (
-        <>
-            <Title title="Tipos de Estados de Vehículos" />
-            <div className="flex justify-end mb-5">
-                <Link href="vehicle-status/new" className="btn-primary flex items-center gap-2">
-                    <IoAddCircleOutline className="text-xl" />
-                    Nuevo
-                </Link>
-            </div>
+	return (
+		<>
+			<Title title="Tipos de Estados de Vehículos" />
+			<div className="flex justify-end mb-5">
+				<Link href="vehicle-status/new" className="btn-primary flex items-center gap-2">
+					<IoAddCircleOutline className="text-xl" />
+					Nuevo
+				</Link>
+			</div>
 
-            <div className="mb-10">
-                <Table columns={vehicleStatusColumns} rows={vehicleStatuses} />
-                {totalPages > 0 && <Pagination totalPages={totalPages} />}
-            </div>
-        </>
-    );
+			<div className="mb-10">
+				<Table columns={vehicleStatusColumns} rows={vehicleStatuses} />
+				{totalPages > 0 && <Pagination totalPages={totalPages} />}
+			</div>
+		</>
+	);
 }

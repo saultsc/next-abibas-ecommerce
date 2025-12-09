@@ -5,9 +5,11 @@ import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { createOrUpdateVehicleDocumentType, deleteVehicleDocumentType } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { VehicleDocumentType } from '@/interfaces';
+
+import { createOrUpdateVehicleDocumentType } from '@/actions/vehicle-document-types/create-update-vehicle-document-types';
+import { deleteVehicleDocumentType } from '@/actions/vehicle-document-types/delete-vehicle-document-types';
 
 interface Props {
 	vehicleDocumentType: VehicleDocumentType;
@@ -47,7 +49,11 @@ export const VehicleDocumentTypeForm = ({ vehicleDocumentType }: Props) => {
 		formData.append('type_name', type_name);
 		formData.append('state', state);
 
-		const { success, data: vehicleDocumentTypeData, message } = await createOrUpdateVehicleDocumentType(formData);
+		const {
+			success,
+			data: vehicleDocumentTypeData,
+			message,
+		} = await createOrUpdateVehicleDocumentType(formData);
 
 		if (!success) {
 			toast.error(message || 'Error al guardar el tipo de documento de vehículo');
@@ -55,12 +61,16 @@ export const VehicleDocumentTypeForm = ({ vehicleDocumentType }: Props) => {
 		}
 
 		toast.success(message || 'Tipo de documento de vehículo guardado exitosamente');
-		router.replace(`/system/vehicle-document-types/${vehicleDocumentTypeData?.document_type_id}`);
+		router.replace(
+			`/system/vehicle-document-types/${vehicleDocumentTypeData?.document_type_id}`
+		);
 	};
 
 	const handleDelete = async () => {
 		if (!vehicleDocumentType.document_type_id) return;
-		const { success, message } = await deleteVehicleDocumentType(vehicleDocumentType.document_type_id);
+		const { success, message } = await deleteVehicleDocumentType(
+			vehicleDocumentType.document_type_id
+		);
 
 		if (!success) {
 			toast.error(message || 'No se pudo eliminar el tipo de documento de vehículo');
@@ -79,7 +89,6 @@ export const VehicleDocumentTypeForm = ({ vehicleDocumentType }: Props) => {
 					label="Tipo de Documento *"
 					variant="filled"
 					className="w-full"
-					
 					error={!!errors.type_name}
 					helperText={errors.type_name?.message}
 					{...register('type_name', {
@@ -122,7 +131,10 @@ export const VehicleDocumentTypeForm = ({ vehicleDocumentType }: Props) => {
 				</button>
 
 				{vehicleDocumentType.document_type_id && (
-					<DeleteButton onDelete={handleDelete} itemName={vehicleDocumentType.type_name} />
+					<DeleteButton
+						onDelete={handleDelete}
+						itemName={vehicleDocumentType.type_name}
+					/>
 				)}
 			</div>
 		</form>

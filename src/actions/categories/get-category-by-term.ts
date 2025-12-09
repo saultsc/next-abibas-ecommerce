@@ -1,8 +1,7 @@
 'use server';
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const getCategoryByTerm = async (term: string): Promise<Response<Category>> => {
 	const isNumeric = !isNaN(Number(term));

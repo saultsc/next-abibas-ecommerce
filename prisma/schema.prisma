@@ -1,25 +1,15 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma/client"
 }
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
-}
-
-model roles {
-  role_id    Int      @id(map: "PK__roles__760965CCC8207FB3") @default(autoincrement())
-  role_name  String   @db.VarChar(100)
-  state      String   @default("A", map: "DF__roles__state__33D4B598") @db.VarChar(1)
-  created_at DateTime @default(now(), map: "DF__roles__created_a__34C8D9D1") @db.DateTime
-  updated_at DateTime @default(now(), map: "DF__roles__updated_a__35BCFE0A") @db.DateTime
-  states     states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__roles__state__38996AB5")
-  users      users[]
 }
 
 model addresses {
-  address_id     Int      @id(map: "PK__addresse__CAA247C8A1B49CFA") @default(autoincrement())
-  person_id      Int
+  address_id     Int      @id(map: "PK__addresse__CAA247C854B4238E") @default(autoincrement())
+  party_id       Int
   address_line1  String   @db.VarChar(200)
   address_line2  String?  @db.VarChar(200)
   city           String   @db.VarChar(100)
@@ -30,34 +20,34 @@ model addresses {
   state          String   @default("A", map: "DF__addresses__state__7E37BEF6") @db.VarChar(1)
   created_at     DateTime @default(now(), map: "DF__addresses__creat__7F2BE32F") @db.DateTime
   updated_at     DateTime @default(now(), map: "DF__addresses__updat__00200768") @db.DateTime
-  persons        persons  @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__addresses__perso__01142BA1")
-  states         states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__addresses__state__02084FDA")
+  parties        parties  @relation(fields: [party_id], references: [party_id], onUpdate: NoAction, map: "FK__addresses__party__02084FDA")
+  states         states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__addresses__state__02FC7413")
   orders         orders[]
 }
 
 model categories {
-  category_id   Int        @id(map: "PK__categori__D54EE9B44B9BFE4C") @default(autoincrement())
+  category_id   Int        @id(map: "PK__categori__D54EE9B4F38ED609") @default(autoincrement())
   category_name String     @db.VarChar(100)
   state         String     @default("A", map: "DF__categorie__state__44FF419A") @db.VarChar(1)
   created_at    DateTime   @default(now(), map: "DF__categorie__creat__45F365D3") @db.DateTime
   updated_at    DateTime   @default(now(), map: "DF__categorie__updat__46E78A0C") @db.DateTime
-  states        states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK_categories_state")
+  states        states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__categorie__state__47DBAE45")
   products      products[]
 }
 
 model colors {
-  color_id         Int                @id(map: "PK__colors__1143CECB5A5C73A5") @default(autoincrement())
+  color_id         Int                @id(map: "PK__colors__1143CECBEAED7A62") @default(autoincrement())
   color_name       String             @db.VarChar(50)
   hex_code         String?            @db.VarChar(7)
   state            String             @default("A", map: "DF__colors__state__3F466844") @db.VarChar(1)
   created_at       DateTime           @default(now(), map: "DF__colors__created___403A8C7D") @db.DateTime
   updated_at       DateTime           @default(now(), map: "DF__colors__updated___412EB0B6") @db.DateTime
-  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__colors__state__44FF419A")
+  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__colors__state__4222D4EF")
   product_variants product_variants[]
 }
 
 model completed_maintenance {
-  completed_maintenance_id Int                    @id(map: "PK__complete__AAC00D0E07B05F81") @default(autoincrement())
+  completed_maintenance_id Int                    @id(map: "PK__complete__AAC00D0E06DFD353") @default(autoincrement())
   scheduled_maintenance_id Int?
   vehicle_id               Int
   maintenance_type_id      Int
@@ -66,80 +56,86 @@ model completed_maintenance {
   start_date               DateTime               @db.Date
   completion_date          DateTime?              @db.Date
   supplier_id              Int
-  total_cost               Decimal                @default(0.00, map: "DF__completed__total__27F8EE98") @db.Decimal(12, 2)
-  warranty_days            Int                    @default(0, map: "DF__completed__warra__28ED12D1")
+  total_cost               Decimal                @default(0.00, map: "DF__completed__total__2AD55B43") @db.Decimal(12, 2)
+  warranty_days            Int                    @default(0, map: "DF__completed__warra__2BC97F7C")
   notes                    String?                @db.VarChar(1000)
-  state                    String                 @default("A", map: "DF__completed__state__29E1370A") @db.VarChar(1)
-  created_at               DateTime               @default(now(), map: "DF__completed__creat__2AD55B43") @db.DateTime
-  updated_at               DateTime               @default(now(), map: "DF__completed__updat__2BC97F7C") @db.DateTime
-  maintenance_types        maintenance_types      @relation(fields: [maintenance_type_id], references: [maintenance_type_id], onUpdate: NoAction, map: "FK__completed__maint__1209AD79")
-  scheduled_maintenance    scheduled_maintenance? @relation(fields: [scheduled_maintenance_id], references: [scheduled_maintenance_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__completed__sched__10216507")
-  states                   states                 @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__completed__state__2EA5EC27")
-  suppliers                suppliers              @relation(fields: [supplier_id], references: [supplier_id], onUpdate: NoAction, map: "FK__completed__suppl__12FDD1B2")
-  vehicles                 vehicles               @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__completed__vehic__11158940")
+  state                    String                 @default("A", map: "DF__completed__state__2CBDA3B5") @db.VarChar(1)
+  created_at               DateTime               @default(now(), map: "DF__completed__creat__2DB1C7EE") @db.DateTime
+  updated_at               DateTime               @default(now(), map: "DF__completed__updat__2EA5EC27") @db.DateTime
+  maintenance_types        maintenance_types      @relation(fields: [maintenance_type_id], references: [maintenance_type_id], onUpdate: NoAction, map: "FK__completed__maint__2DB1C7EE")
+  scheduled_maintenance    scheduled_maintenance? @relation(fields: [scheduled_maintenance_id], references: [scheduled_maintenance_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__completed__sched__2BC97F7C")
+  states                   states                 @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__completed__state__2F9A1060")
+  suppliers                suppliers              @relation(fields: [supplier_id], references: [supplier_id], onUpdate: NoAction, map: "FK__completed__suppl__2EA5EC27")
+  vehicles                 vehicles               @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__completed__vehic__2CBDA3B5")
   maintenance_parts        maintenance_parts[]
 }
 
 model customers {
-  customer_id Int          @id(map: "PK__customer__CD65CB85201B15A8") @default(autoincrement())
-  user_id     Int          @unique(map: "UQ__customer__B9BE370E27FFE4C8")
-  total_spent Decimal      @default(0.00, map: "DF__customers__total__160F4887") @db.Decimal(12, 2)
-  created_at  DateTime     @default(now(), map: "DF__customers__creat__17036CC0") @db.DateTime
-  updated_at  DateTime     @default(now(), map: "DF__customers__updat__17F790F9") @db.DateTime
-  users       users        @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK__customers__user___07C12930")
-  deliveries  deliveries[]
-  orders      orders[]
+  customer_id    Int          @id(map: "PK__customer__CD65CB85A267A1A0") @default(autoincrement())
+  user_id        Int          @unique(map: "UQ__customer__B9BE370E64497D2D")
+  loyalty_points Int          @default(0, map: "DF__customers__loyal__17F790F9")
+  total_spent    Decimal      @default(0.00, map: "DF__customers__total__18EBB532") @db.Decimal(12, 2)
+  created_at     DateTime     @default(now(), map: "DF__customers__creat__19DFD96B") @db.DateTime
+  updated_at     DateTime     @default(now(), map: "DF__customers__updat__1AD3FDA4") @db.DateTime
+  users          users        @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK__customers__user___19DFD96B")
+  deliveries     deliveries[]
+  orders         orders[]
 }
 
 model deliveries {
-  delivery_id   Int       @id(map: "PK__deliveri__1C5CF4F58E4BAFE1") @default(autoincrement())
+  delivery_id   Int       @id(map: "PK__deliveri__1C5CF4F5B927DCED") @default(autoincrement())
   shipment_id   Int
   order_id      Int
   customer_id   Int
   received_by   String?   @db.VarChar(100)
-  delivery_date DateTime  @default(now(), map: "DF__deliverie__deliv__56B3DD81") @db.DateTime
+  delivery_date DateTime  @default(now(), map: "DF__deliverie__deliv__59904A2C") @db.DateTime
   notes         String?   @db.VarChar(1000)
   signature_url String?   @db.VarChar(500)
-  state         String    @default("A", map: "DF__deliverie__state__57A801BA") @db.VarChar(1)
-  created_at    DateTime  @default(now(), map: "DF__deliverie__creat__589C25F3") @db.DateTime
-  updated_at    DateTime  @default(now(), map: "DF__deliverie__updat__59904A2C") @db.DateTime
-  customers     customers @relation(fields: [customer_id], references: [customer_id], onUpdate: NoAction, map: "FK__deliverie__custo__3BFFE745")
-  orders        orders    @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__deliverie__order__3B0BC30C")
-  shipments     shipments @relation(fields: [shipment_id], references: [shipment_id], onUpdate: NoAction, map: "FK__deliverie__shipm__3A179ED3")
-  states        states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__deliverie__state__5B78929E")
+  state         String    @default("A", map: "DF__deliverie__state__5A846E65") @db.VarChar(1)
+  created_at    DateTime  @default(now(), map: "DF__deliverie__creat__5B78929E") @db.DateTime
+  updated_at    DateTime  @default(now(), map: "DF__deliverie__updat__5C6CB6D7") @db.DateTime
+  customers     customers @relation(fields: [customer_id], references: [customer_id], onUpdate: NoAction, map: "FK__deliverie__custo__5B78929E")
+  orders        orders    @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__deliverie__order__5A846E65")
+  shipments     shipments @relation(fields: [shipment_id], references: [shipment_id], onUpdate: NoAction, map: "FK__deliverie__shipm__59904A2C")
+  states        states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__deliverie__state__5C6CB6D7")
+}
+
+model departments {
+  department_id   Int         @id(map: "PK__departme__C22324220FE7B693") @default(autoincrement())
+  department_name String      @db.VarChar(100)
+  state           String      @default("A", map: "DF__departmen__state__4AB81AF0") @db.VarChar(1)
+  created_at      DateTime    @default(now(), map: "DF__departmen__creat__4BAC3F29") @db.DateTime
+  updated_at      DateTime    @default(now(), map: "DF__departmen__updat__4CA06362") @db.DateTime
+  states          states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__departmen__state__4D94879B")
+  employees       employees[]
 }
 
 model document_types {
-  document_type_id Int         @id(map: "PK__document__69F7C2B1D0B598CA") @default(autoincrement())
-  type_name        String      @db.VarChar(50)
-  state            String      @default("A", map: "DF__document___state__286302EC") @db.VarChar(1)
-  created_at       DateTime    @default(now(), map: "DF__document___creat__29572725") @db.DateTime
-  updated_at       DateTime    @default(now(), map: "DF__document___updat__2A4B4B5E") @db.DateTime
-  states           states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__document___state__2B3F6F97")
-  employees        employees[]
+  document_type_id Int       @id(map: "PK__document__69F7C2B1816C1ACF") @default(autoincrement())
+  type_name        String    @db.VarChar(50)
+  state            String    @default("A", map: "DF__document___state__286302EC") @db.VarChar(1)
+  created_at       DateTime  @default(now(), map: "DF__document___creat__29572725") @db.DateTime
+  updated_at       DateTime  @default(now(), map: "DF__document___updat__2A4B4B5E") @db.DateTime
+  states           states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__document___state__2B3F6F97")
+  persons          persons[]
 }
 
 model employees {
-  employee_id         Int                   @id(map: "PK__employee__C52E0BA8B8AEC09A") @default(autoincrement())
-  user_id             Int                   @unique(map: "UQ__employee__B9BE370EDDBEB474")
+  employee_id         Int                   @id(map: "PK__employee__C52E0BA86B37EDA9") @default(autoincrement())
+  user_id             Int                   @unique(map: "UQ__employee__B9BE370E184BB309")
   hire_date           DateTime              @db.Date
   department_id       Int?
-  document_type_id    Int
-  document_number     String                @db.VarChar(50)
-  created_at          DateTime              @default(now(), map: "DF__employees__creat__1DB06A4F") @db.DateTime
-  updated_at          DateTime              @default(now(), map: "DF__employees__updat__1EA48E88") @db.DateTime
-  departments         departments?          @relation(fields: [department_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__employees__depar__236943A5")
-  document_types      document_types        @relation(fields: [document_type_id], references: [document_type_id], onUpdate: NoAction, map: "FK__employees__docum__1F98B2C1")
-  users               users                 @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK__employees__user___0D7A0286")
+  created_at          DateTime              @default(now(), map: "DF__employees__creat__1F98B2C1") @db.DateTime
+  updated_at          DateTime              @default(now(), map: "DF__employees__updat__208CD6FA") @db.DateTime
+  departments         departments?          @relation(fields: [department_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__employees__depar__208CD6FA")
+  users               users                 @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK__employees__user___1F98B2C1")
   fuel_logs           fuel_logs[]
   inventory_movements inventory_movements[]
   shipments           shipments[]
-
-  @@unique([document_type_id, document_number], map: "UK_person_document")
 }
 
 model fuel_logs {
-  fuel_log_id     Int       @id(map: "PK__fuel_log__78804E849DA3E71A") @default(autoincrement())
+  fuel_log_id     Int       @id(map: "PK__fuel_log__78804E84510434CF") @default(autoincrement())
   vehicle_id      Int
   driver_id       Int
   fill_date       DateTime  @db.Date
@@ -150,78 +146,78 @@ model fuel_logs {
   gas_station     String?   @db.VarChar(100)
   invoice_number  String?   @db.VarChar(50)
   notes           String?   @db.VarChar(500)
-  state           String    @default("A", map: "DF__fuel_logs__state__3DE82FB7") @db.VarChar(1)
-  created_at      DateTime  @default(now(), map: "DF__fuel_logs__creat__3EDC53F0") @db.DateTime
-  updated_at      DateTime  @default(now(), map: "DF__fuel_logs__updat__3FD07829") @db.DateTime
-  employees       employees @relation(fields: [driver_id], references: [employee_id], onUpdate: NoAction, map: "FK__fuel_logs__drive__2334397B")
-  states          states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__fuel_logs__state__40C49C62")
-  vehicles        vehicles  @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__fuel_logs__vehic__22401542")
+  state           String    @default("A", map: "DF__fuel_logs__state__40C49C62") @db.VarChar(1)
+  created_at      DateTime  @default(now(), map: "DF__fuel_logs__creat__41B8C09B") @db.DateTime
+  updated_at      DateTime  @default(now(), map: "DF__fuel_logs__updat__42ACE4D4") @db.DateTime
+  employees       employees @relation(fields: [driver_id], references: [employee_id], onUpdate: NoAction, map: "FK__fuel_logs__drive__40C49C62")
+  states          states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__fuel_logs__state__41B8C09B")
+  vehicles        vehicles  @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__fuel_logs__vehic__3FD07829")
 }
 
 model inventory_movements {
-  movement_id      Int              @id(map: "PK__inventor__AB1D1022BD20CADF") @default(autoincrement())
+  movement_id      Int              @id(map: "PK__inventor__AB1D1022B04107C5") @default(autoincrement())
   variant_id       Int
   movement         String           @db.VarChar(20)
   quantity         Int
   reference_number String?          @db.VarChar(50)
   notes            String?          @db.VarChar(500)
-  movement_date    DateTime         @default(now(), map: "DF__inventory__movem__42E1EEFE") @db.DateTime
+  movement_date    DateTime         @default(now(), map: "DF__inventory__movem__45BE5BA9") @db.DateTime
   created_by       Int?
-  state            String           @default("A", map: "DF__inventory__state__43D61337") @db.VarChar(1)
-  created_at       DateTime         @default(now(), map: "DF__inventory__creat__44CA3770") @db.DateTime
-  updated_at       DateTime         @default(now(), map: "DF__inventory__updat__45BE5BA9") @db.DateTime
-  users            employees?       @relation(fields: [created_by], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__inventory__creat__31B762FC")
-  movement_types   movement_types   @relation(fields: [movement], references: [movement], onUpdate: NoAction, map: "FK__inventory__movem__4A8310C6")
+  state            String           @default("A", map: "DF__inventory__state__46B27FE2") @db.VarChar(1)
+  created_at       DateTime         @default(now(), map: "DF__inventory__creat__47A6A41B") @db.DateTime
+  updated_at       DateTime         @default(now(), map: "DF__inventory__updat__489AC854") @db.DateTime
+  employees        employees?       @relation(fields: [created_by], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__inventory__creat__47A6A41B")
+  movement_types   movement_types   @relation(fields: [movement], references: [movement], onUpdate: NoAction, map: "FK__inventory__movem__46B27FE2")
   states           states           @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__inventory__state__489AC854")
-  product_variants product_variants @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "FK__inventory__varia__2FCF1A8A")
+  product_variants product_variants @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "FK__inventory__varia__45BE5BA9")
 }
 
 model maintenance_parts {
-  maintenance_part_id      Int                   @id(map: "PK__maintena__6F84A7BDBC93422D") @default(autoincrement())
+  maintenance_part_id      Int                   @id(map: "PK__maintena__6F84A7BD82C76113") @default(autoincrement())
   completed_maintenance_id Int
   part_description         String                @db.VarChar(200)
   part_number              String?               @db.VarChar(100)
-  quantity                 Int                   @default(1, map: "DF__maintenan__quant__336AA144")
+  quantity                 Int                   @default(1, map: "DF__maintenan__quant__36470DEF")
   unit_cost                Decimal               @db.Decimal(10, 2)
   total_cost               Decimal?              @db.Decimal(21, 2)
   supplier_id              Int
-  state                    String                @default("A", map: "DF__maintenan__state__3552E9B6") @db.VarChar(1)
-  created_at               DateTime              @default(now(), map: "DF__maintenan__creat__36470DEF") @db.DateTime
-  updated_at               DateTime              @default(now(), map: "DF__maintenan__updat__373B3228") @db.DateTime
-  completed_maintenance    completed_maintenance @relation(fields: [completed_maintenance_id], references: [completed_maintenance_id], onUpdate: NoAction, map: "FK__maintenan__compl__1A9EF37A")
-  states                   states                @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__382F5661")
-  suppliers                suppliers             @relation(fields: [supplier_id], references: [supplier_id], onUpdate: NoAction, map: "FK__maintenan__suppl__1B9317B3")
+  state                    String                @default("A", map: "DF__maintenan__state__382F5661") @db.VarChar(1)
+  created_at               DateTime              @default(now(), map: "DF__maintenan__creat__39237A9A") @db.DateTime
+  updated_at               DateTime              @default(now(), map: "DF__maintenan__updat__3A179ED3") @db.DateTime
+  completed_maintenance    completed_maintenance @relation(fields: [completed_maintenance_id], references: [completed_maintenance_id], onUpdate: NoAction, map: "FK__maintenan__compl__373B3228")
+  states                   states                @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__39237A9A")
+  suppliers                suppliers             @relation(fields: [supplier_id], references: [supplier_id], onUpdate: NoAction, map: "FK__maintenan__suppl__382F5661")
 }
 
 model maintenance_statuses {
-  maintenance_status_id Int                     @id(map: "PK__maintena__234CAC5431185591") @default(autoincrement())
+  maintenance_status_id Int                     @id(map: "PK__maintena__234CAC5491BBC762") @default(autoincrement())
   status_name           String                  @db.VarChar(50)
-  state                 String                  @default("A", map: "DF__maintenan__state__18B6AB08") @db.VarChar(1)
-  created_at            DateTime                @default(now(), map: "DF__maintenan__creat__19AACF41") @db.DateTime
-  updated_at            DateTime                @default(now(), map: "DF__maintenan__updat__1A9EF37A") @db.DateTime
-  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__1E6F845E")
+  state                 String                  @default("A", map: "DF__maintenan__state__1B9317B3") @db.VarChar(1)
+  created_at            DateTime                @default(now(), map: "DF__maintenan__creat__1C873BEC") @db.DateTime
+  updated_at            DateTime                @default(now(), map: "DF__maintenan__updat__1D7B6025") @db.DateTime
+  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__1A9EF37A")
   scheduled_maintenance scheduled_maintenance[]
 }
 
 model maintenance_types {
-  maintenance_type_id   Int                     @id(map: "PK__maintena__162D5D0E679ED96E") @default(autoincrement())
+  maintenance_type_id   Int                     @id(map: "PK__maintena__162D5D0EDD11C5E0") @default(autoincrement())
   type_name             String                  @db.VarChar(50)
   description           String?                 @db.VarChar(255)
-  state                 String                  @default("A", map: "DF__maintenan__state__12FDD1B2") @db.VarChar(1)
-  created_at            DateTime                @default(now(), map: "DF__maintenan__creat__13F1F5EB") @db.DateTime
-  updated_at            DateTime                @default(now(), map: "DF__maintenan__updat__14E61A24") @db.DateTime
+  state                 String                  @default("A", map: "DF__maintenan__state__15DA3E5D") @db.VarChar(1)
+  created_at            DateTime                @default(now(), map: "DF__maintenan__creat__16CE6296") @db.DateTime
+  updated_at            DateTime                @default(now(), map: "DF__maintenan__updat__17C286CF") @db.DateTime
   completed_maintenance completed_maintenance[]
-  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__18B6AB08")
+  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__maintenan__state__14E61A24")
   scheduled_maintenance scheduled_maintenance[]
 }
 
 model movement_types {
-  movement            String                @id(map: "PK__movement__D20D5C05AF3B0BF6") @db.VarChar(20)
+  movement            String                @id(map: "PK__movement__D20D5C0563A09765") @db.VarChar(20)
   state               String                @default("A", map: "DF__movement___state__5070F446") @db.VarChar(1)
   created_at          DateTime              @default(now(), map: "DF__movement___creat__5165187F") @db.DateTime
   updated_at          DateTime              @default(now(), map: "DF__movement___updat__52593CB8") @db.DateTime
   inventory_movements inventory_movements[]
-  states              states                @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK_movement_types_state")
+  states              states                @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__movement___state__534D60F1")
 }
 
 model order_items {
@@ -229,65 +225,67 @@ model order_items {
   variant_id       Int
   quantity         Int
   unit_price       Decimal          @db.Decimal(10, 2)
-  discount         Decimal          @default(0.00, map: "DF__order_ite__disco__5AB9788F") @db.Decimal(10, 2)
+  discount         Decimal          @default(0.00, map: "DF__order_ite__disco__5D95E53A") @db.Decimal(10, 2)
   subtotal         Decimal?         @db.Decimal(22, 2)
-  created_at       DateTime         @default(now(), map: "DF__order_ite__creat__5BAD9CC8") @db.DateTime
-  updated_at       DateTime         @default(now(), map: "DF__order_ite__updat__5CA1C101") @db.DateTime
-  orders           orders           @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__order_ite__order__44CA3770")
-  product_variants product_variants @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "FK__order_ite__varia__45BE5BA9")
+  created_at       DateTime         @default(now(), map: "DF__order_ite__creat__5E8A0973") @db.DateTime
+  updated_at       DateTime         @default(now(), map: "DF__order_ite__updat__5F7E2DAC") @db.DateTime
+  orders           orders           @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__order_ite__order__5CA1C101")
+  product_variants product_variants @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "FK__order_ite__varia__5D95E53A")
 
-  @@id([order_id, variant_id], map: "PK__order_it__28F5A4A288E0AA0D")
+  @@id([order_id, variant_id], map: "PK__order_it__28F5A4A25FD84C8A")
 }
 
 model order_statuses {
-  order_status_id Int      @id(map: "PK__order_st__A499CF2396A3008D") @default(autoincrement())
+  order_status_id Int      @id(map: "PK__order_st__A499CF233B08F859") @default(autoincrement())
   status_name     String   @db.VarChar(50)
   state           String   @default("A", map: "DF__order_sta__state__5629CD9C") @db.VarChar(1)
   created_at      DateTime @default(now(), map: "DF__order_sta__creat__571DF1D5") @db.DateTime
   updated_at      DateTime @default(now(), map: "DF__order_sta__updat__5812160E") @db.DateTime
-  states          states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__order_sta__state__5812160E")
+  states          states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__order_sta__state__59063A47")
   orders          orders[]
 }
 
 model orders {
-  order_id                Int               @id(map: "PK__orders__46596229AD7CFCF8") @default(autoincrement())
-  order_number            String            @unique(map: "UQ__orders__730E34DFD9FAF3D3") @db.VarChar(50)
+  order_id                Int               @id(map: "PK__orders__4659622914EF83D4") @default(autoincrement())
+  order_number            String            @unique(map: "UQ__orders__730E34DF6DB05609") @db.VarChar(50)
   customer_id             Int
   shipping_address_id     Int
   order_status_id         Int
-  subtotal                Decimal           @default(0.00, map: "DF__orders__subtotal__4D5F7D71") @db.Decimal(12, 2)
-  tax_amount              Decimal           @default(0.00, map: "DF__orders__tax_amou__4E53A1AA") @db.Decimal(12, 2)
-  shipping_cost           Decimal           @default(0.00, map: "DF__orders__shipping__4F47C5E3") @db.Decimal(10, 2)
-  discount_amount         Decimal           @default(0.00, map: "DF__orders__discount__503BEA1C") @db.Decimal(10, 2)
+  subtotal                Decimal           @default(0.00, map: "DF__orders__subtotal__503BEA1C") @db.Decimal(12, 2)
+  tax_amount              Decimal           @default(0.00, map: "DF__orders__tax_amou__51300E55") @db.Decimal(12, 2)
+  shipping_cost           Decimal           @default(0.00, map: "DF__orders__shipping__5224328E") @db.Decimal(10, 2)
+  discount_amount         Decimal           @default(0.00, map: "DF__orders__discount__531856C7") @db.Decimal(10, 2)
   total_amount            Decimal           @db.Decimal(12, 2)
   estimated_delivery_date DateTime?         @db.Date
   actual_delivery_date    DateTime?         @db.DateTime
   notes                   String?           @db.VarChar(500)
-  state                   String            @default("A", map: "DF__orders__state__51300E55") @db.VarChar(1)
-  created_at              DateTime          @default(now(), map: "DF__orders__created___5224328E") @db.DateTime
-  updated_at              DateTime          @default(now(), map: "DF__orders__updated___531856C7") @db.DateTime
+  state                   String            @default("A", map: "DF__orders__state__540C7B00") @db.VarChar(1)
+  created_at              DateTime          @default(now(), map: "DF__orders__created___55009F39") @db.DateTime
+  updated_at              DateTime          @default(now(), map: "DF__orders__updated___55F4C372") @db.DateTime
   deliveries              deliveries[]
   order_items             order_items[]
-  customers               customers         @relation(fields: [customer_id], references: [customer_id], onUpdate: NoAction, map: "FK__orders__customer__3C34F16F")
-  order_statuses          order_statuses    @relation(fields: [order_status_id], references: [order_status_id], onUpdate: NoAction, map: "FK__orders__order_st__3E1D39E1")
-  addresses               addresses         @relation(fields: [shipping_address_id], references: [address_id], onUpdate: NoAction, map: "FK__orders__shipping__3D2915A8")
+  customers               customers         @relation(fields: [customer_id], references: [customer_id], onUpdate: NoAction, map: "FK__orders__customer__531856C7")
+  order_statuses          order_statuses    @relation(fields: [order_status_id], references: [order_status_id], onUpdate: NoAction, map: "FK__orders__order_st__55009F39")
+  addresses               addresses         @relation(fields: [shipping_address_id], references: [address_id], onUpdate: NoAction, map: "FK__orders__shipping__540C7B00")
   states                  states            @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__orders__state__55F4C372")
   payments                payments[]
   shipment_orders         shipment_orders[]
 }
 
 model parties {
-  party_type  String    @id(map: "PK__parties__D80A73EF8FB717AE") @db.VarChar(1)
-  description String    @db.VarChar(100)
-  state       String    @default("A", map: "DF__parties__state__6754599E") @db.VarChar(1)
-  created_at  DateTime  @default(now(), map: "DF__parties__created__68487DD7") @db.DateTime
-  updated_at  DateTime  @default(now(), map: "DF__parties__updated__693CA210") @db.DateTime
-  states      states    @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK_parties_state")
-  persons     persons[]
+  party_id   Int         @id(map: "PK__parties__8A2AF38E98EF5ED2") @default(autoincrement())
+  party_type String      @db.VarChar(20)
+  state      String      @default("A", map: "DF__parties__state__68487DD7") @db.VarChar(1)
+  created_at DateTime    @default(now(), map: "DF__parties__created__693CA210") @db.DateTime
+  updated_at DateTime    @default(now(), map: "DF__parties__updated__6A30C649") @db.DateTime
+  addresses  addresses[]
+  states     states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__parties__state__6B24EA82")
+  persons    persons?
+  phones     phones[]
 }
 
 model payment_methods {
-  payment_method_id Int        @id(map: "PK__payment___8A3EA9EB38649211") @default(autoincrement())
+  payment_method_id Int        @id(map: "PK__payment___8A3EA9EB4D0989F4") @default(autoincrement())
   method_name       String     @db.VarChar(50)
   state             String     @default("A", map: "DF__payment_m__state__5BE2A6F2") @db.VarChar(1)
   created_at        DateTime   @default(now(), map: "DF__payment_m__creat__5CD6CB2B") @db.DateTime
@@ -297,115 +295,126 @@ model payment_methods {
 }
 
 model payments {
-  payment_id        Int             @id(map: "PK__payments__ED1FC9EA3A72FE81") @default(autoincrement())
+  payment_id        Int             @id(map: "PK__payments__ED1FC9EAA0558C16") @default(autoincrement())
   order_id          Int
   payment_method_id Int
   transaction_id    String?         @db.VarChar(100)
   amount            Decimal         @db.Decimal(12, 2)
-  payment_date      DateTime        @default(now(), map: "DF__payments__paymen__625A9A57") @db.DateTime
-  status            String          @default("COMPLETADO", map: "DF__payments__status__634EBE90") @db.VarChar(20)
+  payment_date      DateTime        @default(now(), map: "DF__payments__paymen__65370702") @db.DateTime
+  status            String          @default("COMPLETADO", map: "DF__payments__status__662B2B3B") @db.VarChar(20)
   notes             String?         @db.VarChar(500)
-  state             String          @default("A", map: "DF__payments__state__65370702") @db.VarChar(1)
-  created_at        DateTime        @default(now(), map: "DF__payments__create__662B2B3B") @db.DateTime
-  updated_at        DateTime        @default(now(), map: "DF__payments__update__671F4F74") @db.DateTime
-  orders            orders          @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__payments__order___4F47C5E3")
-  payment_methods   payment_methods @relation(fields: [payment_method_id], references: [payment_method_id], onUpdate: NoAction, map: "FK__payments__paymen__503BEA1C")
+  state             String          @default("A", map: "DF__payments__state__681373AD") @db.VarChar(1)
+  created_at        DateTime        @default(now(), map: "DF__payments__create__690797E6") @db.DateTime
+  updated_at        DateTime        @default(now(), map: "DF__payments__update__69FBBC1F") @db.DateTime
+  orders            orders          @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__payments__order___671F4F74")
+  payment_methods   payment_methods @relation(fields: [payment_method_id], references: [payment_method_id], onUpdate: NoAction, map: "FK__payments__paymen__681373AD")
   states            states          @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__payments__state__690797E6")
 }
 
 model persons {
-  person_id     Int         @id(map: "PK__persons__543848DF9363A6A8") @default(autoincrement())
-  party_type    String      @default("P", map: "DF__persons__party_t__6D0D32F4") @db.VarChar(1)
-  first_name    String      @db.VarChar(100)
-  last_name     String?     @db.VarChar(100)
-  email         String?     @db.VarChar(100)
-  date_of_birth DateTime?   @db.Date
-  state         String      @default("A", map: "DF__persons__state__6E01572D") @db.VarChar(1)
-  created_at    DateTime    @default(now(), map: "DF__persons__created__6EF57B66") @db.DateTime
-  updated_at    DateTime    @default(now(), map: "DF__persons__updated__6FE99F9F") @db.DateTime
-  addresses     addresses[]
-  parties       parties     @relation(fields: [party_type], references: [party_type], onUpdate: NoAction, map: "FK__persons__party_t__70DDC3D8")
-  states        states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__persons__state__71D1E811")
-  phones        phones[]
-  suppliers     suppliers?
-  users         users[]
+  person_id        Int             @id(map: "PK__persons__543848DF610D4885") @default(autoincrement())
+  first_name       String          @db.VarChar(100)
+  last_name        String          @db.VarChar(100)
+  email            String?         @db.VarChar(100)
+  date_of_birth    DateTime?       @db.Date
+  document_type_id Int?
+  document_number  String?         @db.VarChar(50)
+  created_at       DateTime        @default(now(), map: "DF__persons__created__6E01572D") @db.DateTime
+  updated_at       DateTime        @default(now(), map: "DF__persons__updated__6EF57B66") @db.DateTime
+  document_types   document_types? @relation(fields: [document_type_id], references: [document_type_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__persons__documen__71D1E811")
+  parties          parties         @relation(fields: [person_id], references: [party_id], onUpdate: NoAction, map: "FK__persons__person___70DDC3D8")
+  phones           phones[]
+  suppliers        suppliers?
+  users            users?
 }
 
 model phone_types {
-  phone_type_id Int      @id(map: "PK__phone_ty__F535ED3F461992ED") @default(autoincrement())
+  phone_type_id Int      @id(map: "PK__phone_ty__F535ED3FE690AF9A") @default(autoincrement())
   type_name     String   @db.VarChar(50)
   state         String   @default("A", map: "DF__phone_typ__state__2E1BDC42") @db.VarChar(1)
   created_at    DateTime @default(now(), map: "DF__phone_typ__creat__2F10007B") @db.DateTime
   updated_at    DateTime @default(now(), map: "DF__phone_typ__updat__300424B4") @db.DateTime
-  states        states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__phone_typ__state__31EC6D26")
+  states        states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__phone_typ__state__30F848ED")
   phones        phones[]
 }
 
 model phones {
-  phone_id      Int         @id(map: "PK__phones__E6BD6DD7D7AAE208") @default(autoincrement())
-  person_id     Int
+  phone_id      Int         @id(map: "PK__phones__E6BD6DD769E7099C") @default(autoincrement())
+  party_id      Int
   phone_type_id Int
+  person_id     Int
   phone_number  String      @db.VarChar(20)
-  is_primary    Boolean     @default(false, map: "DF__phones__is_prima__74AE54BC")
-  state         String      @default("A", map: "DF__phones__state__75A278F5") @db.VarChar(1)
-  created_at    DateTime    @default(now(), map: "DF__phones__created___76969D2E") @db.DateTime
-  updated_at    DateTime    @default(now(), map: "DF__phones__updated___778AC167") @db.DateTime
+  is_primary    Boolean     @default(false, map: "DF__phones__is_prima__73BA3083")
+  state         String      @default("A", map: "DF__phones__state__74AE54BC") @db.VarChar(1)
+  created_at    DateTime    @default(now(), map: "DF__phones__created___75A278F5") @db.DateTime
+  updated_at    DateTime    @default(now(), map: "DF__phones__updated___76969D2E") @db.DateTime
+  parties       parties     @relation(fields: [party_id], references: [party_id], onUpdate: NoAction, map: "FK__phones__party_id__797309D9")
   persons       persons     @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__phones__person_i__787EE5A0")
-  phone_types   phone_types @relation(fields: [phone_type_id], references: [phone_type_id], onUpdate: NoAction, map: "FK__phones__phone_ty__6C190EBB")
-  states        states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__phones__state__7A672E12")
+  phone_types   phone_types @relation(fields: [phone_type_id], references: [phone_type_id], onUpdate: NoAction, map: "FK__phones__phone_ty__7A672E12")
+  states        states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__phones__state__7B5B524B")
 }
 
 model product_images {
-  image_id   Int      @id(map: "PK__product___DC9AC955D1822F1C") @default(autoincrement())
+  image_id   Int      @id(map: "PK__product___DC9AC955B6CB8F73") @default(autoincrement())
   product_id Int
   image_url  String   @db.VarChar(500)
-  is_primary Boolean  @default(false, map: "DF__product_i__is_pr__3B40CD36")
-  state      String   @default("A", map: "DF__product_i__state__3C34F16F") @db.VarChar(1)
-  created_at DateTime @default(now(), map: "DF__product_i__creat__3D2915A8") @db.DateTime
-  updated_at DateTime @default(now(), map: "DF__product_i__updat__3E1D39E1") @db.DateTime
-  products   products @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK__product_i__produ__29221CFB")
+  is_primary Boolean  @default(false, map: "DF__product_i__is_pr__3E1D39E1")
+  state      String   @default("A", map: "DF__product_i__state__3F115E1A") @db.VarChar(1)
+  created_at DateTime @default(now(), map: "DF__product_i__creat__40058253") @db.DateTime
+  updated_at DateTime @default(now(), map: "DF__product_i__updat__40F9A68C") @db.DateTime
+  products   products @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK__product_i__produ__3E1D39E1")
   states     states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__product_i__state__3F115E1A")
 }
 
 model product_variants {
-  variant_id          Int                   @id(map: "PK__product___EACC68B73721E2E2") @default(autoincrement())
+  variant_id          Int                   @id(map: "PK__product___EACC68B713BD2DDF") @default(autoincrement())
   product_id          Int
   color_id            Int
   size_code           String                @db.VarChar(10)
-  price_adjustment    Decimal               @default(0.00, map: "DF__product_v__price__2EDAF651") @db.Decimal(10, 2)
-  stock_quantity      Int                   @default(0, map: "DF__product_v__stock__2FCF1A8A")
-  reorder_level       Int                   @default(10, map: "DF__product_v__reord__31B762FC")
-  state               String                @default("A", map: "DF__product_v__state__32AB8735") @db.VarChar(1)
-  created_at          DateTime              @default(now(), map: "DF__product_v__creat__339FAB6E") @db.DateTime
-  updated_at          DateTime              @default(now(), map: "DF__product_v__updat__3493CFA7") @db.DateTime
+  price_adjustment    Decimal               @default(0.00, map: "DF__product_v__price__31B762FC") @db.Decimal(10, 2)
+  stock_quantity      Int                   @default(0, map: "DF__product_v__stock__32AB8735")
+  reorder_level       Int                   @default(10, map: "DF__product_v__reord__3493CFA7")
+  state               String                @default("A", map: "DF__product_v__state__3587F3E0") @db.VarChar(1)
+  created_at          DateTime              @default(now(), map: "DF__product_v__creat__367C1819") @db.DateTime
+  updated_at          DateTime              @default(now(), map: "DF__product_v__updat__37703C52") @db.DateTime
   inventory_movements inventory_movements[]
   order_items         order_items[]
-  colors              colors                @relation(fields: [color_id], references: [color_id], onUpdate: NoAction, map: "FK__product_v__color__2180FB33")
-  products            products              @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK__product_v__produ__208CD6FA")
-  sizes               sizes                 @relation(fields: [size_code], references: [size_code], onUpdate: NoAction, map: "FK__product_v__size___22751F6C")
+  colors              colors                @relation(fields: [color_id], references: [color_id], onUpdate: NoAction, map: "FK__product_v__color__3587F3E0")
+  products            products              @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK__product_v__produ__3493CFA7")
+  sizes               sizes                 @relation(fields: [size_code], references: [size_code], onUpdate: NoAction, map: "FK__product_v__size___367C1819")
   states              states                @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__product_v__state__37703C52")
 
   @@unique([product_id, color_id, size_code], map: "UK_product_variant")
 }
 
 model products {
-  product_id       Int                @id(map: "PK__products__47027DF5C4FB806E") @default(autoincrement())
+  product_id       Int                @id(map: "PK__products__47027DF59EE8250D") @default(autoincrement())
   product_name     String             @db.VarChar(200)
   description      String?            @db.VarChar(1000)
   price            Decimal            @db.Decimal(10, 2)
   category_id      Int
   weight           Decimal?           @db.Decimal(8, 2)
-  state            String             @default("A", map: "DF__products__state__2739D489") @db.VarChar(1)
-  created_at       DateTime           @default(now(), map: "DF__products__create__282DF8C2") @db.DateTime
-  updated_at       DateTime           @default(now(), map: "DF__products__update__29221CFB") @db.DateTime
+  state            String             @default("A", map: "DF__products__state__2A164134") @db.VarChar(1)
+  created_at       DateTime           @default(now(), map: "DF__products__create__2B0A656D") @db.DateTime
+  updated_at       DateTime           @default(now(), map: "DF__products__update__2BFE89A6") @db.DateTime
   product_images   product_images[]
   product_variants product_variants[]
-  categories       categories         @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "FK__products__catego__151B244E")
-  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__products__state__29221CFB")
+  categories       categories         @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "FK__products__catego__29221CFB")
+  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__products__state__2A164134")
+}
+
+model roles {
+  role_id    Int      @id(map: "PK__roles__760965CCDAD688F4") @default(autoincrement())
+  role_name  String   @db.VarChar(100)
+  state      String   @default("A", map: "DF__roles__state__33D4B598") @db.VarChar(1)
+  created_at DateTime @default(now(), map: "DF__roles__created_a__34C8D9D1") @db.DateTime
+  updated_at DateTime @default(now(), map: "DF__roles__updated_a__35BCFE0A") @db.DateTime
+  states     states   @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__roles__state__36B12243")
+  users      users[]
 }
 
 model scheduled_maintenance {
-  scheduled_maintenance_id Int                     @id(map: "PK__schedule__D18DC10F3D3ACB45") @default(autoincrement())
+  scheduled_maintenance_id Int                     @id(map: "PK__schedule__D18DC10FE33773DE") @default(autoincrement())
   vehicle_id               Int
   maintenance_type_id      Int
   description              String?                 @db.VarChar(500)
@@ -414,51 +423,51 @@ model scheduled_maintenance {
   supplier_id              Int?
   estimated_cost           Decimal?                @db.Decimal(10, 2)
   maintenance_status_id    Int
-  state                    String                  @default("A", map: "DF__scheduled__state__1E6F845E") @db.VarChar(1)
-  created_at               DateTime                @default(now(), map: "DF__scheduled__creat__1F63A897") @db.DateTime
-  updated_at               DateTime                @default(now(), map: "DF__scheduled__updat__2057CCD0") @db.DateTime
+  state                    String                  @default("A", map: "DF__scheduled__state__214BF109") @db.VarChar(1)
+  created_at               DateTime                @default(now(), map: "DF__scheduled__creat__22401542") @db.DateTime
+  updated_at               DateTime                @default(now(), map: "DF__scheduled__updat__2334397B") @db.DateTime
   completed_maintenance    completed_maintenance[]
-  maintenance_types        maintenance_types       @relation(fields: [maintenance_type_id], references: [maintenance_type_id], onUpdate: NoAction, map: "FK__scheduled__maint__0697FACD")
-  maintenance_statuses     maintenance_statuses    @relation(fields: [maintenance_status_id], references: [maintenance_status_id], onUpdate: NoAction, map: "FK__scheduled__maint__0880433F")
-  states                   states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__scheduled__state__2334397B")
-  suppliers                suppliers?              @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__scheduled__suppl__078C1F06")
-  vehicles                 vehicles                @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__scheduled__vehic__05A3D694")
+  maintenance_types        maintenance_types       @relation(fields: [maintenance_type_id], references: [maintenance_type_id], onUpdate: NoAction, map: "FK__scheduled__maint__214BF109")
+  maintenance_statuses     maintenance_statuses    @relation(fields: [maintenance_status_id], references: [maintenance_status_id], onUpdate: NoAction, map: "FK__scheduled__maint__2334397B")
+  states                   states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__scheduled__state__24285DB4")
+  suppliers                suppliers?              @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__scheduled__suppl__22401542")
+  vehicles                 vehicles                @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__scheduled__vehic__2057CCD0")
 }
 
 model shipment_orders {
   shipment_id Int
   order_id    Int
-  sequence    Int       @default(1, map: "DF__shipment___seque__5006DFF2")
-  created_at  DateTime  @default(now(), map: "DF__shipment___creat__50FB042B") @db.DateTime
-  updated_at  DateTime  @default(now(), map: "DF__shipment___updat__51EF2864") @db.DateTime
-  orders      orders    @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__shipment___order__336AA144")
-  shipments   shipments @relation(fields: [shipment_id], references: [shipment_id], onUpdate: NoAction, map: "FK__shipment___shipm__32767D0B")
+  sequence    Int       @default(1, map: "DF__shipment___seque__52E34C9D")
+  created_at  DateTime  @default(now(), map: "DF__shipment___creat__53D770D6") @db.DateTime
+  updated_at  DateTime  @default(now(), map: "DF__shipment___updat__54CB950F") @db.DateTime
+  orders      orders    @relation(fields: [order_id], references: [order_id], onUpdate: NoAction, map: "FK__shipment___order__52E34C9D")
+  shipments   shipments @relation(fields: [shipment_id], references: [shipment_id], onUpdate: NoAction, map: "FK__shipment___shipm__51EF2864")
 
-  @@id([shipment_id, order_id], map: "PK__shipment__C523F87B7221890E")
+  @@id([shipment_id, order_id], map: "PK__shipment__C523F87BB8E78E28")
 }
 
 model shipments {
-  shipment_id       Int               @id(map: "PK__shipment__41466E597B37ACF5") @default(autoincrement())
-  shipment_number   String            @unique(map: "UQ__shipment__18EE3BAFF3AF340B") @db.VarChar(50)
+  shipment_id       Int               @id(map: "PK__shipment__41466E59143FFA2A") @default(autoincrement())
+  shipment_number   String            @unique(map: "UQ__shipment__18EE3BAF8ADCE6A5") @db.VarChar(50)
   vehicle_id        Int
   driver_id         Int
   status_code       String            @db.VarChar(25)
-  ship_date         DateTime          @default(now(), map: "DF__shipments__ship___467D75B8") @db.DateTime
+  ship_date         DateTime          @default(now(), map: "DF__shipments__ship___4959E263") @db.DateTime
   delivery_date     DateTime?         @db.DateTime
   notes             String?           @db.VarChar(1000)
-  state             String            @default("A", map: "DF__shipments__state__477199F1") @db.VarChar(1)
-  created_at        DateTime          @default(now(), map: "DF__shipments__creat__4865BE2A") @db.DateTime
-  updated_at        DateTime          @default(now(), map: "DF__shipments__updat__4959E263") @db.DateTime
+  state             String            @default("A", map: "DF__shipments__state__4A4E069C") @db.VarChar(1)
+  created_at        DateTime          @default(now(), map: "DF__shipments__creat__4B422AD5") @db.DateTime
+  updated_at        DateTime          @default(now(), map: "DF__shipments__updat__4C364F0E") @db.DateTime
   deliveries        deliveries[]
   shipment_orders   shipment_orders[]
-  employees         employees         @relation(fields: [driver_id], references: [employee_id], onUpdate: NoAction, map: "FK__shipments__drive__2BC97F7C")
-  states            states            @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__shipments__state__4B422AD5")
-  shipping_statuses shipping_statuses @relation(fields: [status_code], references: [status_code], onUpdate: NoAction, map: "FK__shipments__statu__2CBDA3B5")
-  vehicles          vehicles          @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__shipments__vehic__2AD55B43")
+  employees         employees         @relation(fields: [driver_id], references: [employee_id], onUpdate: NoAction, map: "FK__shipments__drive__4A4E069C")
+  states            states            @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__shipments__state__4C364F0E")
+  shipping_statuses shipping_statuses @relation(fields: [status_code], references: [status_code], onUpdate: NoAction, map: "FK__shipments__statu__4B422AD5")
+  vehicles          vehicles          @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__shipments__vehic__4959E263")
 }
 
 model shipping_statuses {
-  status_code String      @id(map: "PK__shipping__4157B0209A76AAF3") @db.VarChar(25)
+  status_code String      @id(map: "PK__shipping__4157B020CB900A31") @db.VarChar(25)
   description String      @db.VarChar(100)
   state       String      @default("A", map: "DF__shipping___state__619B8048") @db.VarChar(1)
   created_at  DateTime    @default(now(), map: "DF__shipping___creat__628FA481") @db.DateTime
@@ -468,129 +477,16 @@ model shipping_statuses {
 }
 
 model sizes {
-  size_code        String             @id(map: "PK__sizes__4D990C7AA0F8C796") @db.VarChar(10)
+  size_code        String             @id(map: "PK__sizes__4D990C7AC1AE5912") @db.VarChar(10)
   state            String             @default("A", map: "DF__sizes__state__398D8EEE") @db.VarChar(1)
   created_at       DateTime           @default(now(), map: "DF__sizes__created_a__3A81B327") @db.DateTime
   updated_at       DateTime           @default(now(), map: "DF__sizes__updated_a__3B75D760") @db.DateTime
   product_variants product_variants[]
-  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__sizes__state__3E52440B")
-}
-
-model suppliers {
-  supplier_id           Int                     @id(map: "PK__supplier__6EE594E8993B595B") @default(autoincrement())
-  person_id             Int                     @unique(map: "UQ__supplier__543848DE4A158D0D")
-  company_name          String                  @db.VarChar(200)
-  tax_id                String?                 @db.VarChar(50)
-  state                 String                  @default("A", map: "DF__suppliers__state__05D8E0BE") @db.VarChar(1)
-  created_at            DateTime                @default(now(), map: "DF__suppliers__creat__06CD04F7") @db.DateTime
-  updated_at            DateTime                @default(now(), map: "DF__suppliers__updat__07C12930") @db.DateTime
-  completed_maintenance completed_maintenance[]
-  maintenance_parts     maintenance_parts[]
-  scheduled_maintenance scheduled_maintenance[]
-  persons               persons                 @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__suppliers__perso__08B54D69")
-  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__suppliers__state__08B54D69")
-  vehicles              vehicles[]
-}
-
-model users {
-  user_id    Int        @id(map: "PK__users__B9BE370FA36BC900") @default(autoincrement())
-  person_id  Int
-  username   String     @unique(map: "UQ__users__F3DBC572EBFBB8C1") @db.VarChar(50)
-  password   String     @db.VarChar(100)
-  role_id    Int?
-  last_login DateTime?  @db.DateTime
-  state      String     @default("A", map: "DF__users__state__0D7A0286") @db.VarChar(1)
-  created_at DateTime   @default(now(), map: "DF__users__created_a__0E6E26BF") @db.DateTime
-  updated_at DateTime   @default(now(), map: "DF__users__updated_a__0F624AF8") @db.DateTime
-  customers  customers?
-  employees  employees?
-  persons    persons    @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__users__person_id__0F624AF8")
-  roles      roles?     @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__users__role_id__00200768")
-  states     states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__users__state__114A936A")
-}
-
-model vehicle_document_types {
-  document_type_id  Int                 @id(map: "PK__vehicle___69F7C2B1664D52EA") @default(autoincrement())
-  type_name         String              @db.VarChar(100)
-  state             String              @default("A", map: "DF__vehicle_d__state__04AFB25B") @db.VarChar(1)
-  created_at        DateTime            @default(now(), map: "DF__vehicle_d__creat__05A3D694") @db.DateTime
-  updated_at        DateTime            @default(now(), map: "DF__vehicle_d__updat__0697FACD") @db.DateTime
-  states            states              @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_d__state__0A688BB1")
-  vehicle_documents vehicle_documents[]
-}
-
-model vehicle_documents {
-  vehicle_document_id    Int                    @id(map: "PK__vehicle___8C5AE5328B845298") @default(autoincrement())
-  vehicle_id             Int
-  document_type_id       Int
-  document_number        String?                @db.VarChar(100)
-  issuing_authority      String?                @db.VarChar(255)
-  issue_date             DateTime?              @db.Date
-  expiration_date        DateTime               @db.Date
-  amount                 Decimal?               @db.Decimal(10, 2)
-  is_valid               Boolean                @default(true, map: "DF__vehicle_d__is_va__0A688BB1")
-  state                  String                 @default("A", map: "DF__vehicle_d__state__0B5CAFEA") @db.VarChar(1)
-  created_at             DateTime               @default(now(), map: "DF__vehicle_d__creat__0C50D423") @db.DateTime
-  updated_at             DateTime               @default(now(), map: "DF__vehicle_d__updat__0D44F85C") @db.DateTime
-  vehicle_document_types vehicle_document_types @relation(fields: [document_type_id], references: [document_type_id], onUpdate: NoAction, map: "FK__vehicle_d__docum__74794A92")
-  states                 states                 @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_d__state__12FDD1B2")
-  vehicles               vehicles               @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__vehicle_d__vehic__73852659")
-}
-
-model vehicle_statuses {
-  vehicle_status_id Int        @id(map: "PK__vehicle___E8592AD29CE6EDDC") @default(autoincrement())
-  status_name       String     @db.VarChar(50)
-  state             String     @default("A", map: "DF__vehicle_s__state__72910220") @db.VarChar(1)
-  created_at        DateTime   @default(now(), map: "DF__vehicle_s__creat__73852659") @db.DateTime
-  updated_at        DateTime   @default(now(), map: "DF__vehicle_s__updat__74794A92") @db.DateTime
-  states            states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_s__state__7849DB76")
-  vehicles          vehicles[]
-}
-
-model vehicle_types {
-  vehicle_type_id  Int        @id(map: "PK__vehicle___2A00721834017EE7") @default(autoincrement())
-  type_name        String     @db.VarChar(100)
-  description      String?    @db.VarChar(500)
-  state            String     @default("A", map: "DF__vehicle_t__state__6CD828CA") @db.VarChar(1)
-  load_capacity_kg Decimal    @db.Decimal(10, 2)
-  created_at       DateTime   @default(now(), map: "DF__vehicle_t__creat__6DCC4D03") @db.DateTime
-  updated_at       DateTime   @default(now(), map: "DF__vehicle_t__updat__6EC0713C") @db.DateTime
-  states           states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_t__state__72910220")
-  vehicles         vehicles[]
-}
-
-model vehicles {
-  vehicle_id            Int                     @id(map: "PK__vehicles__F2947BC1F513D74C") @default(autoincrement())
-  vehicle_type_id       Int
-  make                  String                  @db.VarChar(100)
-  model                 String                  @db.VarChar(100)
-  year                  Int
-  license_plate         String                  @unique(map: "UQ__vehicles__F72CD56E84F08EBA") @db.VarChar(20)
-  vin                   String?                 @unique(map: "UQ__vehicles__DDB00C663F1EF40D") @db.VarChar(50)
-  engine_number         String?                 @db.VarChar(50)
-  color                 String?                 @db.VarChar(50)
-  current_mileage       Int                     @default(0, map: "DF__vehicles__curren__7B264821")
-  load_capacity_kg      Decimal                 @db.Decimal(10, 2)
-  vehicle_status_id     Int
-  supplier_id           Int?
-  purchase_date         DateTime?               @db.Date
-  purchase_price        Decimal?                @db.Decimal(12, 2)
-  state                 String                  @default("A", map: "DF__vehicles__state__7C1A6C5A") @db.VarChar(1)
-  created_at            DateTime                @default(now(), map: "DF__vehicles__create__7D0E9093") @db.DateTime
-  updated_at            DateTime                @default(now(), map: "DF__vehicles__update__7E02B4CC") @db.DateTime
-  completed_maintenance completed_maintenance[]
-  fuel_logs             fuel_logs[]
-  scheduled_maintenance scheduled_maintenance[]
-  shipments             shipments[]
-  vehicle_documents     vehicle_documents[]
-  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicles__state__00DF2177")
-  suppliers             suppliers?              @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__vehicles__suppli__671F4F74")
-  vehicle_types         vehicle_types           @relation(fields: [vehicle_type_id], references: [vehicle_type_id], onUpdate: NoAction, map: "FK__vehicles__vehicl__65370702")
-  vehicle_statuses      vehicle_statuses        @relation(fields: [vehicle_status_id], references: [vehicle_status_id], onUpdate: NoAction, map: "FK__vehicles__vehicl__662B2B3B")
+  states           states             @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__sizes__state__3C69FB99")
 }
 
 model states {
-  state                  String                   @id(map: "PK__states__A9360BC284293A0F") @db.VarChar(1)
+  state                  String                   @id(map: "PK__states__A9360BC2259D91DC") @db.VarChar(1)
   description            String                   @db.VarChar(100)
   created_at             DateTime                 @default(now(), map: "DF__states__created___24927208") @db.DateTime
   updated_at             DateTime                 @default(now(), map: "DF__states__updated___25869641") @db.DateTime
@@ -614,7 +510,6 @@ model states {
   parties                parties[]
   payment_methods        payment_methods[]
   payments               payments[]
-  persons                persons[]
   phone_types            phone_types[]
   phones                 phones[]
   product_images         product_images[]
@@ -634,12 +529,114 @@ model states {
   vehicles               vehicles[]
 }
 
-model departments {
-  department_id   Int         @id(map: "PK__departme__C22324228DC2436E") @default(autoincrement())
-  department_name String      @db.VarChar(100)
-  state           String      @default("A", map: "DF__departmen__state__4AB81AF0") @db.VarChar(1)
-  created_at      DateTime    @default(now(), map: "DF__departmen__creat__4BAC3F29") @db.DateTime
-  updated_at      DateTime    @default(now(), map: "DF__departmen__updat__4CA06362") @db.DateTime
-  states          states      @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__departmen__state__4D94879B")
-  employees       employees[]
+model suppliers {
+  supplier_id           Int                     @id(map: "PK__supplier__6EE594E8FD1D20E8") @default(autoincrement())
+  person_id             Int                     @unique(map: "UK_supplier_person")
+  company_name          String?                 @db.VarChar(100)
+  state                 String                  @default("A", map: "DF__suppliers__state__05D8E0BE") @db.VarChar(1)
+  created_at            DateTime                @default(now(), map: "DF__suppliers__creat__06CD04F7") @db.DateTime
+  updated_at            DateTime                @default(now(), map: "DF__suppliers__updat__07C12930") @db.DateTime
+  completed_maintenance completed_maintenance[]
+  maintenance_parts     maintenance_parts[]
+  scheduled_maintenance scheduled_maintenance[]
+  persons               persons                 @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__suppliers__perso__08B54D69")
+  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__suppliers__state__09A971A2")
+  vehicles              vehicles[]
+}
+
+model users {
+  user_id    Int        @id(map: "PK__users__B9BE370FD4A47F50") @default(autoincrement())
+  person_id  Int        @unique(map: "UK_user_person")
+  username   String     @unique(map: "UQ__users__F3DBC57257F3E631") @db.VarChar(50)
+  password   String     @db.VarChar(100)
+  role_id    Int?
+  last_login DateTime?  @db.DateTime
+  state      String     @default("A", map: "DF__users__state__0F624AF8") @db.VarChar(1)
+  created_at DateTime   @default(now(), map: "DF__users__created_a__10566F31") @db.DateTime
+  updated_at DateTime   @default(now(), map: "DF__users__updated_a__114A936A") @db.DateTime
+  customers  customers?
+  employees  employees?
+  persons    persons    @relation(fields: [person_id], references: [person_id], onUpdate: NoAction, map: "FK__users__person_id__10566F31")
+  roles      roles?     @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__users__role_id__114A936A")
+  states     states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__users__state__123EB7A3")
+}
+
+model vehicle_document_types {
+  document_type_id  Int                 @id(map: "PK__vehicle___69F7C2B1018A7914") @default(autoincrement())
+  type_name         String              @db.VarChar(100)
+  state             String              @default("A", map: "DF__vehicle_d__state__078C1F06") @db.VarChar(1)
+  created_at        DateTime            @default(now(), map: "DF__vehicle_d__creat__0880433F") @db.DateTime
+  updated_at        DateTime            @default(now(), map: "DF__vehicle_d__updat__09746778") @db.DateTime
+  states            states              @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_d__state__0697FACD")
+  vehicle_documents vehicle_documents[]
+}
+
+model vehicle_documents {
+  vehicle_document_id    Int                    @id(map: "PK__vehicle___8C5AE532E6B8F7E6") @default(autoincrement())
+  vehicle_id             Int
+  document_type_id       Int
+  document_number        String?                @db.VarChar(100)
+  issuing_authority      String?                @db.VarChar(255)
+  issue_date             DateTime?              @db.Date
+  expiration_date        DateTime               @db.Date
+  amount                 Decimal?               @db.Decimal(10, 2)
+  is_valid               Boolean                @default(true, map: "DF__vehicle_d__is_va__0D44F85C")
+  state                  String                 @default("A", map: "DF__vehicle_d__state__0E391C95") @db.VarChar(1)
+  created_at             DateTime               @default(now(), map: "DF__vehicle_d__creat__0F2D40CE") @db.DateTime
+  updated_at             DateTime               @default(now(), map: "DF__vehicle_d__updat__10216507") @db.DateTime
+  vehicle_document_types vehicle_document_types @relation(fields: [document_type_id], references: [document_type_id], onUpdate: NoAction, map: "FK__vehicle_d__docum__0E391C95")
+  states                 states                 @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_d__state__0F2D40CE")
+  vehicles               vehicles               @relation(fields: [vehicle_id], references: [vehicle_id], onUpdate: NoAction, map: "FK__vehicle_d__vehic__0D44F85C")
+}
+
+model vehicle_statuses {
+  vehicle_status_id Int        @id(map: "PK__vehicle___E8592AD29EA8B787") @default(autoincrement())
+  status_name       String     @db.VarChar(50)
+  state             String     @default("A", map: "DF__vehicle_s__state__756D6ECB") @db.VarChar(1)
+  created_at        DateTime   @default(now(), map: "DF__vehicle_s__creat__76619304") @db.DateTime
+  updated_at        DateTime   @default(now(), map: "DF__vehicle_s__updat__7755B73D") @db.DateTime
+  states            states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_s__state__74794A92")
+  vehicles          vehicles[]
+}
+
+model vehicle_types {
+  vehicle_type_id  Int        @id(map: "PK__vehicle___2A007218107BB26F") @default(autoincrement())
+  type_name        String     @db.VarChar(100)
+  description      String?    @db.VarChar(500)
+  state            String     @default("A", map: "DF__vehicle_t__state__6FB49575") @db.VarChar(1)
+  load_capacity_kg Decimal    @db.Decimal(10, 2)
+  created_at       DateTime   @default(now(), map: "DF__vehicle_t__creat__70A8B9AE") @db.DateTime
+  updated_at       DateTime   @default(now(), map: "DF__vehicle_t__updat__719CDDE7") @db.DateTime
+  states           states     @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicle_t__state__6EC0713C")
+  vehicles         vehicles[]
+}
+
+model vehicles {
+  vehicle_id            Int                     @id(map: "PK__vehicles__F2947BC16FD5F83C") @default(autoincrement())
+  vehicle_type_id       Int
+  make                  String                  @db.VarChar(100)
+  model                 String                  @db.VarChar(100)
+  year                  Int
+  license_plate         String                  @unique(map: "UQ__vehicles__F72CD56E026E9EDE") @db.VarChar(20)
+  vin                   String?                 @unique(map: "UQ__vehicles__DDB00C662AA1A801") @db.VarChar(50)
+  engine_number         String?                 @db.VarChar(50)
+  color                 String?                 @db.VarChar(50)
+  current_mileage       Int                     @default(0, map: "DF__vehicles__curren__7E02B4CC")
+  load_capacity_kg      Decimal                 @db.Decimal(10, 2)
+  vehicle_status_id     Int
+  supplier_id           Int?
+  purchase_date         DateTime?               @db.Date
+  purchase_price        Decimal?                @db.Decimal(12, 2)
+  state                 String                  @default("A", map: "DF__vehicles__state__7EF6D905") @db.VarChar(1)
+  created_at            DateTime                @default(now(), map: "DF__vehicles__create__7FEAFD3E") @db.DateTime
+  updated_at            DateTime                @default(now(), map: "DF__vehicles__update__00DF2177") @db.DateTime
+  completed_maintenance completed_maintenance[]
+  fuel_logs             fuel_logs[]
+  scheduled_maintenance scheduled_maintenance[]
+  shipments             shipments[]
+  vehicle_documents     vehicle_documents[]
+  states                states                  @relation(fields: [state], references: [state], onUpdate: NoAction, map: "FK__vehicles__state__00DF2177")
+  suppliers             suppliers?              @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "FK__vehicles__suppli__7FEAFD3E")
+  vehicle_types         vehicle_types           @relation(fields: [vehicle_type_id], references: [vehicle_type_id], onUpdate: NoAction, map: "FK__vehicles__vehicl__7E02B4CC")
+  vehicle_statuses      vehicle_statuses        @relation(fields: [vehicle_status_id], references: [vehicle_status_id], onUpdate: NoAction, map: "FK__vehicles__vehicl__7EF6D905")
 }

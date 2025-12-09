@@ -1,5 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { Phone } from './pohone.interface';
+import { Prisma } from '@/generated';
+
+import { Phone } from '@/interfaces';
 
 export interface Party {
 	party_type: string;
@@ -23,7 +24,9 @@ export interface Person {
 	last_name: string | null;
 	date_of_birth: Date | null;
 	email: string | null;
-	party_type: string;
+	document_type_id: number | null;
+	document_number: string | null;
+	party_type?: string;
 	created_at: Date;
 	updated_at: Date;
 	document_types?: DocumentType;

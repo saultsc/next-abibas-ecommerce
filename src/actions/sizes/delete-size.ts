@@ -1,7 +1,6 @@
 'use server';
 
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 import { revalidatePath } from 'next/cache';
 
 export const deleteSize = async (size_code: string) => {

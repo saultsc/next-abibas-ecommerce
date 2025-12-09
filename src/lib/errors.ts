@@ -64,6 +64,10 @@ export enum ErrorCode {
 
 	// Errores de clientes
 	CUSTOMER_NOT_FOUND = 'CUSTOMER_NOT_FOUND',
+
+	// Errores de suplidores
+	SUPPLIER_ALREADY_EXISTS = 'SUPPLIER_ALREADY_EXISTS',
+	SUPPLIER_CREATION_FAILED = 'SUPPLIER_CREATION_FAILED',
 }
 
 /**
@@ -125,6 +129,9 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 	[ErrorCode.DOCUMENT_ALREADY_EXISTS]: 'El número de documento ya está en uso',
 	[ErrorCode.EMAIL_ALREADY_EXISTS]: 'El correo electrónico ya está en uso',
 	[ErrorCode.CUSTOMER_NOT_FOUND]: 'Cliente no encontrado',
+
+	[ErrorCode.SUPPLIER_ALREADY_EXISTS]: 'Ya existe un suplidor con ese nombre o documento',
+	[ErrorCode.SUPPLIER_CREATION_FAILED]: 'Error al crear el suplidor',
 };
 
 /**

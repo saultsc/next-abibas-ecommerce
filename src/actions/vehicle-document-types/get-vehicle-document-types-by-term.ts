@@ -1,8 +1,7 @@
 'use server';
 
 import { Response, VehicleDocumentType, vehicle_document_typesWhereInput } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const getVehicleDocumentTypesByTerm = async (
 	term: string

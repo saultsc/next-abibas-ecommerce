@@ -3,9 +3,8 @@ export const revalidate = 0;
 import { getPaginatedSizes } from '@/actions';
 import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { Size } from '@/interfaces';
-import { dateFormat } from '@/utils/dateFormat';
 import Link from 'next/link';
-import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline, IoTimeOutline } from 'react-icons/io5';
+import { IoAddCircleOutline, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 
 interface Props {
 	searchParams: Promise<{ page?: string }>;
@@ -33,24 +32,7 @@ export default async function SizesPage({ searchParams }: Props) {
 				</Link>
 			),
 		},
-		{
-			header: 'Creado',
-			cell: (z: Size) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					<IoTimeOutline className="text-base" />
-					{dateFormat(z.created_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (z: Size) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					<IoTimeOutline className="text-base" />
-					{dateFormat(z.updated_at)}
-				</span>
-			),
-		},
+
 		{
 			header: 'Estado',
 			cell: (z: Size) => <StateBadge state={z.state} />,

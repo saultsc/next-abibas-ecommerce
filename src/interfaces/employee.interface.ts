@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 export interface Department {
 	department_id: number;
@@ -12,8 +12,6 @@ export interface Employee {
 	employee_id: number;
 	user_id: number;
 	hire_date: Date;
-	document_number: string;
-	document_type_id: number;
 	department_id: number | null;
 	created_at: Date;
 	updated_at: Date;

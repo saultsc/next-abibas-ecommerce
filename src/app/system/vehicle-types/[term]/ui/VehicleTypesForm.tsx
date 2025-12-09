@@ -1,12 +1,14 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
+import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
+import { VehicleType } from '@/interfaces';
 import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { createOrUpdateVehicleType, deleteVehicleType } from '@/actions';
-import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
-import { VehicleType } from '@/interfaces';
+
+import { createOrUpdateVehicleType } from '@/actions/vehicle-types/create-update-vehicleTypes';
+import { deleteVehicleType } from '@/actions/vehicle-types/delete-vehicleTypes';
 
 interface Props {
 	vehicleType: VehicleType;
@@ -15,8 +17,8 @@ interface Props {
 interface FormInputs {
 	type_name: string;
 	description: string | null;
-    load_capacity_kg: number;
-    state: string;
+	load_capacity_kg: number;
+	state: string;
 }
 
 export const VehicleTypesForm = ({ vehicleType }: Props) => {
@@ -31,11 +33,12 @@ export const VehicleTypesForm = ({ vehicleType }: Props) => {
 	} = useForm<FormInputs>({
 		defaultValues: {
 			type_name: vehicleType.type_name,
-            description: vehicleType.description ?? '',
-            load_capacity_kg: typeof vehicleType.load_capacity_kg === 'number' 
-            ? vehicleType.load_capacity_kg 
-            : Number(vehicleType.load_capacity_kg),
-        state: vehicleType.state ?? 'A',
+			description: vehicleType.description ?? '',
+			load_capacity_kg:
+				typeof vehicleType.load_capacity_kg === 'number'
+					? vehicleType.load_capacity_kg
+					: Number(vehicleType.load_capacity_kg),
+			state: vehicleType.state ?? 'A',
 		},
 		mode: 'onChange',
 	});
@@ -50,11 +53,15 @@ export const VehicleTypesForm = ({ vehicleType }: Props) => {
 		}
 
 		formData.append('type_name', type_name);
-        formData.append('description', data.description || '');
-        formData.append('load_capacity_kg', data.load_capacity_kg.toString());
+		formData.append('description', data.description || '');
+		formData.append('load_capacity_kg', data.load_capacity_kg.toString());
 		formData.append('state', state);
 
-		const { success, data: vehicleTypeData, message } = await createOrUpdateVehicleType(formData);
+		const {
+			success,
+			data: vehicleTypeData,
+			message,
+		} = await createOrUpdateVehicleType(formData);
 
 		if (!success) {
 			toast.error(message || 'Error al guardar el tipo de vehículo');
@@ -111,41 +118,41 @@ export const VehicleTypesForm = ({ vehicleType }: Props) => {
 					{...register('description')}
 				/>
 			</div>
-            {/* Capacidad de carga (kg) */}
-            <div className="w-full mb-4">
-        <TextField 
-            label="Capacidad de carga (kg) *"
-            variant="filled"
-            className="w-full"
-            error={!!errors.load_capacity_kg}
-            helperText={errors.load_capacity_kg?.message}
-            type='number'
-            inputProps={{
-                min: 0,
-                step: "any",
-                pattern: "[0-9]*",
-                inputMode: "numeric"
-            }}
-            onKeyDown={(e) => {
-                if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
-                    e.preventDefault();
-                }
-            }}
-            {...register('load_capacity_kg', {
-                valueAsNumber: true,
-                required: 'La capacidad de carga es requerida',
-                min: {
-                    value: 0,
-                    message: 'La capacidad de carga debe ser mayor o igual a 0',
-                },
-                validate: (value) => {
-                    if (isNaN(value)) {
-                        return 'Debe ingresar un número válido';
-                    }
-                    return true;
-                }
-        })}
-			/>
+			{/* Capacidad de carga (kg) */}
+			<div className="w-full mb-4">
+				<TextField
+					label="Capacidad de carga (kg) *"
+					variant="filled"
+					className="w-full"
+					error={!!errors.load_capacity_kg}
+					helperText={errors.load_capacity_kg?.message}
+					type="number"
+					inputProps={{
+						min: 0,
+						step: 'any',
+						pattern: '[0-9]*',
+						inputMode: 'numeric',
+					}}
+					onKeyDown={(e) => {
+						if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+							e.preventDefault();
+						}
+					}}
+					{...register('load_capacity_kg', {
+						valueAsNumber: true,
+						required: 'La capacidad de carga es requerida',
+						min: {
+							value: 0,
+							message: 'La capacidad de carga debe ser mayor o igual a 0',
+						},
+						validate: (value) => {
+							if (isNaN(value)) {
+								return 'Debe ingresar un número válido';
+							}
+							return true;
+						},
+					})}
+				/>
 			</div>
 
 			{/* Estado */}

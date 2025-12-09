@@ -1,4 +1,4 @@
-import { ShipmentForm } from './ui';
+import { ShipmentForm } from './ui/ShipmentForm';
 
 export const revalidate = 0;
 

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 export interface Category {
 	category_id: number;

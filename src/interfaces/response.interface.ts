@@ -1,4 +1,4 @@
-import { ErrorCode } from '@/lib';
+import { ErrorCode } from '@/lib/errors';
 
 export interface Response<T = unknown> {
 	success: boolean;

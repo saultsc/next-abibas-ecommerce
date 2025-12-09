@@ -9,5 +9,6 @@ export * from './response.interface';
 export * from './role.interface';
 export * from './shipment.interface';
 export * from './size.interface';
+export * from './supplier.interface';
 export * from './user.interface';
 export * from './vehicle.interface';

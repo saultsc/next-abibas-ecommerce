@@ -1,12 +1,14 @@
 'use client';
 
-import { createOrUpdateColor, deleteColor } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Color } from '@/interfaces';
 import { TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+
+import { createOrUpdateColor } from '@/actions/colors/create-update-color';
+import { deleteColor } from '@/actions/colors/delete-color';
 
 interface Props {
 	color: Color;

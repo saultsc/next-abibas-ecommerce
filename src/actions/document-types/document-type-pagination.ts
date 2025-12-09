@@ -4,8 +4,7 @@ import {
 	DocumentTypesWhereInput,
 	Response,
 } from '@/interfaces';
-import { ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { ErrorCode, prisma } from '@/lib';
 
 interface Params {
 	page?: number;

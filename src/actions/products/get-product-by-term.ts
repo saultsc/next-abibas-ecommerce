@@ -1,8 +1,7 @@
 'use server';
 
 import { Product, ProductInclude, ProductWhereInput, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const getProductByTerm = async (term: string): Promise<Response<Product>> => {
 	const isNumeric = !isNaN(Number(term));

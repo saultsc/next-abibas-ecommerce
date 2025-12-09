@@ -1,5 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma } from '@/generated';
+
+import { Decimal } from '@prisma/client/runtime/client';
 
 export interface VehicleType {
 	vehicle_type_id: number;

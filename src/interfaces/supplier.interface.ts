@@ -1,16 +1,15 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 import { Person } from '@/interfaces';
 
 export interface Supplier {
 	supplier_id: number;
 	person_id: number;
-	company_name: string;
-	tax_id?: string | null;
+	company_name?: string | null;
 	state: string;
 	created_at: Date;
 	updated_at: Date;
-	persons?: Person[];
+	persons?: Person;
 }
 
 export type SupplierWhereInput = Prisma.suppliersWhereInput;

@@ -1,8 +1,7 @@
 'use server';
 
 import { Color, ColorWhereInput, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 
 export const getColorByTerm = async (term: string): Promise<Response<Color>> => {
 	const isNumeric = !isNaN(Number(term));

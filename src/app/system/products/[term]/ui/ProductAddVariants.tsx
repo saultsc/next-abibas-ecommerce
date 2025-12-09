@@ -6,12 +6,15 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogTitle, IconButton, Switch, TextField } from '@mui/material';
 import { IoAdd, IoClose } from 'react-icons/io5';
 
-import { deleteProductVariant, searchColors, searchSizes } from '@/actions';
 import { CustomSelect } from '@/components';
 import { useSearch } from '@/hooks';
 import { Color, ProductVariants, Size } from '@/interfaces';
-import { ErrorCode } from '@/lib';
+import { ErrorCode } from '@/lib/errors';
 import { useState } from 'react';
+
+import { searchColors } from '@/actions/colors/color-search';
+import { deleteProductVariant } from '@/actions/products/delete-product-variant';
+import { searchSizes } from '@/actions/sizes/size-search';
 
 interface Props {
 	variants: ProductVariants[];
@@ -116,7 +119,7 @@ export const ProductAddVariants = ({
 				{variants.map((variant) => (
 					<div
 						key={variant.variant_id}
-						className="w-full relative bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md hover:border-blue-300 transition-all">
+						className="w-full relative bg-linear-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md hover:border-blue-300 transition-all">
 						<button
 							type="button"
 							onClick={() => handleRemoveVariant(variant.variant_id)}
@@ -197,7 +200,7 @@ export const ProductAddVariants = ({
 				PaperProps={{
 					className: 'rounded-xl',
 				}}>
-				<DialogTitle className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+				<DialogTitle className="flex items-center justify-between bg-linear-to-r from-blue-50 to-blue-100 border-b border-blue-200">
 					<div>
 						<h2 className="text-xl font-bold text-gray-800">Agregar Nueva Variante</h2>
 						<p className="text-sm text-gray-600 mt-1">

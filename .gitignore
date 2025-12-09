@@ -45,3 +45,15 @@ next-env.d.ts
 
 # dbData
 /sqlserver
+
+/generated/prisma
+
+/src/generated/prisma
+
+/src/generated/prisma
+
+/src/generated/prisma
+
+/src/generated/prisma
+
+/src/generated/prisma

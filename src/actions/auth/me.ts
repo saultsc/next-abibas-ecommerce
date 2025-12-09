@@ -3,8 +3,7 @@
 import { cookies, headers } from 'next/headers';
 
 import { Response, User } from '@/interfaces';
-import { CustomError, ErrorCode, verifyToken } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, prisma, verifyToken } from '@/lib';
 
 /**
  * Obtiene la información del usuario autenticado desde el JWT

@@ -51,6 +51,7 @@ const groupedMenus: MenuGroup[] = [
 		label: 'Vehículos',
 		icon: AiFillCar,
 		items: [
+			{ href: '/system/vehicles', icon: FaTruck, label: 'Gestión' },
 			{ href: '/system/vehicle-types', icon: MdCategory, label: 'Tipos' },
 			{ href: '/system/vehicle-status', icon: MdOutlineToggleOn, label: 'Estados' },
 			{ href: '/system/maintenance', icon: MdOutlineToggleOn, label: 'Mantenimientos' },

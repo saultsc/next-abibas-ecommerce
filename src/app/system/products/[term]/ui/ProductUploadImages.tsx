@@ -1,10 +1,15 @@
-import { deleteProductImage } from '@/actions';
-import { ProductImages } from '@/interfaces';
-import { ErrorCode } from '@/lib';
-import Image from 'next/image';
+'use client';
+
 import { useState } from 'react';
+
+import Image from 'next/image';
+
 import { IoCloudUploadOutline, IoTrash } from 'react-icons/io5';
 import { toast } from 'sonner';
+
+import { ProductImages } from '@/interfaces';
+
+import { deleteProductImage } from '@/actions/products/delete-product-image';
 
 type ProductImageInput = ProductImages | File;
 
@@ -59,10 +64,10 @@ export const ProductUploadImages = ({ images, onImagesChange }: Props) => {
 
 		const { success, code, message } = await deleteProductImage(imageToRemove.image_id);
 
-		if (code === ErrorCode.PRODUCT_IMAGE_NOT_FOUND) {
-			onImagesChange(images.filter((_, i) => i !== index));
-			return;
-		}
+		// if (code === ErrorCode.PRODUCT_IMAGE_NOT_FOUND) {
+		// 	onImagesChange(images.filter((_, i) => i !== index));
+		// 	return;
+		// }
 
 		if (success) {
 			onImagesChange(images.filter((_, i) => i !== index));

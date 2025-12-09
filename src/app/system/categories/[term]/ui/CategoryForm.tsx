@@ -5,9 +5,11 @@ import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { createOrUpdateCategory, deleteCategory } from '@/actions';
 import { DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
 import { Category } from '@/interfaces';
+
+import { createOrUpdateCategory } from '@/actions/categories/create-update-category';
+import { deleteCategory } from '@/actions/categories/delete-category';
 
 interface Props {
 	category: Category;

@@ -1,6 +1,5 @@
+import { Decimal, Prisma } from '@/generated';
 import { Category, Color, Size } from '@/interfaces';
-import { Prisma } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export interface Product {
 	product_id: number;

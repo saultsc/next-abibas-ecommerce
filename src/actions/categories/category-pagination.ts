@@ -1,7 +1,7 @@
 'use server';
 
 import { Category, CategoryWhereInput, Response } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 interface Params {
 	page?: number;

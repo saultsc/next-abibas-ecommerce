@@ -65,7 +65,7 @@ export const CustomerForm = (props: Props) => {
 			<div className="w-[70%] flex flex-col gap-6">
 				{/* Header con información del cliente */}
 				{user.username && (
-					<div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 shadow-sm">
+					<div className="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 shadow-sm">
 						<div className="flex items-start justify-between gap-4">
 							<div className="flex-1">
 								<div className="flex items-center gap-3 mb-2">

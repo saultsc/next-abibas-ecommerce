@@ -1,5 +1,5 @@
 import { Color, ColorWhereInput, Response } from '@/interfaces';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib';
 
 interface Params {
 	page?: number;

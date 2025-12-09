@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 export interface Color {
 	color_id: number;

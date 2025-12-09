@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated';
 
 import { Customer, Employee, Person, Role } from '@/interfaces';
 

@@ -1,8 +1,7 @@
 'use server';
 import { envs } from '@/config';
 import { Response, User } from '@/interfaces';
-import { CustomError, ErrorCode, generateToken, hashPassword } from '@/lib';
-import prisma from '@/lib/prisma';
+import { CustomError, ErrorCode, generateToken, hashPassword, prisma } from '@/lib';
 import dayjs from 'dayjs';
 import { cookies } from 'next/headers';
 import z from 'zod';
