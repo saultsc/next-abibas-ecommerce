@@ -15,10 +15,14 @@ const userSchema = z.object({
 		.number()
 		.optional()
 		.transform((val) => (val ? Number(val) : undefined)),
-	person_id: z.coerce
-		.number()
+	person_id: z
+		.union([z.string(), z.number()])
 		.optional()
-		.transform((val) => (val ? Number(val) : undefined)),
+		.transform((val) => {
+			if (!val || val === 'undefined' || val === 'null') return undefined;
+			const num = Number(val);
+			return isNaN(num) ? undefined : num;
+		}),
 	department_id: z.coerce.number().transform((val) => Number(val)),
 	document_type_id: z.coerce.number().transform((val) => Number(val)),
 	role_id: z.coerce.number().transform((val) => Number(val)),
@@ -37,15 +41,33 @@ const userSchema = z.object({
 	document_number: z.string().min(4).max(20),
 	state: z.enum(['A', 'I']).default('A'),
 	phones: z
-		.array(
-			z.object({
-				phone_number: z.string().min(10).max(15),
-				phone_type_id: z.number().min(1),
-				party_id: z.number().min(1),
-				state: z.enum(['A', 'I']).default('A'),
-			})
-		)
-		.optional(),
+		.union([z.string(), z.array(z.any())])
+		.optional()
+		.transform((val) => {
+			if (!val) return undefined;
+			if (typeof val === 'string') {
+				try {
+					return JSON.parse(val);
+				} catch {
+					return undefined;
+				}
+			}
+			return val;
+		}),
+	addresses: z
+		.union([z.string(), z.array(z.any())])
+		.optional()
+		.transform((val) => {
+			if (!val) return undefined;
+			if (typeof val === 'string') {
+				try {
+					return JSON.parse(val);
+				} catch {
+					return undefined;
+				}
+			}
+			return val;
+		}),
 });
 
 export const createOrUpdateUser = async (formData: FormData): Promise<Response<User>> => {
@@ -60,7 +82,7 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 			code: ErrorCode.VALIDATION_ERROR,
 		};
 
-	const { phones, user_id, ...userData } = userParsed.data;
+	const { phones, addresses, user_id, ...userData } = userParsed.data;
 
 	try {
 		const isExist = await prisma.users.findFirst({
@@ -140,6 +162,108 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 				user = { ...rest, persons: persons, employees };
 
 				message = 'Usuario actualizado exitosamente';
+
+				// Procesar teléfonos al actualizar
+				if (phones && phones.length > 0) {
+					for (const phone of phones) {
+						if (phone.phone_id) {
+							// Verificar si el teléfono existe en la BD
+							const existingPhone = await tx.phones.findUnique({
+								where: { phone_id: phone.phone_id },
+							});
+
+							if (existingPhone) {
+								// Actualizar teléfono existente
+								await tx.phones.update({
+									where: { phone_id: phone.phone_id },
+									data: {
+										phone_number: phone.phone_number,
+										phone_type_id: phone.phone_type_id,
+										is_primary: phone.is_primary,
+										state: phone.state || 'A',
+										updated_at: new Date(),
+									},
+								});
+							} else {
+								// El ID es temporal, crear nuevo teléfono
+								await tx.phones.create({
+									data: {
+										person_id: persons.person_id,
+										phone_number: phone.phone_number,
+										phone_type_id: phone.phone_type_id,
+										is_primary: phone.is_primary,
+										state: phone.state || 'A',
+									},
+								});
+							}
+						} else {
+							// Crear nuevo teléfono
+							await tx.phones.create({
+								data: {
+									person_id: persons.person_id,
+									phone_number: phone.phone_number,
+									phone_type_id: phone.phone_type_id,
+									is_primary: phone.is_primary,
+									state: phone.state || 'A',
+								},
+							});
+						}
+					}
+				}
+
+				// Procesar direcciones al actualizar
+				if (addresses && addresses.length > 0) {
+					for (const address of addresses) {
+						if (address.address_id) {
+							// Verificar si la dirección existe en la BD
+							const existingAddress = await tx.addresses.findUnique({
+								where: { address_id: address.address_id },
+							});
+
+							if (existingAddress) {
+								// Actualizar dirección existente
+								await tx.addresses.update({
+									where: { address_id: address.address_id },
+									data: {
+										address_line1: address.address_line1,
+										address_line2: address.address_line2,
+										city_id: address.city_id,
+										postal_code: address.postal_code,
+										is_primary: address.is_primary,
+										state: address.state || 'A',
+										updated_at: new Date(),
+									},
+								});
+							} else {
+								// El ID es temporal, crear nueva dirección
+								await tx.addresses.create({
+									data: {
+										person_id: persons.person_id,
+										address_line1: address.address_line1,
+										address_line2: address.address_line2,
+										city_id: address.city_id,
+										postal_code: address.postal_code,
+										is_primary: address.is_primary,
+										state: address.state || 'A',
+									},
+								});
+							}
+						} else {
+							// Crear nueva dirección
+							await tx.addresses.create({
+								data: {
+									person_id: persons.person_id,
+									address_line1: address.address_line1,
+									address_line2: address.address_line2,
+									city_id: address.city_id,
+									postal_code: address.postal_code,
+									is_primary: address.is_primary,
+									state: address.state || 'A',
+								},
+							});
+						}
+					}
+				}
 			} else {
 				if (!userData.password) {
 					throw CustomError.badRequest(ErrorCode.VALIDATION_ERROR);
@@ -181,11 +305,37 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 				user = { ...rest, persons, employees };
 
 				message = 'Usuario creado exitosamente';
+
+				if (phones && phones.length > 0) {
+					for (const phone of phones) {
+						await tx.phones.create({
+							data: {
+								person_id: persons.person_id,
+								phone_number: phone.phone_number,
+								phone_type_id: phone.phone_type_id,
+								is_primary: phone.is_primary,
+								state: 'A',
+							},
+						});
+					}
+				}
+
+				if (addresses && addresses.length > 0) {
+					for (const address of addresses) {
+						await tx.addresses.create({
+							data: {
+								person_id: persons.person_id,
+								address_line1: address.address_line1,
+								address_line2: address.address_line2,
+								city_id: address.city_id,
+								postal_code: address.postal_code,
+								is_primary: address.is_primary,
+								state: 'A',
+							},
+						});
+					}
+				}
 			}
-
-			// Todo: Process Phones
-
-			// Todo: Process Addresses
 
 			return user;
 		});

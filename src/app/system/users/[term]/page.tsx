@@ -6,6 +6,7 @@ import {
 	searchPhoneTypes,
 	searchRoles,
 } from '@/actions';
+import { searchCountries } from '@/actions/address/country-search';
 import { Title } from '@/components';
 import { User } from '@/interfaces';
 import { UserForm } from './ui/UserForm';
@@ -19,14 +20,16 @@ interface Props {
 export default async function CategoryByTermPage({ params }: Props) {
 	const { term } = await params;
 
-	const [user, documentTypes, roles, parties, phoneTypes, departments] = await Promise.all([
-		getUserByTerm(term),
-		searchDocumentTypes(''),
-		searchRoles(''),
-		searchParties(''),
-		searchPhoneTypes(''),
-		searchDepartments(''),
-	]);
+	const [user, documentTypes, roles, parties, phoneTypes, departments, countries] =
+		await Promise.all([
+			getUserByTerm(term),
+			searchDocumentTypes(''),
+			searchRoles(''),
+			searchParties(''),
+			searchPhoneTypes(''),
+			searchDepartments(''),
+			searchCountries(''),
+		]);
 
 	const title = term === 'new' ? 'Nuevo usuario' : 'Editar usuario';
 
@@ -41,6 +44,7 @@ export default async function CategoryByTermPage({ params }: Props) {
 				parties={parties.data || []}
 				phoneTypes={phoneTypes.data || []}
 				departments={departments.data || []}
+				countries={countries.data || []}
 			/>
 		</>
 	);

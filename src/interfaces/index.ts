@@ -1,3 +1,4 @@
+export * from './address.interface';
 export * from './category.interface';
 export * from './color.interface';
 export * from './customer.interface';

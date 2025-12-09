@@ -1,10 +1,9 @@
 import { Prisma } from '@/generated';
 
-import { Phone } from '@/interfaces';
+import { Address, Phone } from '@/interfaces';
 
 export interface Party {
 	party_type: string;
-	description: string;
 	state: string;
 	created_at: Date;
 	updated_at: Date;
@@ -32,6 +31,7 @@ export interface Person {
 	document_types?: DocumentType;
 	phones?: Phone[];
 	parties?: Party[];
+	addresses?: Address[];
 }
 
 export type PartiesWhereInput = Prisma.partiesWhereInput;

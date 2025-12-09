@@ -56,12 +56,16 @@ export * from './users/create-update-user';
 export * from './users/departament-search';
 export * from './users/get-user-by-term';
 export * from './users/party-search';
+export * from './users/phone-search';
 export * from './users/phone-type-search';
 export * from './users/user-pagination';
 
 // * Document Types
 export * from './document-types/document-type-pagination';
 export * from './document-types/document-type-search';
+
+// * Addresses
+export * from './address/address-search';
 
 // * Roles
 export * from './roles/role-search';

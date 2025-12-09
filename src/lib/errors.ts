@@ -68,6 +68,9 @@ export enum ErrorCode {
 	// Errores de suplidores
 	SUPPLIER_ALREADY_EXISTS = 'SUPPLIER_ALREADY_EXISTS',
 	SUPPLIER_CREATION_FAILED = 'SUPPLIER_CREATION_FAILED',
+
+	// Errores de direcciones
+	ADDRESS_ALREADY_EXISTS = 'ADDRESS_ALREADY_EXISTS',
 }
 
 /**
@@ -132,6 +135,8 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 
 	[ErrorCode.SUPPLIER_ALREADY_EXISTS]: 'Ya existe un suplidor con ese nombre o documento',
 	[ErrorCode.SUPPLIER_CREATION_FAILED]: 'Error al crear el suplidor',
+
+	[ErrorCode.ADDRESS_ALREADY_EXISTS]: 'Ya existe una dirección con esos datos',
 };
 
 /**

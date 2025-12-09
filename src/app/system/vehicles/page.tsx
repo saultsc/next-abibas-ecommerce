@@ -45,11 +45,10 @@ export default async function VehiclePage({ searchParams }: Props) {
 		},
 		{
 			header: 'Kilometraje',
-			cell: (c: Vehicle) => (
-				<span className="text-gray-600 text-sm">
-					{c.current_mileage.toLocaleString()} km
-				</span>
-			),
+			cell: (c: Vehicle) =>
+				c.current_mileage ? (
+					<span className="text-gray-600 text-sm">{c.current_mileage} km</span>
+				) : null,
 		},
 		{
 			header: 'Estado',

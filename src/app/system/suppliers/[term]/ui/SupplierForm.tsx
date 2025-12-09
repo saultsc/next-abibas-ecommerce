@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -8,9 +9,15 @@ import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
+import {
+	AddAddressForm,
+	CustomSelect,
+	DeleteButton,
+	StateSwitch,
+	SystemInfoCard,
+} from '@/components';
 import { useSearch } from '@/hooks';
-import { DocumentType, Party, Phone, PhoneType, Supplier } from '@/interfaces';
+import { Address, Country, DocumentType, Party, Phone, PhoneType, Supplier } from '@/interfaces';
 import { validateDateOfBirth } from '@/utils';
 
 import { searchDocumentTypes } from '@/actions/document-types/document-type-search';
@@ -21,6 +28,7 @@ interface Props {
 	documentTypes: DocumentType[];
 	parties: Party[];
 	phoneTypes: PhoneType[];
+	countries?: Country[];
 }
 
 interface FormInputs {
@@ -34,14 +42,17 @@ interface FormInputs {
 	state: string;
 
 	phones?: Phone[];
+	addresses?: Address[];
 }
 
 export const SupplierForm = (props: Props) => {
-	const { supplier, documentTypes, parties, phoneTypes } = props;
+	const { supplier, documentTypes, parties, phoneTypes, countries = [] } = props;
 
 	const router = useRouter();
 
 	const isEditMode = !!supplier.supplier_id;
+
+	const [addresses, setAddresses] = useState<Address[]>(supplier.persons?.addresses || []);
 
 	const {
 		handleSubmit,
@@ -328,13 +339,11 @@ export const SupplierForm = (props: Props) => {
 
 				{/* Direcciones */}
 				<div className="w-full">
-					<h3 className="text-lg font-semibold text-gray-700 mb-4">Direcciones</h3>
-					<div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px] max-h-[300px] overflow-y-auto">
-						{/* Aquí irá el componente de manejo de direcciones */}
-						<p className="text-gray-500 text-sm">
-							Componente de direcciones pendiente...
-						</p>
-					</div>
+					<AddAddressForm
+						addresses={addresses}
+						onAddressesChange={setAddresses}
+						countries={countries}
+					/>
 				</div>
 			</div>
 		</form>

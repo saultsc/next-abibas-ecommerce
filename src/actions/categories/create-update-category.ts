@@ -1,7 +1,7 @@
 'use server';
 
 import { Category, Response } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -31,14 +31,14 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 		let message;
 
 		if (category_id) {
-			category = await prismaClient.categories.update({
+			category = await prisma.categories.update({
 				where: { category_id },
 				data: { ...rest, updated_at: new Date() },
 			});
 
 			message = 'Categoría actualizada exitosamente';
 		} else {
-			const isExisting = await prismaClient.categories.findFirst({
+			const isExisting = await prisma.categories.findFirst({
 				where: { category_name: rest.category_name },
 			});
 
@@ -46,7 +46,7 @@ export const createOrUpdateCategory = async (formData: FormData): Promise<Respon
 				throw new CustomError(ErrorCode.CATEGORY_ALREADY_EXISTS);
 			}
 
-			category = await prismaClient.categories.create({
+			category = await prisma.categories.create({
 				data: { ...rest },
 			});
 

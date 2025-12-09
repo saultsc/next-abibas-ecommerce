@@ -1,3 +1,9 @@
+// * Addresses
+export * from './addresses/AddAddressForm';
+
+// * Phones
+export * from './phones/AddPhoneForm';
+
 // * Product
 export * from './product/ProductImage';
 export * from './product/QuantitySelector';

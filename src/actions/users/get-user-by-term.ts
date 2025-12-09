@@ -19,12 +19,24 @@ export const getUserByTerm = async (term: string): Promise<Response<User>> => {
 		persons: {
 			include: {
 				phones: true,
+				addresses: {
+					include: {
+						cities: {
+							include: {
+								provinces: {
+									include: {
+										countries: true,
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 		employees: {
 			include: {
 				departments: true,
-				document_types: true,
 			},
 		},
 		roles: true,

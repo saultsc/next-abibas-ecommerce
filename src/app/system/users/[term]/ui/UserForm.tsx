@@ -8,15 +8,31 @@ import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
-import { useSearch } from '@/hooks';
-import { Department, DocumentType, Party, Phone, PhoneType, Role, User } from '@/interfaces';
-import { validateDateOfBirth } from '@/utils';
-
 import { searchDocumentTypes } from '@/actions/document-types/document-type-search';
 import { searchRoles } from '@/actions/roles/role-search';
 import { createOrUpdateUser } from '@/actions/users/create-update-user';
 import { searchDepartments } from '@/actions/users/departament-search';
+import {
+	AddAddressForm,
+	AddPhoneForm,
+	CustomSelect,
+	DeleteButton,
+	StateSwitch,
+	SystemInfoCard,
+} from '@/components';
+import { useSearch } from '@/hooks';
+import {
+	Address,
+	Country,
+	Department,
+	DocumentType,
+	Party,
+	Phone,
+	PhoneType,
+	Role,
+	User,
+} from '@/interfaces';
+import { validateDateOfBirth } from '@/utils';
 
 interface Props {
 	user: User;
@@ -25,6 +41,7 @@ interface Props {
 	parties: Party[];
 	phoneTypes: PhoneType[];
 	departments: Department[];
+	countries: Country[];
 }
 
 interface FormInputs {
@@ -45,10 +62,11 @@ interface FormInputs {
 	role_id: number;
 
 	phones?: Phone[];
+	addresses?: Address[];
 }
 
 export const UserForm = (props: Props) => {
-	const { user, documentTypes, departments, roles, parties, phoneTypes } = props;
+	const { user, documentTypes, departments, roles, parties, phoneTypes, countries } = props;
 
 	const router = useRouter();
 
@@ -78,6 +96,9 @@ export const UserForm = (props: Props) => {
 
 			password: isEditMode ? FAKE_PASSWORD : '',
 			confirm_password: isEditMode ? FAKE_PASSWORD : '',
+
+			phones: user.persons?.phones || [],
+			addresses: user.persons?.addresses || [],
 		},
 		mode: 'onChange',
 	});
@@ -85,13 +106,15 @@ export const UserForm = (props: Props) => {
 	const onSubmit = async (data: FormInputs) => {
 		const formData = new FormData();
 
-		const { phones, confirm_password, ...userToSave } = data;
+		const { phones, addresses, confirm_password, ...userToSave } = data;
 
 		if (user.user_id) {
 			formData.append('user_id', String(user.user_id));
 		}
 
-		formData.append('person_id', user.person_id?.toString());
+		if (user.person_id) {
+			formData.append('person_id', user.person_id.toString());
+		}
 		formData.append('first_name', userToSave.first_name);
 		formData.append('last_name', userToSave.last_name);
 		formData.append('date_of_birth', userToSave.date_of_birth.toISOString());
@@ -111,6 +134,10 @@ export const UserForm = (props: Props) => {
 
 		if (phones && phones.length > 0) {
 			formData.append('phones', JSON.stringify(phones));
+		}
+
+		if (addresses && addresses.length > 0) {
+			formData.append('addresses', JSON.stringify(addresses));
 		}
 
 		const { success, message } = await createOrUpdateUser(formData);
@@ -501,29 +528,33 @@ export const UserForm = (props: Props) => {
 			</div>
 
 			{/* Columna Derecha - Teléfonos y Direcciones */}
-			<div className="w-[30%] flex flex-col gap-6 sticky top-4 self-start">
+			<div className="w-[30%] flex flex-col gap-6">
 				{/* Teléfonos de Contacto */}
 				<div className="w-full">
 					<h3 className="text-lg font-semibold text-gray-700 mb-4">
 						Teléfonos de Contacto
 					</h3>
-					<div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px] max-h-[300px] overflow-y-auto">
-						{/* Aquí irá el componente de manejo de teléfonos */}
-						<p className="text-gray-500 text-sm">
-							Componente de teléfonos pendiente...
-						</p>
-					</div>
+					<AddPhoneForm
+						phones={watch('phones') || []}
+						onPhonesChange={(phones) =>
+							setValue('phones', phones, { shouldValidate: true })
+						}
+						phoneTypes={phoneTypes}
+						personId={user.person_id}
+					/>
 				</div>
 
 				{/* Direcciones */}
 				<div className="w-full">
 					<h3 className="text-lg font-semibold text-gray-700 mb-4">Direcciones</h3>
-					<div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px] max-h-[300px] overflow-y-auto">
-						{/* Aquí irá el componente de manejo de direcciones */}
-						<p className="text-gray-500 text-sm">
-							Componente de direcciones pendiente...
-						</p>
-					</div>
+					<AddAddressForm
+						onAddressesChange={(addresses) =>
+							setValue('addresses', addresses, { shouldValidate: true })
+						}
+						addresses={watch('addresses') || []}
+						countries={countries}
+						personId={user.person_id}
+					/>
 				</div>
 			</div>
 		</form>
