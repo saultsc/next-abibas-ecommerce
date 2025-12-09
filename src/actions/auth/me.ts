@@ -37,6 +37,7 @@ export const me = async (): Promise<Response<User>> => {
 		const user = await prisma.users.findUnique({
 			where: {
 				user_id: user_id,
+				state: 'A',
 			},
 			include: {
 				roles: true,

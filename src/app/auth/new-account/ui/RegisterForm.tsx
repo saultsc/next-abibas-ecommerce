@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { CircularProgress, IconButton, InputAdornment, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-import { register } from '@/actions';
+import { register } from '@/actions/auth/register';
 import { validateDateOfBirth } from '@/utils';
 import { IoArrowBack, IoArrowForward, IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 

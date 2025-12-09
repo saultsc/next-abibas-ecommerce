@@ -1,9 +1,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
+import { me } from '@/actions/auth/me';
 import { RegisterForm } from './ui/RegisterForm';
 
-export default function NewAccountPage() {
+export default async function NewAccountPage() {
+	// Verificar si ya hay una sesión activa
+	const result = await me();
+
+	if (result.success && result.data) {
+		const roleName = result.data.roles?.role_name?.toLowerCase();
+
+		// Redirigir según el rol
+		if (roleName === 'cliente' || roleName === 'customer') {
+			redirect('/');
+		} else {
+			// Empleados, administradores y otros roles van al dashboard
+			redirect('/system/dashboard');
+		}
+	}
+
 	return (
 		<>
 			{/* Card */}

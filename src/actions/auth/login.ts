@@ -35,6 +35,9 @@ export const login = async (formData: FormData): Promise<Response<LoginResponse>
 			where: {
 				username,
 			},
+			include: {
+				roles: true,
+			},
 		});
 
 		if (!user)

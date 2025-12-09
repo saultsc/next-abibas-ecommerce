@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 import { toast } from 'sonner';
 
-import { login } from '@/actions';
+import { login } from '@/actions/auth/login';
 
 interface LoginFormInputs {
 	username: string;
@@ -42,7 +42,23 @@ export const LoginForm = () => {
 			}
 
 			toast.success('¡Bienvenido!');
-			router.push('/system/dashboard');
+
+			// Redirigir según el rol del usuario
+			const roleName = result.data?.roles?.role_name?.toLowerCase();
+
+			if (roleName === 'cliente' || roleName === 'customer') {
+				// Clientes van a la página de inicio (shop)
+				router.push('/');
+			} else if (roleName === 'empleado' || roleName === 'employee') {
+				// Empleados van al dashboard del sistema
+				router.push('/system/dashboard');
+			} else if (roleName === 'administrador' || roleName === 'admin') {
+				// Administradores van al dashboard del sistema
+				router.push('/system/dashboard');
+			} else {
+				// Por defecto, ir a la página de inicio
+				router.push('/');
+			}
 		} catch (error) {
 			console.log('Error en login:', error);
 			toast.error('Error al iniciar sesión');

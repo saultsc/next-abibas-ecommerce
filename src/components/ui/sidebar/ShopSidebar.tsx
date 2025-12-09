@@ -16,6 +16,7 @@ import {
 	IoTicketOutline,
 } from 'react-icons/io5';
 
+import { User } from '@/interfaces';
 import { useUiStore } from '@/store';
 import { isAdminRoute } from '@/utils';
 import { CiShoppingBasket } from 'react-icons/ci';
@@ -26,6 +27,10 @@ interface MenuItem {
 	href: string;
 	icon: React.ElementType;
 	label: string;
+}
+
+interface Props {
+	user: User | null;
 }
 
 const adminMenuItems: MenuItem[] = [
@@ -44,11 +49,24 @@ const userMenuItems: MenuItem[] = [
 	{ href: '/', icon: IoLogOutOutline, label: 'Salir' },
 ];
 
-export const ShopSidebar = () => {
+export const ShopSidebar = ({ user }: Props) => {
 	const isSideMenuOpen = useUiStore((state) => state.isSideMenuOpen);
 	const closeMenu = useUiStore((state) => state.closeSideMenu);
 
 	const pathname = usePathname();
+
+	// Verificar si el usuario NO es cliente ni customer (puede acceder a administrador)
+	const roleName = user?.roles?.role_name?.toLowerCase();
+	const canAccessAdmin = user && roleName && roleName !== 'cliente' && roleName !== 'customer';
+
+	// Filtrar los items del menú de usuario según si hay sesión o no
+	const filteredUserMenuItems = userMenuItems.filter((item) => {
+		// Si hay usuario logueado, NO mostrar "Ingresar"
+		if (user && item.label === 'Ingresar') return false;
+		// Si NO hay usuario logueado, NO mostrar "Salir"
+		if (!user && item.label === 'Salir') return false;
+		return true;
+	});
 
 	return (
 		<div>
@@ -99,7 +117,7 @@ export const ShopSidebar = () => {
 						<span className="ml-3 text-xl">Catalogo</span>
 					</Link>
 				) : (
-					userMenuItems.map((item) => {
+					filteredUserMenuItems.map((item) => {
 						const Icon = item.icon;
 						return (
 							<Link
@@ -113,34 +131,36 @@ export const ShopSidebar = () => {
 						);
 					})
 				)}
-
-				{/* Line Separator */}
-				<div className="w-full h-px bg-gray-200 my-10" />
 
 				{/* Admin Menu */}
-				{isAdminRoute(pathname) ? (
-					adminMenuItems.map((item) => {
-						const Icon = item.icon;
-						return (
+				{isAdminRoute(pathname)
+					? adminMenuItems.map((item) => {
+							{
+								/* Line Separator */
+							}
+							<div className="w-full h-px bg-gray-200 my-10" />;
+
+							const Icon = item.icon;
+							return (
+								<Link
+									key={item.href}
+									href={item.href}
+									onClick={() => closeMenu()}
+									className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all">
+									<Icon size={25} />
+									<span className="ml-3 text-xl">{item.label}</span>
+								</Link>
+							);
+					  })
+					: canAccessAdmin && (
 							<Link
-								key={item.href}
-								href={item.href}
+								href="/system/dashboard"
 								onClick={() => closeMenu()}
 								className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all">
-								<Icon size={25} />
-								<span className="ml-3 text-xl">{item.label}</span>
+								<IoPeopleOutline size={25} />
+								<span className="ml-3 text-xl">Administrador</span>
 							</Link>
-						);
-					})
-				) : (
-					<Link
-						href="/system/dashboard"
-						onClick={() => closeMenu()}
-						className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all">
-						<IoPeopleOutline size={25} />
-						<span className="ml-3 text-xl">Administrador</span>
-					</Link>
-				)}
+					  )}
 			</nav>
 		</div>
 	);

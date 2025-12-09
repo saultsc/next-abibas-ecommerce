@@ -24,6 +24,7 @@ export * from './ui/PageNotfound';
 export * from './ui/Pagination';
 export * from './ui/sidebar/AdminSidebar';
 export * from './ui/sidebar/ShopSidebar';
+export * from './ui/sidebar/ShopSidebarWrapper';
 export * from './ui/StateBadge';
 export * from './ui/StateSwitch';
 export * from './ui/SystemInfoCard';
