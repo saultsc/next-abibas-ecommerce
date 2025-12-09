@@ -28,7 +28,6 @@ export const getPaginatedSuppliers = async (params: Params): Promise<Response<Su
 		persons: {
 			include: {
 				phones: true,
-				parties: true,
 				document_types: true,
 			},
 		},

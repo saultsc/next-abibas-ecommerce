@@ -23,7 +23,7 @@ export default async function VehiclePage({ searchParams }: Props) {
 			header: 'Marca',
 			cell: (c: Vehicle) => (
 				<Link
-					href={`vehicle/${c.vehicle_id}`}
+					href={`vehicles/${c.vehicle_id}`}
 					className="group hover:underline flex items-center gap-2 text-gray-800 hover:text-gray-900 font-semibold">
 					<IoEyeOffOutline className="text-lg group-hover:hidden transition-all" />
 					<IoEyeOutline className="text-lg hidden group-hover:block transition-all" />
@@ -60,7 +60,7 @@ export default async function VehiclePage({ searchParams }: Props) {
 		<>
 			<Title title="Vehículos" />
 			<div className="flex justify-end mb-5">
-				<Link href="vehicle/new" className="btn-primary flex items-center gap-2">
+				<Link href="vehicles/new" className="btn-primary flex items-center gap-2">
 					<IoAddCircleOutline className="text-xl" />
 					Nuevo
 				</Link>

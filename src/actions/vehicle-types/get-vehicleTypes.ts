@@ -13,9 +13,15 @@ export const getVehicleTypes = async () => {
 			},
 		});
 
+		// Serializar campos Decimal para pasar al cliente
+		const serializedVehicleTypes = vehicleTypes.map((vt) => ({
+			...vt,
+			load_capacity_kg: Number(vt.load_capacity_kg),
+		}));
+
 		return {
 			ok: true,
-			data: vehicleTypes,
+			data: serializedVehicleTypes,
 		};
 	} catch (error) {
 		console.log(error);

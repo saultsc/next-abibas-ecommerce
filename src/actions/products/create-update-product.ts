@@ -35,6 +35,14 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 		let message;
 		let uploadedImageUrls: (string | null)[] = [];
 
+		// Obtener variantes del FormData
+		const variantsJson = formData.get('variants') as string;
+		const variants = variantsJson ? JSON.parse(variantsJson) : [];
+
+		// Obtener IDs de imágenes existentes que se mantienen
+		const existingImagesJson = formData.get('existingImages') as string;
+		const existingImageIds = existingImagesJson ? JSON.parse(existingImagesJson) : [];
+
 		const imageFiles = formData.getAll('images') as File[];
 		if (imageFiles && imageFiles.length > 0) {
 			const uploadResult = await uploadImages(imageFiles);
@@ -54,6 +62,98 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 						data: { ...rest, updated_at: new Date() },
 					});
 
+					// Actualizar variantes: eliminar las que no están en la nueva lista
+					if (variants && variants.length > 0) {
+						// Obtener IDs de variantes actuales
+						const currentVariantIds = variants
+							.filter((v: any) => v.variant_id)
+							.map((v: any) => v.variant_id);
+
+						// Eliminar variantes que ya no están en la lista
+						await tx.product_variants.deleteMany({
+							where: {
+								product_id: product.product_id,
+								variant_id: { notIn: currentVariantIds },
+							},
+						});
+
+						// Actualizar o crear cada variante
+						for (const variant of variants) {
+							if (variant.variant_id) {
+								// Actualizar variante existente
+								await tx.product_variants.update({
+									where: { variant_id: variant.variant_id },
+									data: {
+										color_id: variant.color_id,
+										size_code: variant.size_code,
+										price_adjustment: variant.price_adjustment || 0,
+										stock_quantity: variant.stock_quantity || 0,
+										reorder_level: variant.reorder_level || 0,
+										state: variant.state || 'A',
+										updated_at: new Date(),
+									},
+								});
+							} else {
+								// Crear nueva variante
+								await tx.product_variants.create({
+									data: {
+										product_id: product.product_id,
+										color_id: variant.color_id,
+										size_code: variant.size_code,
+										price_adjustment: variant.price_adjustment || 0,
+										stock_quantity: variant.stock_quantity || 0,
+										reorder_level: variant.reorder_level || 0,
+										state: variant.state || 'A',
+									},
+								});
+							}
+						}
+					} else {
+						// Si no hay variantes, eliminar todas las existentes
+						await tx.product_variants.deleteMany({
+							where: { product_id: product.product_id },
+						});
+					}
+
+					// Gestionar imágenes: eliminar las que no están en existingImageIds
+					if (existingImageIds.length > 0) {
+						const imagesToDelete = await tx.product_images.findMany({
+							where: {
+								product_id: product.product_id,
+								image_id: { notIn: existingImageIds },
+							},
+						});
+
+						if (imagesToDelete.length > 0) {
+							await tx.product_images.deleteMany({
+								where: {
+									product_id: product.product_id,
+									image_id: { notIn: existingImageIds },
+								},
+							});
+
+							// Eliminar archivos físicos
+							await rollbackUploadedImages(
+								imagesToDelete.map((img) => img.image_url)
+							);
+						}
+					} else {
+						// Si no hay imágenes existentes, eliminar todas
+						const imagesToDelete = await tx.product_images.findMany({
+							where: { product_id: product.product_id },
+						});
+
+						if (imagesToDelete.length > 0) {
+							await tx.product_images.deleteMany({
+								where: { product_id: product.product_id },
+							});
+
+							await rollbackUploadedImages(
+								imagesToDelete.map((img) => img.image_url)
+							);
+						}
+					}
+
 					message = 'Producto actualizado exitosamente';
 				} else {
 					const isExisting = await tx.products.findFirst({
@@ -67,6 +167,21 @@ export const createOrUpdateProduct = async (formData: FormData): Promise<Respons
 					product = await tx.products.create({
 						data: { ...rest },
 					});
+
+					// Crear variantes si existen
+					if (variants && variants.length > 0) {
+						await tx.product_variants.createMany({
+							data: variants.map((variant: any) => ({
+								product_id: product.product_id,
+								color_id: variant.color_id,
+								size_code: variant.size_code,
+								price_adjustment: variant.price_adjustment || 0,
+								stock_quantity: variant.stock_quantity || 0,
+								reorder_level: variant.reorder_level || 0,
+								state: variant.state || 'A',
+							})),
+						});
+					}
 
 					message = 'Producto creado exitosamente';
 				}

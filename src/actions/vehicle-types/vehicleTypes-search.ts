@@ -1,6 +1,7 @@
 'use server';
 
 import { Response, VehicleType, VehicleTypeWhereInput } from '@/interfaces';
+import { prisma } from '@/lib';
 
 export const searchVehicleTypes = async (term: string): Promise<Response<VehicleType[]>> => {
 	const where: VehicleTypeWhereInput = {
@@ -13,7 +14,7 @@ export const searchVehicleTypes = async (term: string): Promise<Response<Vehicle
 	};
 
 	try {
-		const vehicleTypes = await prismaClient.vehicle_types.findMany({
+		const vehicleTypes = await prisma.vehicle_types.findMany({
 			where,
 		});
 

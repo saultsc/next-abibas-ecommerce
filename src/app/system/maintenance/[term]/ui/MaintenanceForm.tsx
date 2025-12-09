@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -8,8 +9,8 @@ import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { createUpdateMaintenance, deleteMaintenance } from '@/actions/maintenance';
 import { CustomSelect, DeleteButton, StateSwitch, SystemInfoCard } from '@/components';
-import { useState } from 'react';
 import { MaintenanceDocuments } from './MaintenanceDocuments';
 import { MaintenanceParts } from './MaintenanceParts';
 
@@ -22,6 +23,7 @@ interface MaintenanceType {
 interface Supplier {
 	supplier_id: number;
 	company_name: string;
+	supplier_name: string;
 }
 
 interface Vehicle {
@@ -56,6 +58,23 @@ interface Props {
 	vehicles: Vehicle[];
 }
 
+interface MaintenancePart {
+	maintenance_part_id?: number;
+	part_description: string;
+	part_number: string | null;
+	quantity: number;
+	unit_cost: number;
+	total_cost: number;
+}
+
+interface MaintenanceDocument {
+	maintenance_document_id?: number;
+	document_url: string;
+	document_name?: string | null;
+}
+
+type DocumentInput = MaintenanceDocument | File;
+
 interface FormInputs {
 	vehicle_id: number;
 	maintenance_type_id: number;
@@ -68,6 +87,8 @@ interface FormInputs {
 	warranty_days: number;
 	notes: string;
 	state: string;
+	parts?: MaintenancePart[];
+	documents?: MaintenanceDocument[];
 }
 
 export const MaintenanceForm = (props: Props) => {
@@ -77,9 +98,25 @@ export const MaintenanceForm = (props: Props) => {
 
 	const isEditMode = !!maintenance?.completed_maintenance_id;
 
-	const [maintenanceTypeSearch, setMaintenanceTypeSearch] = useState('');
-	const [supplierSearch, setSupplierSearch] = useState('');
-	const [vehicleSearch, setVehicleSearch] = useState('');
+	// Estados locales para parts y documents
+	const [localParts, setLocalParts] = useState<MaintenancePart[]>([]);
+	const [localDocuments, setLocalDocuments] = useState<DocumentInput[]>([]);
+
+	// Inicializar parts y documents cuando maintenance cambie
+	useEffect(() => {
+		if (maintenance) {
+			// @ts-ignore - maintenance puede tener maintenance_parts
+			if (maintenance.maintenance_parts) {
+				// @ts-ignore
+				setLocalParts(maintenance.maintenance_parts);
+			}
+			// @ts-ignore - maintenance puede tener maintenance_documents
+			if (maintenance.maintenance_documents) {
+				// @ts-ignore
+				setLocalDocuments(maintenance.maintenance_documents);
+			}
+		}
+	}, [maintenance]);
 
 	const {
 		handleSubmit,
@@ -93,57 +130,142 @@ export const MaintenanceForm = (props: Props) => {
 			maintenance_type_id: maintenance?.maintenance_type_id ?? ('' as any),
 			description: maintenance?.description ?? '',
 			mileage_at_service: maintenance?.mileage_at_service ?? 0,
-			start_date: maintenance?.start_date ?? dayjs().toDate(),
-			completion_date: maintenance?.completion_date ?? null,
+			start_date: maintenance?.start_date
+				? new Date(maintenance.start_date)
+				: dayjs().toDate(),
+			completion_date: maintenance?.completion_date
+				? new Date(maintenance.completion_date)
+				: null,
 			supplier_id: maintenance?.supplier_id ?? ('' as any),
 			total_cost: maintenance?.total_cost ?? 0,
 			warranty_days: maintenance?.warranty_days ?? 0,
 			notes: maintenance?.notes ?? '',
 			state: maintenance?.state ?? 'A',
+			parts: [],
+			documents: [],
 		},
 		mode: 'onChange',
 	});
 
+	// Calcular costo total automáticamente desde las partes
+	const calculateTotalCost = () => {
+		const total = localParts.reduce((sum, part) => {
+			const partCost = Number(part.total_cost) || 0;
+			return sum + partCost;
+		}, 0);
+		return Number(total);
+	};
+
 	const onSubmit = async (data: FormInputs) => {
-		console.log('Form Data:', data);
+		try {
+			const formData = new FormData();
 
-		// Simulando guardado
-		toast.success(
-			isEditMode
-				? 'Mantenimiento actualizado exitosamente'
-				: 'Mantenimiento creado exitosamente'
-		);
+			// Agregar ID si existe
+			if (maintenance?.completed_maintenance_id) {
+				formData.append(
+					'completed_maintenance_id',
+					maintenance.completed_maintenance_id.toString()
+				);
+			}
 
-		// Esperar 1 segundo y redirigir
-		setTimeout(() => {
-			router.replace('/system/maintenance');
-		}, 1000);
+			// Agregar datos básicos
+			formData.append('vehicle_id', data.vehicle_id.toString());
+			formData.append('maintenance_type_id', data.maintenance_type_id.toString());
+			formData.append('description', data.description);
+			formData.append('mileage_at_service', data.mileage_at_service.toString());
+
+			// Convertir fechas a Date si no lo son ya
+			const startDate =
+				data.start_date instanceof Date ? data.start_date : new Date(data.start_date);
+			formData.append('start_date', startDate.toISOString());
+
+			if (data.completion_date) {
+				const completionDate =
+					data.completion_date instanceof Date
+						? data.completion_date
+						: new Date(data.completion_date);
+				formData.append('completion_date', completionDate.toISOString());
+			}
+
+			formData.append('supplier_id', data.supplier_id.toString());
+			// Usar el costo total calculado desde las partes
+			const totalCost = calculateTotalCost();
+			formData.append('total_cost', totalCost.toString());
+			formData.append('warranty_days', data.warranty_days.toString());
+			if (data.notes) {
+				formData.append('notes', data.notes);
+			}
+			formData.append('state', data.state);
+
+			// Agregar partes como JSON
+			if (localParts && localParts.length > 0) {
+				formData.append('parts', JSON.stringify(localParts));
+			}
+
+			// Separar documentos existentes y nuevos archivos
+			if (localDocuments && localDocuments.length > 0) {
+				const existingDocs: any[] = [];
+				const newFiles: File[] = [];
+
+				localDocuments.forEach((doc) => {
+					if (doc instanceof File) {
+						newFiles.push(doc);
+					} else {
+						existingDocs.push(doc);
+					}
+				});
+
+				// Agregar IDs de documentos existentes
+				if (existingDocs.length > 0) {
+					formData.append(
+						'existingDocuments',
+						JSON.stringify(existingDocs.map((d) => d.maintenance_document_id))
+					);
+				}
+
+				// Agregar nuevos archivos
+				newFiles.forEach((file) => {
+					formData.append('documents', file);
+				});
+			}
+
+			const result = await createUpdateMaintenance(formData);
+
+			if (!result.ok) {
+				toast.error(result.message);
+				return;
+			}
+
+			toast.success(result.message);
+			if (result.maintenance?.completed_maintenance_id) {
+				router.replace(
+					`/system/maintenance/${result.maintenance.completed_maintenance_id}`
+				);
+			}
+		} catch (error) {
+			console.error('Error al guardar mantenimiento:', error);
+			toast.error('Error al guardar el mantenimiento');
+		}
 	};
 
 	const handleDelete = async () => {
-		// Simulando eliminación
-		toast.success('Mantenimiento eliminado exitosamente');
+		if (!maintenance?.completed_maintenance_id) return;
 
-		setTimeout(() => {
-			router.replace('/system/maintenance');
-		}, 1000);
+		try {
+			const result = await deleteMaintenance(maintenance.completed_maintenance_id);
+
+			if (!result.ok) {
+				toast.error(result.message);
+				return;
+			}
+
+			toast.success(result.message);
+			router.push('/system/maintenance');
+		} catch (error) {
+			console.error('Error al eliminar:', error);
+			toast.error('Error al eliminar el mantenimiento');
+		}
 	};
-
-	// Filtros para búsqueda simulada
-	const filteredMaintenanceTypes = maintenanceTypes.filter((type) =>
-		type.type_name.toLowerCase().includes(maintenanceTypeSearch.toLowerCase())
-	);
-
-	const filteredSuppliers = suppliers.filter((supplier) =>
-		supplier.company_name.toLowerCase().includes(supplierSearch.toLowerCase())
-	);
-
-	const filteredVehicles = vehicles.filter(
-		(vehicle) =>
-			vehicle.make.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
-			vehicle.model.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
-			vehicle.license_plate.toLowerCase().includes(vehicleSearch.toLowerCase())
-	);
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="flex gap-6 mb-6 pb-6">
@@ -169,8 +291,7 @@ export const MaintenanceForm = (props: Props) => {
 									shouldValidate: true,
 								});
 							}}
-							onSearch={(value) => setVehicleSearch(value)}
-							options={filteredVehicles.map((vehicle) => ({
+							options={vehicles.map((vehicle) => ({
 								value: vehicle.vehicle_id,
 								label: `${vehicle.make} ${vehicle.model} ${vehicle.year} - ${vehicle.license_plate}`,
 							}))}
@@ -223,8 +344,7 @@ export const MaintenanceForm = (props: Props) => {
 									}
 								);
 							}}
-							onSearch={(value) => setMaintenanceTypeSearch(value)}
-							options={filteredMaintenanceTypes.map((type) => ({
+							options={maintenanceTypes.map((type) => ({
 								value: type.maintenance_type_id,
 								label: type.type_name,
 							}))}
@@ -330,8 +450,7 @@ export const MaintenanceForm = (props: Props) => {
 									shouldValidate: true,
 								});
 							}}
-							onSearch={(value) => setSupplierSearch(value)}
-							options={filteredSuppliers.map((supplier) => ({
+							options={suppliers.map((supplier) => ({
 								value: supplier.supplier_id,
 								label: supplier.company_name,
 							}))}
@@ -343,25 +462,6 @@ export const MaintenanceForm = (props: Props) => {
 
 						{/* Costo total y Días de garantía */}
 						<div className="flex gap-4">
-							<TextField
-								label="Costo Total *"
-								type="number"
-								variant="filled"
-								className="w-full"
-								error={!!errors.total_cost}
-								helperText={errors.total_cost?.message}
-								{...register('total_cost', {
-									required: 'Este campo es requerido',
-									min: {
-										value: 0,
-										message: 'El costo debe ser mayor o igual a 0',
-									},
-								})}
-								inputProps={{
-									step: '0.01',
-								}}
-							/>
-
 							<TextField
 								label="Días de Garantía *"
 								type="number"
@@ -433,13 +533,31 @@ export const MaintenanceForm = (props: Props) => {
 
 			{/* Columna Derecha - Información Adicional */}
 			<div className="w-[30%] flex flex-col gap-6 sticky top-4 self-start">
+				{/* Card de Costo Total Calculado */}
+				<div className="w-full">
+					<div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+						<p className="text-sm text-gray-600 mb-1">Costo Total (calculado)</p>
+						<p className="text-2xl font-bold text-blue-700">
+							${calculateTotalCost().toFixed(2)}
+						</p>
+						<p className="text-xs text-gray-500 mt-1">
+							Basado en {localParts.length} parte
+							{localParts.length !== 1 ? 's' : ''}
+						</p>
+					</div>
+				</div>
+
 				{/* Partes y Materiales */}
 				<div className="w-full">
 					<h3 className="text-lg font-semibold text-gray-700 mb-4">
 						Partes y Materiales
 					</h3>
 					<div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px] max-h-[400px] overflow-y-auto">
-						<MaintenanceParts />
+						<MaintenanceParts
+							maintenanceId={maintenance?.completed_maintenance_id}
+							parts={localParts}
+							onPartsChange={setLocalParts}
+						/>
 					</div>
 				</div>
 
@@ -447,7 +565,11 @@ export const MaintenanceForm = (props: Props) => {
 				<div className="w-full">
 					<h3 className="text-lg font-semibold text-gray-700 mb-4">Documentos</h3>
 					<div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px] max-h-[300px] overflow-y-auto">
-						<MaintenanceDocuments />
+						<MaintenanceDocuments
+							maintenanceId={maintenance?.completed_maintenance_id}
+							documents={localDocuments}
+							onDocumentsChange={setLocalDocuments}
+						/>
 					</div>
 				</div>
 			</div>

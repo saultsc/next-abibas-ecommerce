@@ -1,14 +1,14 @@
 'use server';
 
 import { Response, VehicleType } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 import { revalidatePath } from 'next/cache';
 
 export const deleteVehicleType = async (
 	vehicle_type_id: number
 ): Promise<Response<VehicleType>> => {
 	try {
-		const isExisting = await prismaClient.vehicle_types.findUnique({
+		const isExisting = await prisma.vehicle_types.findUnique({
 			where: { vehicle_type_id },
 		});
 
@@ -19,7 +19,7 @@ export const deleteVehicleType = async (
 			};
 		}
 
-		const existingReferences = await prismaClient.vehicle_types.findFirst({
+		const existingReferences = await prisma.vehicle_types.findFirst({
 			where: { vehicle_type_id },
 			select: { vehicles: true },
 		});
@@ -28,7 +28,7 @@ export const deleteVehicleType = async (
 			throw new CustomError(ErrorCode.CATEGORY_HAS_PRODUCTS);
 		}
 
-		await prismaClient.vehicle_types.delete({
+		await prisma.vehicle_types.delete({
 			where: { vehicle_type_id },
 		});
 

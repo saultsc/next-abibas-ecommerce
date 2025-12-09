@@ -2,14 +2,14 @@
 
 import { cookies, headers } from 'next/headers';
 
-import { Response, User } from '@/interfaces';
+import { Response } from '@/interfaces';
 import { CustomError, ErrorCode, prisma, verifyToken } from '@/lib';
 
 /**
  * Obtiene la información del usuario autenticado desde el JWT
  * Busca el token en el header Authorization (Bearer token) o en las cookies
  */
-export const me = async (): Promise<Response<User>> => {
+export const me = async (): Promise<Response<any>> => {
 	try {
 		// Obtener headers y cookies
 		const headersList = await headers();
@@ -26,11 +26,23 @@ export const me = async (): Promise<Response<User>> => {
 			token = cookieStore.get('token')?.value;
 		}
 
-		if (!token) throw CustomError.unauthorized(ErrorCode.UNAUTHORIZED);
+		if (!token) {
+			return {
+				success: false,
+				message: 'No hay sesión activa',
+				code: ErrorCode.UNAUTHORIZED,
+			};
+		}
 
 		const decoded = verifyToken(token);
 
-		if (!decoded) throw CustomError.unauthorized(ErrorCode.INVALID_TOKEN);
+		if (!decoded) {
+			return {
+				success: false,
+				message: 'Token inválido',
+				code: ErrorCode.INVALID_TOKEN,
+			};
+		}
 
 		const { user_id } = decoded;
 
@@ -41,6 +53,23 @@ export const me = async (): Promise<Response<User>> => {
 			},
 			include: {
 				roles: true,
+				persons: {
+					include: {
+						phones: {
+							include: {
+								phone_types: true,
+							},
+							where: {
+								state: 'A',
+							},
+							orderBy: {
+								is_primary: 'desc',
+							},
+						},
+						document_types: true,
+					},
+				},
+				customers: true,
 			},
 		});
 

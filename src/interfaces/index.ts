@@ -3,6 +3,7 @@ export * from './category.interface';
 export * from './color.interface';
 export * from './customer.interface';
 export * from './employee.interface';
+export * from './order.interface';
 export * from './person.interface';
 export * from './pohone.interface';
 export * from './product.interface';

@@ -8,7 +8,5 @@ export const ShopSidebarWrapper = async () => {
 	const result = await me();
 	const user = result.success ? result.data : null;
 
-	if (!user) return null;
-
 	return <ShopSidebar user={user} />;
 };

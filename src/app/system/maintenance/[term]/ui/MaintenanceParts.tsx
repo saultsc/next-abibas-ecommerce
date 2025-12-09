@@ -1,7 +1,9 @@
 'use client';
 
+import { createUpdateMaintenancePart, deleteMaintenancePart } from '@/actions/maintenance';
+import { getMaintenancePartsByMaintenanceId } from '@/actions/maintenance/get-maintenance-parts';
 import { Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	IoAddCircleOutline,
 	IoClose,
@@ -13,16 +15,16 @@ import { NumericFormat } from 'react-number-format';
 import { toast } from 'sonner';
 
 interface MaintenancePart {
-	maintenance_part_id: number;
+	maintenance_part_id?: number;
 	part_description: string;
-	part_number: string;
+	part_number: string | null;
 	quantity: number;
 	unit_cost: number;
 	total_cost: number;
-	supplier_name: string;
 }
 
 interface Props {
+	maintenanceId?: number;
 	parts?: MaintenancePart[];
 	onPartsChange?: (parts: MaintenancePart[]) => void;
 }
@@ -32,131 +34,133 @@ interface PartFormData {
 	part_number: string;
 	quantity: number;
 	unit_cost: number;
-	supplier_name: string;
 }
 
-// Proveedores estáticos para el select
-const mockSuppliers = [
-	'Mercedes-Benz Parts',
-	'Mobil 1',
-	'Brembo',
-	'Bosch',
-	'Mann Filter',
-	'Castrol',
-	'Michelin',
-	'Continental',
-	'NGK',
-	'Denso',
-];
-
-// Datos estáticos de ejemplo
-const mockParts: MaintenancePart[] = [
-	{
-		maintenance_part_id: 1,
-		part_description: 'Filtro de aceite sintético',
-		part_number: 'FOL-2023-MB',
-		quantity: 1,
-		unit_cost: 450,
-		total_cost: 450,
-		supplier_name: 'Mercedes-Benz Parts',
-	},
-	{
-		maintenance_part_id: 2,
-		part_description: 'Aceite sintético 5W-40 (5 litros)',
-		part_number: 'OIL-5W40-5L',
-		quantity: 2,
-		unit_cost: 1200,
-		total_cost: 2400,
-		supplier_name: 'Mobil 1',
-	},
-	{
-		maintenance_part_id: 3,
-		part_description: 'Pastillas de freno delanteras',
-		part_number: 'BRK-F-2024',
-		quantity: 1,
-		unit_cost: 3500,
-		total_cost: 3500,
-		supplier_name: 'Brembo',
-	},
-	{
-		maintenance_part_id: 4,
-		part_description: 'Discos de freno',
-		part_number: 'DSC-F-2024',
-		quantity: 2,
-		unit_cost: 2800,
-		total_cost: 5600,
-		supplier_name: 'Brembo',
-	},
-];
-
-export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) => {
-	const [partsList, setPartsList] = useState<MaintenancePart[]>(parts);
+export const MaintenanceParts = ({ maintenanceId, parts = [], onPartsChange }: Props) => {
+	const [partsList, setPartsList] = useState<MaintenancePart[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingPartId, setEditingPartId] = useState<number | null>(null);
+	const [loading, setLoading] = useState(false);
 	const [formData, setFormData] = useState<PartFormData>({
 		part_description: '',
 		part_number: '',
 		quantity: 1,
 		unit_cost: 0,
-		supplier_name: '',
 	});
 
-	const handleAddPart = () => {
-		const total_cost = formData.quantity * formData.unit_cost;
-
-		if (editingPartId) {
-			// Modo edición
-			const updatedParts = partsList.map((part) =>
-				part.maintenance_part_id === editingPartId
-					? {
-							...part,
-							...formData,
-							total_cost,
-					  }
-					: part
-			);
-			setPartsList(updatedParts);
-			if (onPartsChange) {
-				onPartsChange(updatedParts);
+	// Cargar partes cuando hay maintenanceId
+	useEffect(() => {
+		const loadParts = async () => {
+			if (!maintenanceId) {
+				setPartsList([]);
+				return;
 			}
-			toast.success('Parte actualizada exitosamente');
-		} else {
-			// Modo crear
-			const newPart: MaintenancePart = {
-				maintenance_part_id: Date.now(),
-				...formData,
-				total_cost,
-			};
 
-			const updatedParts = [...partsList, newPart];
-			setPartsList(updatedParts);
-			if (onPartsChange) {
-				onPartsChange(updatedParts);
+			setLoading(true);
+			const response = await getMaintenancePartsByMaintenanceId(maintenanceId);
+
+			if (response.ok && response.parts) {
+				const mappedParts = response.parts.map((part: any) => ({
+					...part,
+					unit_cost: Number(part.unit_cost),
+					total_cost: Number(part.total_cost),
+				}));
+				setPartsList(mappedParts as any);
 			}
-			toast.success('Parte agregada exitosamente');
-		}
+			setLoading(false);
+		};
 
-		setIsModalOpen(false);
+		loadParts();
+	}, [maintenanceId]);
+
+	const handleOpenModal = () => {
+		setIsModalOpen(true);
 		setEditingPartId(null);
-
-		// Reset form
 		setFormData({
 			part_description: '',
 			part_number: '',
 			quantity: 1,
 			unit_cost: 0,
-			supplier_name: '',
 		});
 	};
 
-	const handleEditPart = (part: MaintenancePart) => {
-		setEditingPartId(part.maintenance_part_id);
+	const handleSubmitPart = async () => {
+		if (!formData.part_description.trim()) {
+			toast.error('Ingrese una descripción');
+			return;
+		}
+
+		// Modo local: sin maintenanceId
+		if (!maintenanceId) {
+			const totalCost = formData.quantity * formData.unit_cost;
+			const newPart: MaintenancePart = {
+				maintenance_part_id: editingPartId || undefined,
+				part_description: formData.part_description,
+				part_number: formData.part_number,
+				quantity: formData.quantity,
+				unit_cost: formData.unit_cost,
+				total_cost: totalCost,
+			};
+
+			let updatedParts;
+			if (editingPartId !== null) {
+				// Editar parte existente
+				updatedParts = parts.map((p, index) => (index === editingPartId ? newPart : p));
+			} else {
+				// Agregar nueva parte
+				updatedParts = [...parts, newPart];
+			}
+
+			onPartsChange?.(updatedParts);
+			setIsModalOpen(false);
+			toast.success(editingPartId !== null ? 'Parte actualizada' : 'Parte agregada');
+			return;
+		}
+
+		// Modo guardado: con maintenanceId
+		setLoading(true);
+
+		const response = await createUpdateMaintenancePart({
+			maintenance_part_id: editingPartId || undefined,
+			completed_maintenance_id: maintenanceId,
+			part_description: formData.part_description,
+			part_number: formData.part_number,
+			quantity: formData.quantity,
+			unit_cost: formData.unit_cost,
+		});
+
+		setLoading(false);
+
+		if (!response.ok) {
+			toast.error(response.message || 'Error al guardar la parte');
+			return;
+		}
+
+		toast.success(editingPartId ? 'Parte actualizada' : 'Parte agregada');
+
+		// Recargar partes
+		const partsResponse = await getMaintenancePartsByMaintenanceId(maintenanceId);
+		if (partsResponse.ok && partsResponse.parts) {
+			const mappedParts = partsResponse.parts.map((part: any) => ({
+				...part,
+				unit_cost: Number(part.unit_cost),
+				total_cost: Number(part.total_cost),
+			}));
+			setPartsList(mappedParts as any);
+			// Notificar al padre para actualizar el costo total
+			onPartsChange?.(mappedParts as any);
+		}
+
+		handleCloseModal();
+	};
+
+	const handleEditPart = (part: MaintenancePart, index: number) => {
+		setEditingPartId(maintenanceId ? part.maintenance_part_id! : index);
 		setFormData({
 			part_description: part.part_description,
-			part_number: part.part_number,
+			part_number: part.part_number || '',
 			quantity: part.quantity,
 			unit_cost: part.unit_cost,
-			supplier_name: part.supplier_name,
 		});
 		setIsModalOpen(true);
 	};
@@ -169,22 +173,56 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 			part_number: '',
 			quantity: 1,
 			unit_cost: 0,
-			supplier_name: '',
 		});
 	};
 
-	const handleDeletePart = (partId: number) => {
-		const updatedParts = partsList.filter((part) => part.maintenance_part_id !== partId);
-		setPartsList(updatedParts);
-		if (onPartsChange) {
-			onPartsChange(updatedParts);
+	const handleDeletePart = async (partId: number, index: number) => {
+		if (!confirm('¿Está seguro de eliminar esta parte?')) return;
+
+		// Modo local
+		if (!maintenanceId) {
+			const updatedParts = parts.filter((_, i) => i !== index);
+			onPartsChange?.(updatedParts);
+			toast.success('Parte eliminada');
+			return;
 		}
+
+		// Modo guardado
+		setLoading(true);
+		const response = await deleteMaintenancePart(partId);
+		setLoading(false);
+
+		if (!response.ok) {
+			toast.error(response.message || 'Error al eliminar la parte');
+			return;
+		}
+
 		toast.success('Parte eliminada');
+
+		// Recargar partes
+		const partsResponse = await getMaintenancePartsByMaintenanceId(maintenanceId);
+		if (partsResponse.ok && partsResponse.parts) {
+			const mappedParts = partsResponse.parts.map((part: any) => ({
+				...part,
+				unit_cost: Number(part.unit_cost),
+				total_cost: Number(part.total_cost),
+			}));
+			setPartsList(mappedParts as any);
+			onPartsChange?.(mappedParts as any);
+		}
 	};
 
 	const calculateTotalCost = () => {
-		return partsList.reduce((sum, part) => sum + part.total_cost, 0);
+		const list = maintenanceId ? partsList : parts;
+		return list.reduce((sum, part) => sum + part.total_cost, 0);
 	};
+
+	// Usar la lista correcta dependiendo del modo
+	const displayParts = maintenanceId ? partsList : parts;
+
+	if (loading) {
+		return <div className="text-center py-4 text-sm text-gray-500">Cargando partes...</div>;
+	}
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -195,7 +233,7 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 				</span>
 				<button
 					type="button"
-					onClick={() => setIsModalOpen(true)}
+					onClick={handleOpenModal}
 					className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
 					<IoAddCircleOutline className="text-lg" />
 					Agregar
@@ -203,7 +241,7 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 			</div>
 
 			{/* Lista de partes */}
-			{partsList.length === 0 ? (
+			{displayParts.length === 0 ? (
 				<div className="text-center py-8">
 					<IoCubeOutline className="text-4xl text-gray-300 mx-auto mb-2" />
 					<p className="text-gray-500 text-sm">No hay partes agregadas</p>
@@ -213,10 +251,10 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 				</div>
 			) : (
 				<div className="space-y-2">
-					{partsList.map((part) => (
+					{displayParts.map((part, index) => (
 						<div
-							key={part.maintenance_part_id}
-							onClick={() => handleEditPart(part)}
+							key={part.maintenance_part_id || index}
+							onClick={() => handleEditPart(part, index)}
 							className="bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer">
 							<div className="flex justify-between items-start mb-2">
 								<div className="flex-1">
@@ -231,7 +269,7 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 									type="button"
 									onClick={(e) => {
 										e.stopPropagation();
-										handleDeletePart(part.maintenance_part_id);
+										handleDeletePart(part.maintenance_part_id || 0, index);
 									}}
 									className="text-red-500 hover:text-red-700 transition-colors ml-2 z-10"
 									title="Eliminar parte">
@@ -253,12 +291,6 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 									${part.total_cost.toLocaleString()}
 								</span>
 							</div>
-
-							<div className="mt-1.5 pt-1.5 border-t border-gray-100">
-								<p className="text-xs text-gray-500">
-									Proveedor: {part.supplier_name}
-								</p>
-							</div>
 						</div>
 					))}
 				</div>
@@ -273,7 +305,7 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 				PaperProps={{
 					className: 'rounded-xl',
 				}}>
-				<DialogTitle className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+				<DialogTitle className="flex items-center justify-between bg-linear-to-r from-blue-50 to-blue-100 border-b border-blue-200">
 					<div>
 						<h2 className="text-xl font-bold text-gray-800">
 							{editingPartId ? 'Editar Parte/Material' : 'Agregar Parte/Material'}
@@ -357,30 +389,6 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 							/>
 						</div>
 
-						{/* Proveedor */}
-						<div>
-							<TextField
-								label="Proveedor *"
-								variant="filled"
-								fullWidth
-								value={formData.supplier_name}
-								onChange={(e) =>
-									setFormData({ ...formData, supplier_name: e.target.value })
-								}
-								placeholder="Ej: Mercedes-Benz Parts"
-								helperText="Nombre del proveedor de la parte"
-								select
-								SelectProps={{
-									native: true,
-								}}>
-								{mockSuppliers.map((supplier) => (
-									<option key={supplier} value={supplier}>
-										{supplier}
-									</option>
-								))}
-							</TextField>
-						</div>
-
 						{/* Resumen del costo total */}
 						<div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
 							<div className="flex justify-between items-center">
@@ -401,20 +409,25 @@ export const MaintenanceParts = ({ parts = mockParts, onPartsChange }: Props) =>
 						<div className="flex gap-3 pt-2 border-t border-gray-200">
 							<button
 								type="button"
-								onClick={handleAddPart}
+								onClick={handleSubmitPart}
 								disabled={
+									loading ||
 									!formData.part_description ||
-									!formData.supplier_name ||
 									formData.quantity < 1 ||
 									formData.unit_cost <= 0
 								}
 								className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
-								{editingPartId ? 'Actualizar Parte' : 'Agregar Parte'}
+								{loading
+									? 'Guardando...'
+									: editingPartId
+									? 'Actualizar Parte'
+									: 'Agregar Parte'}
 							</button>
 							<button
 								type="button"
 								onClick={handleCloseModal}
-								className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+								disabled={loading}
+								className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:opacity-50">
 								Cancelar
 							</button>
 						</div>

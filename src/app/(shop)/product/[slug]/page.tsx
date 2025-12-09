@@ -1,13 +1,10 @@
 import { notFound } from 'next/navigation';
 
-import {
-	ProductMobileSlideShow,
-	ProductSlideShow,
-	QuantitySelector,
-	SizeSelector,
-} from '@/components';
+import { getProductByTerm } from '@/actions/products/get-product-by-term';
 import { titleFonts } from '@/config/fonts';
-import { initialData } from '@/seed/seed';
+
+import { AddToCart } from './ui/AddToCart';
+import { ProductImages } from './ui/ProductImages';
 
 interface Props {
 	params: Promise<{
@@ -15,55 +12,53 @@ interface Props {
 	}>;
 }
 
-export default async function ({ params }: Props) {
+export default async function ProductPage({ params }: Props) {
 	const { slug } = await params;
 
-	const product = initialData.products.find((p) => p.slug === slug);
+	const { data: product, success } = await getProductByTerm(slug);
 
-	if (!product) {
+	if (!success || !product) {
 		notFound();
 	}
 
+	// Serializar el producto para pasar a componentes cliente
+	const serializedProduct = JSON.parse(
+		JSON.stringify({
+			...product,
+			price: Number(product.price),
+			weight: product.weight ? Number(product.weight) : null,
+			variants: product.variants?.map((variant) => ({
+				...variant,
+				price_adjustment: Number(variant.price_adjustment),
+			})),
+		})
+	);
+
 	return (
 		<div className="mt-5 mb-20 grid grid-cols-1 md:grid-cols-3 gap-3">
-			{/* Mobile Slideshow */}
-			<ProductMobileSlideShow
-				images={product.productImage}
-				title={product.title}
-				className="block md:hidden"
-			/>
-
-			{/* Desktop Slideshow */}
-			<div className="col-span-2 md:col-span-2">
-				<ProductSlideShow
-					images={product.productImage}
-					title={product.title}
-					className="hidden md:block"
-				/>
+			{/* Imágenes del producto */}
+			<div className="col-span-1 md:col-span-2">
+				<ProductImages images={product.images || []} productName={product.product_name} />
 			</div>
 
-			{/* Detalles */}
-			<div className="col-span-1 px-5 ">
+			{/* Detalles y agregar al carrito */}
+			<div className="col-span-1 px-5">
 				<h1 className={`${titleFonts.className} antialiased font-bold text-xl`}>
-					{product.title}
+					{product.product_name}
 				</h1>
-				<p className="text-lg mb-5">${product.price}</p>
 
-				{/* Selector de tallas */}
-				<SizeSelector
-					selectedSize={product.sizes[0] as any}
-					availableSize={product.sizes as any}
-				/>
+				<p className="text-lg mb-5">${Number(product.price).toFixed(2)}</p>
 
-				{/* Selector de cantidad */}
-				<QuantitySelector quantity={1} />
+				{/* Descripción */}
+				{product.description && (
+					<>
+						<h3 className="font-bold text-sm mb-2">Descripción</h3>
+						<p className="font-light mb-5">{product.description}</p>
+					</>
+				)}
 
-				{/* Button */}
-				<button className="btn-primary my-5">Agregar al carrito</button>
-
-				{/* Descripcion */}
-				<h3 className="font-bold text-sm">Descripcion</h3>
-				<p className="font-light">{product.description}</p>
+				{/* Selector de variantes y agregar al carrito */}
+				<AddToCart product={serializedProduct} />
 			</div>
 		</div>
 	);

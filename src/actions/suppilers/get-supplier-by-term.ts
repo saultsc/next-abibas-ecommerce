@@ -16,7 +16,6 @@ export const getSupplierByTerm = async (term: string | number): Promise<Response
 		persons: {
 			include: {
 				phones: true,
-				parties: true,
 			},
 		},
 	};

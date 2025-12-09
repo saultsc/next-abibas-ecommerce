@@ -1,7 +1,7 @@
 'use server';
 
 import { Response, VehicleType } from '@/interfaces';
-import { CustomError, ErrorCode } from '@/lib';
+import { CustomError, ErrorCode, prisma } from '@/lib';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -35,14 +35,14 @@ export const createOrUpdateVehicleType = async (
 		let message;
 
 		if (vehicle_type_id) {
-			vehicleType = await prismaClient.vehicle_types.update({
+			vehicleType = await prisma.vehicle_types.update({
 				where: { vehicle_type_id },
 				data: { ...rest, updated_at: new Date() },
 			});
 
 			message = 'Tipo de vehículo actualizado exitosamente';
 		} else {
-			const isExisting = await prismaClient.vehicle_types.findFirst({
+			const isExisting = await prisma.vehicle_types.findFirst({
 				where: { type_name: rest.type_name },
 			});
 
@@ -50,7 +50,7 @@ export const createOrUpdateVehicleType = async (
 				throw new CustomError(ErrorCode.VEHICLE_TYPE_ALREADY_EXISTS);
 			}
 
-			vehicleType = await prismaClient.vehicle_types.create({
+			vehicleType = await prisma.vehicle_types.create({
 				data: { ...rest },
 			});
 

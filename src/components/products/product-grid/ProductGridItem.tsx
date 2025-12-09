@@ -3,36 +3,39 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SeedProduct } from '@/seed/seed';
+import { Product } from '@/interfaces';
 import { useState } from 'react';
 
 interface Props {
-	product: SeedProduct;
+	product: Product;
 }
 
 export const ProductGridItem = ({ product }: Props) => {
-	const [displayImage, setDisplayImage] = useState(product.productImage[0]);
+	const firstImage = product.images?.[0]?.image_url || '/imgs/placeholder.jpg';
+	const secondImage = product.images?.[1]?.image_url || firstImage;
+
+	const [displayImage, setDisplayImage] = useState(firstImage);
 
 	return (
 		<div className="rounded-md overflow-hidden fade-in">
-			<Link href={`/product/${product.slug}`}>
+			<Link href={`/product/${product.product_id}`}>
 				<Image
-					src={`/products/${displayImage}`}
-					alt={`foto del producto ${product.title}`}
+					src={displayImage}
+					alt={`foto del producto ${product.product_name}`}
 					width={500}
 					height={500}
 					priority
 					className="w-full object-cover"
-					onMouseEnter={() => setDisplayImage(product.productImage[1])}
-					onMouseLeave={() => setDisplayImage(product.productImage[0])}
+					onMouseEnter={() => setDisplayImage(secondImage)}
+					onMouseLeave={() => setDisplayImage(firstImage)}
 				/>
 			</Link>
 
 			<div className="p-4 flex flex-col">
-				<Link className="hover:text-blue-600" href={`/product/${product.slug}`}>
-					{product.title}
+				<Link className="hover:text-blue-600" href={`/product/${product.product_id}`}>
+					{product.product_name}
 				</Link>
-				<span className="font-bold">${product.price}</span>
+				<span className="font-bold">${Number(product.price).toFixed(2)}</span>
 			</div>
 		</div>
 	);

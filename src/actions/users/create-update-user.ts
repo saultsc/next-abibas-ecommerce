@@ -269,6 +269,7 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 					throw CustomError.badRequest(ErrorCode.VALIDATION_ERROR);
 				}
 
+				// Luego crear la persona con el party_id
 				const persons = await tx.persons.create({
 					data: {
 						first_name: userData.first_name,
@@ -303,6 +304,12 @@ export const createOrUpdateUser = async (formData: FormData): Promise<Response<U
 				const { password, ...rest } = newUser;
 
 				user = { ...rest, persons, employees };
+
+				await tx.customers.create({
+					data: {
+						user_id: newUser.user_id,
+					},
+				});
 
 				message = 'Usuario creado exitosamente';
 

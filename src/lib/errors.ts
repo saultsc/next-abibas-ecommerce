@@ -71,6 +71,9 @@ export enum ErrorCode {
 
 	// Errores de direcciones
 	ADDRESS_ALREADY_EXISTS = 'ADDRESS_ALREADY_EXISTS',
+
+	// Errores de órdenes
+	ORDER_NOT_FOUND = 'ORDER_NOT_FOUND',
 }
 
 /**
@@ -137,6 +140,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
 	[ErrorCode.SUPPLIER_CREATION_FAILED]: 'Error al crear el suplidor',
 
 	[ErrorCode.ADDRESS_ALREADY_EXISTS]: 'Ya existe una dirección con esos datos',
+	[ErrorCode.ORDER_NOT_FOUND]: 'Orden no encontrada',
 };
 
 /**

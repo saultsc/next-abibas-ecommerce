@@ -4,7 +4,7 @@ import { getPaginatedProducts } from '@/actions';
 import { Column, Pagination, StateBadge, Table, Title } from '@/components';
 import { ProductImage } from '@/components/product/ProductImage';
 import { Product } from '@/interfaces';
-import { currencyFormat, dateFormat } from '@/utils';
+import { currencyFormat } from '@/utils';
 
 import Link from 'next/link';
 import { IoAddCircleOutline } from 'react-icons/io5';
@@ -92,22 +92,6 @@ export default async function OrdersPage({ searchParams }: Props) {
 		{
 			header: 'Categoría',
 			cell: (p: Product) => p.category?.category_name || null,
-		},
-		{
-			header: 'Creado',
-			cell: (p: Product) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.created_at)}
-				</span>
-			),
-		},
-		{
-			header: 'Actualizado',
-			cell: (p: Product) => (
-				<span className="flex items-center gap-2 text-gray-600 text-sm">
-					{dateFormat(p.updated_at)}
-				</span>
-			),
 		},
 		{
 			header: 'Estado',

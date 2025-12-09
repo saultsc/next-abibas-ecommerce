@@ -9,7 +9,7 @@ import { useUiStore } from '@/store';
 import { AiFillCar } from 'react-icons/ai';
 import { BiCategory as Category } from 'react-icons/bi';
 import { CiShoppingBasket } from 'react-icons/ci';
-import { FaTruck, FaUser, FaUsers } from 'react-icons/fa';
+import { FaOilCan, FaTruck, FaUser, FaUsers } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { IoIosColorFilter } from 'react-icons/io';
 import {
@@ -54,7 +54,7 @@ const groupedMenus: MenuGroup[] = [
 			{ href: '/system/vehicles', icon: FaTruck, label: 'Gestión' },
 			{ href: '/system/vehicle-types', icon: MdCategory, label: 'Tipos' },
 			{ href: '/system/vehicle-status', icon: MdOutlineToggleOn, label: 'Estados' },
-			{ href: '/system/maintenance', icon: MdOutlineToggleOn, label: 'Mantenimientos' },
+			{ href: '/system/maintenance', icon: FaOilCan, label: 'Mantenimientos' },
 		],
 	},
 ];
@@ -109,14 +109,14 @@ export const AdminSidebar = () => {
 					)}>
 					<CiShoppingBasket
 						size={24}
-						className="flex-shrink-0 text-gray-600 group-hover:text-blue-600"
+						className="shrink-0 text-gray-600 group-hover:text-blue-600"
 					/>
 					<span
 						className={clsx(
 							'text-sm font-medium text-gray-700 group-hover:text-blue-600 whitespace-nowrap overflow-hidden transition-all duration-300',
 							isCollapsed
 								? 'opacity-0 -translate-x-1 max-w-0'
-								: 'opacity-100 translate-x-0 max-w-[160px]'
+								: 'opacity-100 translate-x-0 max-w-40'
 						)}>
 						Ver Tienda
 					</span>
@@ -134,7 +134,7 @@ export const AdminSidebar = () => {
 					})}>
 					<MdDashboard
 						size={22}
-						className={clsx('flex-shrink-0', {
+						className={clsx('shrink-0', {
 							'text-blue-600': pathname === '/system/dashboard',
 							'text-gray-600 group-hover:text-gray-900':
 								pathname !== '/system/dashboard',
@@ -145,7 +145,7 @@ export const AdminSidebar = () => {
 							'text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300',
 							isCollapsed
 								? 'opacity-0 -translate-x-1 max-w-0'
-								: 'opacity-100 translate-x-0 max-w-[160px]'
+								: 'opacity-100 translate-x-0 max-w-40'
 						)}>
 						Dashboard
 					</span>
@@ -174,7 +174,7 @@ export const AdminSidebar = () => {
 								)}>
 								<GroupIcon
 									size={22}
-									className={clsx('flex-shrink-0', {
+									className={clsx('shrink-0', {
 										'text-blue-600': anyChildActive,
 										'text-gray-600 group-hover:text-gray-900': !anyChildActive,
 									})}
@@ -183,7 +183,7 @@ export const AdminSidebar = () => {
 									className={clsx(
 										'text-left text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300',
 										{
-											'flex-1 opacity-100 translate-x-0 max-w-[160px]':
+											'flex-1 opacity-100 translate-x-0 max-w-40':
 												!isCollapsed,
 											'opacity-0 -translate-x-1 max-w-0': isCollapsed,
 										}
@@ -221,7 +221,7 @@ export const AdminSidebar = () => {
 												)}>
 												<Icon
 													size={18}
-													className={clsx('flex-shrink-0', {
+													className={clsx('shrink-0', {
 														'text-blue-600': isActive,
 														'text-gray-600 group-hover:text-gray-900':
 															!isActive,
@@ -264,7 +264,7 @@ export const AdminSidebar = () => {
 							)}>
 							<Icon
 								size={22}
-								className={clsx('flex-shrink-0', {
+								className={clsx('shrink-0', {
 									'text-blue-600': isActive,
 									'text-gray-600 group-hover:text-gray-900': !isActive,
 								})}
@@ -278,7 +278,7 @@ export const AdminSidebar = () => {
 									},
 									isCollapsed
 										? 'opacity-0 -translate-x-1 max-w-0'
-										: 'opacity-100 translate-x-0 max-w-[160px]'
+										: 'opacity-100 translate-x-0 max-w-40'
 								)}>
 								{item.label}
 							</span>

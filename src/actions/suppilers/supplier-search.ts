@@ -4,24 +4,33 @@ import { Response, Supplier, SupplierInclude } from '@/interfaces';
 import { prisma } from '@/lib';
 
 export const getSupplierSearch = async (term?: string): Promise<Response<Supplier[]>> => {
-	if (!term) {
-		return {
-			success: true,
-			data: [],
-			message: 'No term provided',
-		};
-	}
-
-	const isNumeric = !isNaN(Number(term));
-
 	const include: SupplierInclude = {
 		persons: {
 			include: {
 				phones: true,
-				parties: true,
 			},
 		},
 	};
+
+	if (!term) {
+		// Si no hay término, retornar todos los proveedores activos
+		const data = await prisma.suppliers.findMany({
+			where: {
+				state: 'A',
+			},
+			include,
+			orderBy: {
+				company_name: 'asc',
+			},
+		});
+		return {
+			success: true,
+			data,
+			message: 'All suppliers fetched successfully',
+		};
+	}
+
+	const isNumeric = !isNaN(Number(term));
 
 	const data = await prisma.suppliers.findMany({
 		where: isNumeric

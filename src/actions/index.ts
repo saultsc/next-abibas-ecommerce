@@ -49,7 +49,7 @@ export * from './vehicle-document-types/get-vehicle-document-types-by-term';
 export * from './vehicle-document-types/vehicle-document-types-pagination';
 
 // * Vehicles
-export * from './vehicles/vehicle-pagination';
+export * from './vehicles';
 
 // * Users
 export * from './users/create-update-user';
@@ -85,3 +85,21 @@ export * from './suppilers/create-update-supplier';
 export * from './suppilers/get-supplier-by-term';
 export * from './suppilers/supplier-pagination';
 export * from './suppilers/supplier-search';
+
+// * Maintenance
+export * from './maintenance/completed-maintenance-search';
+export * from './maintenance/create-update-maintenance';
+export * from './maintenance/create-update-maintenance-part';
+export * from './maintenance/delete-maintenance';
+export * from './maintenance/delete-maintenance-part';
+export * from './maintenance/get-maintenance-by-id';
+export * from './maintenance/get-maintenance-parts';
+export * from './maintenance/maintenance-type-search';
+
+// * Orders
+export * from './orders/create-order';
+export * from './orders/get-my-orders';
+export * from './orders/get-order-by-id';
+
+// * Address
+export * from './address/get-my-addresses';
